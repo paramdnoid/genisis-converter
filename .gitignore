@@ -1,0 +1,71 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# Logs
+*.log
+logs/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+*.lockfile
+
+# Generated mobile-local files
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/coverage/
+mobile/.idea/
+mobile/*.iml
+
+# Android generated/local files
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/local.properties
+mobile/android/*.iml
+mobile/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+
+# iOS generated/local files
+mobile/ios/.symlinks/
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/flutter_export_environment.sh
+mobile/ios/Flutter/ephemeral/
+mobile/ios/Flutter/Flutter.podspec
+mobile/ios/Pods/
+mobile/ios/Runner/GeneratedPluginRegistrant.*
+
+# Accidental non-target Flutter platforms
+mobile/linux/
+mobile/macos/
+mobile/web/
+mobile/windows/
+
+# Node/backend
+node_modules/
+dist/
+.next/
+backend/node_modules/
+backend/dist/
+
+# Local reports and exports
+exports/
+tmp/
