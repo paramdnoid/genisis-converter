@@ -2239,14 +2239,21 @@ Codex soll mindestens Indizes anlegen auf:
 
 Jeder Codex-Task ist erst fertig, wenn:
 
-- [ ] Code kompiliert
-- [ ] `dart format` ausgeführt wurde
-- [ ] `flutter analyze` ohne relevante Fehler läuft
-- [ ] Tests ergänzt oder begründet nicht nötig sind
-- [ ] Offline-Verhalten nicht gebrochen wurde
-- [ ] Keine Secrets hinzugefügt wurden
-- [ ] README oder docs aktualisiert wurden, falls Setup betroffen ist
-- [ ] Akzeptanzkriterien des Tasks erfüllt sind
+- [x] Code kompiliert
+- [x] `dart format` ausgeführt wurde
+- [x] `flutter analyze` ohne relevante Fehler läuft
+- [x] Tests ergänzt oder begründet nicht nötig sind
+- [x] Offline-Verhalten nicht gebrochen wurde
+- [x] Keine Secrets hinzugefügt wurden
+- [x] README oder docs aktualisiert wurden, falls Setup betroffen ist
+- [x] Akzeptanzkriterien des Tasks erfüllt sind
+
+**Status 2026-06-08**
+
+- Gilt für die bisher abgeschlossenen Tasks Block A und Prompt 2.
+- Validierung wurde lokal abgeschlossen: `scripts/generate.sh`, `dart format --set-exit-if-changed .`, `flutter analyze`, `flutter test`, `flutter build apk --debug`, `flutter build ios --simulator --debug`.
+- Änderungen wurden committed: `ae3db8d Initial Flutter app scaffold`.
+- Remote-CI-Lauf ist noch nicht bestätigt; deshalb bleibt `CI läuft` in Milestone 1 offen.
 
 ---
 
@@ -2267,6 +2274,7 @@ Du bist Codex im Repository kaminfeger-app. Lies app.md vollständig. Beginne mi
 - Basisordner für `core`, `data`, `domain`, `features`, `l10n`, `assets`, `backend`, `docs` und `scripts` wurden angelegt.
 - README, `.gitignore`, `.env.example`, Docs, Scripts und `.github/workflows/mobile-ci.yml` wurden erstellt.
 - Flutter Dependencies aus Abschnitt 6 wurden eingetragen und Build Runner wurde lauffähig konfiguriert.
+- Änderungen wurden committed: `ae3db8d Initial Flutter app scaffold`.
 - Validiert mit:
   - `flutter pub get`
   - `scripts/generate.sh`
