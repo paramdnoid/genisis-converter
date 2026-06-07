@@ -371,6 +371,7 @@ dev_dependencies:
 
 - Runtime Dependencies aus Abschnitt 6.1 sind in `mobile/pubspec.yaml` eingetragen.
 - Dev Dependencies aus Abschnitt 6.2 sind in `mobile/pubspec.yaml` eingetragen.
+- `url_launcher` wurde zusätzlich für Navigation-/Telefon-Aktionen im Auftragsdetail ergänzt.
 - `integration_test` ist als Flutter-SDK-Dependency eingerichtet.
 - `scripts/generate.sh` nutzt die aktuelle Build-Runner-CLI: `dart run build_runner build`.
 - Hinweis: `build_runner` 2.15 ignoriert `--delete-conflicting-outputs`; der alte Prompt-Befehl wurde geprüft, der lokale Script-Befehl wurde auf die aktuelle CLI angepasst.
@@ -727,39 +728,39 @@ Metadaten. Datei selbst liegt lokal und später im Object Storage.
 
 ### 10.1 Codex-Aufgaben
 
-- [ ] `mobile/lib/data/db/app_database.dart` erstellen
-- [ ] Drift Tabellen für alle Kernentitäten erstellen
-- [ ] Gemeinsame Spalten über Mixins oder Hilfsmethoden abbilden
-- [ ] Datenbank-Dateipfad über `path_provider` setzen
-- [ ] Migration Strategy definieren
-- [ ] `schemaVersion` starten bei 1
-- [ ] DAO-Klassen je Modul erstellen
-- [ ] Unit Tests für DB initialisieren
-- [ ] Seed-Daten für Entwicklung erstellen
+- [x] `mobile/lib/data/db/app_database.dart` erstellen
+- [x] Drift Tabellen für alle Kernentitäten erstellen
+- [x] Gemeinsame Spalten über Mixins oder Hilfsmethoden abbilden
+- [x] Datenbank-Dateipfad über `path_provider` setzen
+- [x] Migration Strategy definieren
+- [x] `schemaVersion` starten bei 1
+- [x] DAO-Klassen je Modul erstellen
+- [x] Unit Tests für DB initialisieren
+- [x] Seed-Daten für Entwicklung erstellen
 
 ### 10.2 Mindest-DAOs
 
-- [ ] `UserDao`
-- [ ] `CustomerDao`
-- [ ] `ObjectDao`
-- [ ] `InstallationDao`
-- [ ] `WorkOrderDao`
-- [ ] `ChecklistDao`
-- [ ] `MeasurementDao`
-- [ ] `DefectDao`
-- [ ] `PhotoDao`
-- [ ] `ReportDao`
-- [ ] `OutboxDao`
-- [ ] `SyncStateDao`
+- [x] `UserDao`
+- [x] `CustomerDao`
+- [x] `ObjectDao`
+- [x] `InstallationDao`
+- [x] `WorkOrderDao`
+- [x] `ChecklistDao`
+- [x] `MeasurementDao`
+- [x] `DefectDao`
+- [x] `PhotoDao`
+- [x] `ReportDao`
+- [x] `OutboxDao`
+- [x] `SyncStateDao`
 
 ### 10.3 Datenbankregeln
 
-- [ ] Soft Delete verwenden: `deleted_at` statt physischem Löschen
-- [ ] Queries filtern standardmässig `deleted_at IS NULL`
-- [ ] Jede lokale Änderung setzt `sync_status = pending`
-- [ ] Jede lokale Änderung erhöht `version`
-- [ ] Jede lokale Änderung erzeugt Outbox-Eintrag
-- [ ] Bulk-Operationen in Transaktionen ausführen
+- [x] Soft Delete verwenden: `deleted_at` statt physischem Löschen
+- [x] Queries filtern standardmässig `deleted_at IS NULL`
+- [x] Jede lokale Änderung setzt `sync_status = pending`
+- [x] Jede lokale Änderung erhöht `version`
+- [x] Jede lokale Änderung erzeugt Outbox-Eintrag
+- [x] Bulk-Operationen in Transaktionen ausführen
 
 ---
 
@@ -917,9 +918,9 @@ GET    /reports/:id
 
 ### 12.4 Outbox-Regeln
 
-- [ ] Jeder lokale Create erzeugt `operation=create`
-- [ ] Jedes lokale Update erzeugt `operation=update`
-- [ ] Jedes lokale Delete erzeugt `operation=delete` und setzt `deleted_at`
+- [x] Jeder lokale Create erzeugt `operation=create`
+- [x] Jedes lokale Update erzeugt `operation=update`
+- [x] Jedes lokale Delete erzeugt `operation=delete` und setzt `deleted_at`
 - [ ] Foto-Uploads erzeugen `operation=upload_file`
 - [ ] Mehrere Updates derselben Entität dürfen zusammengeführt werden, aber nur wenn sicher
 - [ ] Nach erfolgreichem Push wird `sync_status=synced` gesetzt
@@ -936,8 +937,8 @@ GET    /reports/:id
 - [ ] `PushSyncService` erstellen
 - [ ] `FileUploadSyncService` erstellen
 - [ ] `ConflictResolver` erstellen
-- [ ] Sync Status Provider erstellen
-- [ ] UI für Sync-Status bauen
+- [x] Sync Status Provider erstellen
+- [x] UI für Sync-Status bauen
 - [ ] Manuelles „Jetzt synchronisieren“ bauen
 - [ ] Auto-Sync beim App-Start bauen
 - [ ] Auto-Sync bei Netzwerk-Wiederkehr bauen
@@ -1010,11 +1011,11 @@ GET    /reports/:id
 - [x] Spacing-Konstanten definieren
 - [x] Standard Buttons erstellen
 - [x] Standard Cards erstellen
-- [ ] Status Badges erstellen
+- [x] Status Badges erstellen
 - [x] Offline Banner erstellen
-- [ ] Empty States erstellen
-- [ ] Error States erstellen
-- [ ] Loading Skeletons erstellen
+- [x] Empty States erstellen
+- [x] Error States erstellen
+- [x] Loading Skeletons erstellen
 
 ---
 
@@ -1098,11 +1099,11 @@ Nach erstem Login lädt die App die benötigten Daten für den Techniker:
 ### 17.2 Codex-Aufgaben
 
 - [x] Dashboard Screen erstellen (Platzhalter)
-- [ ] Heute-Query bauen
-- [ ] Nächster-Auftrag-Card bauen
-- [ ] Sync Status Widget einbauen
+- [x] Heute-Query bauen
+- [x] Nächster-Auftrag-Card bauen
+- [x] Sync Status Widget einbauen
 - [x] Offline Banner einbauen
-- [ ] Schnellaktionen einbauen
+- [x] Schnellaktionen einbauen
 - [x] Empty State für keine Aufträge bauen (Platzhalter im Dummy Dashboard)
 - [x] Widget Tests schreiben (Splash -> Login -> Dashboard)
 
@@ -1132,17 +1133,17 @@ completed -> synced
 
 ### 18.3 Codex-Aufgaben
 
-- [ ] WorkOrder Entity erstellen
-- [ ] WorkOrder DAO erstellen
-- [ ] WorkOrder Repository erstellen
-- [ ] WorkOrder List Provider erstellen
-- [ ] WorkOrder List Screen erstellen
-- [ ] Suchfeld bauen
-- [ ] Filter-Chips bauen
+- [x] WorkOrder Entity erstellen
+- [x] WorkOrder DAO erstellen
+- [x] WorkOrder Repository erstellen
+- [x] WorkOrder List Provider erstellen
+- [x] WorkOrder List Screen erstellen
+- [x] Suchfeld bauen
+- [x] Filter-Chips bauen
 - [ ] Pull-to-refresh mit Sync verbinden
 - [ ] Offline-Filter testen
-- [ ] Unit Tests für Statusmodell schreiben
-- [ ] Widget Tests für Liste schreiben
+- [x] Unit Tests für Statusmodell schreiben
+- [x] Widget Tests für Liste schreiben
 
 ---
 
@@ -1175,16 +1176,16 @@ completed -> synced
 
 ### 19.2 Codex-Aufgaben
 
-- [ ] Detail Query mit Joins bauen
-- [ ] Detail Screen erstellen
-- [ ] Statusaktionen implementieren
-- [ ] Startzeit automatisch setzen
-- [ ] Endzeit automatisch setzen
-- [ ] Zeitbuchung automatisch vorschlagen
-- [ ] Validierung vor Abschluss implementieren
-- [ ] „Navigation öffnen“ über System Maps implementieren
-- [ ] „Anrufen“ über URL Launcher implementieren
-- [ ] Tests für Statuswechsel schreiben
+- [x] Detail Query mit Joins bauen
+- [x] Detail Screen erstellen
+- [x] Statusaktionen implementieren
+- [x] Startzeit automatisch setzen
+- [x] Endzeit automatisch setzen
+- [x] Zeitbuchung automatisch vorschlagen
+- [x] Validierung vor Abschluss implementieren
+- [x] „Navigation öffnen“ über System Maps implementieren
+- [x] „Anrufen“ über URL Launcher implementieren
+- [x] Tests für Statuswechsel schreiben
 
 ---
 
@@ -1257,23 +1258,23 @@ completed -> synced
 
 ### 22.3 Codex-Aufgaben
 
-- [ ] Checklist Template Tabellen erstellen
-- [ ] Checklist Answer Tabellen erstellen
-- [ ] Repository erstellen
-- [ ] Use Case „Create checklist from template“ erstellen
-- [ ] Dynamic Form Renderer erstellen
-- [ ] Answer Widgets erstellen:
-  - [ ] Yes/No
-  - [ ] Text
-  - [ ] Number
-  - [ ] Single Select
-  - [ ] Multi Select
-  - [ ] Photo Required
-- [ ] Autosave implementieren
-- [ ] Validierung implementieren
-- [ ] Fortschrittsanzeige implementieren
-- [ ] Tests für Pflichtfelder schreiben
-- [ ] Tests für Autosave schreiben
+- [x] Checklist Template Tabellen erstellen
+- [x] Checklist Answer Tabellen erstellen
+- [x] Repository erstellen
+- [x] Use Case „Create checklist from template“ erstellen
+- [x] Dynamic Form Renderer erstellen
+- [x] Answer Widgets erstellen:
+  - [x] Yes/No
+  - [x] Text
+  - [x] Number
+  - [x] Single Select
+  - [x] Multi Select
+  - [x] Photo Required
+- [x] Autosave implementieren
+- [x] Validierung implementieren
+- [x] Fortschrittsanzeige implementieren
+- [x] Tests für Pflichtfelder schreiben
+- [x] Tests für Autosave schreiben
 
 ---
 
@@ -1304,14 +1305,14 @@ completed -> synced
 
 ### 23.3 Codex-Aufgaben
 
-- [ ] Measurement Entity/DAO/Repository erstellen
-- [ ] Messliste pro Auftrag bauen
-- [ ] Messwert-Formular bauen
-- [ ] Einheiten-Auswahl bauen
-- [ ] Plausibilitätsregeln konfigurierbar machen
-- [ ] Anlage-Auswahl integrieren
+- [x] Measurement Entity/DAO/Repository erstellen
+- [x] Messliste pro Auftrag bauen
+- [x] Messwert-Formular bauen
+- [x] Einheiten-Auswahl bauen
+- [x] Plausibilitätsregeln konfigurierbar machen
+- [x] Anlage-Auswahl integrieren
 - [ ] Messwerte in PDF-Bericht aufnehmen
-- [ ] Unit Tests für Validierung schreiben
+- [x] Unit Tests für Validierung schreiben
 
 ---
 
@@ -1424,13 +1425,13 @@ critical
 ### 27.2 Codex-Aufgaben
 
 - [ ] TimeEntry Entity/DAO/Repository erstellen
-- [ ] Automatischen Eintrag bei Auftrag starten erstellen
-- [ ] Automatischen Abschluss bei Auftrag abschließen erstellen
+- [x] Automatischen Eintrag bei Auftrag starten erstellen
+- [x] Automatischen Abschluss bei Auftrag abschließen erstellen
 - [ ] Zeitliste bauen
 - [ ] Zeitformular bauen
-- [ ] Dauer automatisch berechnen
+- [x] Dauer automatisch berechnen
 - [ ] Validierung gegen negative Dauer
-- [ ] Tests schreiben
+- [x] Tests schreiben
 
 ---
 
@@ -1538,13 +1539,13 @@ Ein Auftrag darf abgeschlossen werden, wenn:
 
 ### 30.3 Codex-Aufgaben
 
-- [ ] CompletionValidator erstellen
+- [x] CompletionValidator erstellen
 - [ ] Abschluss-Screen erstellen
 - [ ] Fehlende-Punkte-Liste bauen
 - [ ] Berichtsvorschau integrieren
 - [ ] Signatur integrieren
-- [ ] Statuswechsel auf completed implementieren
-- [ ] Completion Tests schreiben
+- [x] Statuswechsel auf completed implementieren
+- [x] Completion Tests schreiben
 
 ---
 
@@ -1612,13 +1613,13 @@ Offline-Suche über:
 
 ### 33.2 Codex-Aufgaben
 
-- [ ] Fehlerklassen erstellen
-- [ ] Result/Either Pattern oder Exceptions sauber definieren
+- [x] Fehlerklassen erstellen
+- [x] Result/Either Pattern oder Exceptions sauber definieren
 - [ ] Global Error Handler erstellen
-- [ ] LoggingService erstellen
-- [ ] User-freundliche Fehlermeldungen erstellen
+- [x] LoggingService erstellen
+- [x] User-freundliche Fehlermeldungen erstellen
 - [ ] Retry-Möglichkeiten bei Sync-Fehlern einbauen
-- [ ] Tests schreiben
+- [x] Tests schreiben
 
 ---
 
@@ -1641,11 +1642,11 @@ Offline-Suche über:
 
 - [ ] Secure Storage implementieren
 - [ ] API Client erzwingt HTTPS ausser in lokaler Entwicklung
-- [ ] Keine Secrets committen
-- [ ] `.env.example` erstellen
+- [x] Keine Secrets committen
+- [x] `.env.example` erstellen
 - [ ] Permission Handling sauber implementieren
-- [ ] Datenschutz-Hinweise in docs/security.md dokumentieren
-- [ ] Optional: DB-Verschlüsselung evaluieren und als späteres Ticket aufnehmen
+- [x] Datenschutz-Hinweise in docs/security.md dokumentieren
+- [x] Optional: DB-Verschlüsselung evaluieren und als späteres Ticket aufnehmen
 
 ---
 
@@ -1705,8 +1706,8 @@ Offline-Suche über:
 - [ ] Login mit Internet funktioniert
 - [ ] Nach Login funktioniert App offline
 - [ ] Auftrag kann offline gestartet werden
-- [ ] Checkliste speichert offline
-- [ ] Messung speichert offline
+- [x] Checkliste speichert offline
+- [x] Messung speichert offline
 - [ ] Foto speichert offline
 - [ ] Mangel speichert offline
 - [ ] Unterschrift speichert offline
@@ -1722,9 +1723,9 @@ Offline-Suche über:
 
 - [ ] Test Utilities erstellen
 - [ ] Fake API Client erstellen
-- [ ] In-Memory Drift DB für Tests einrichten
+- [x] In-Memory Drift DB für Tests einrichten
 - [ ] Mock Repositories erstellen
-- [ ] Kern-Use-Cases testen
+- [x] Kern-Use-Cases testen
 - [ ] CI Pipeline mit Tests vorbereiten
 
 ---
@@ -1899,22 +1900,22 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 
 ### Milestone 2 — Lokale DB
 
-- [ ] Drift eingerichtet
-- [ ] Kernentitäten als Tabellen vorhanden
-- [ ] DAOs vorhanden
-- [ ] Seed-Daten vorhanden
-- [ ] Auftragsliste aus lokaler DB sichtbar
+- [x] Drift eingerichtet
+- [x] Kernentitäten als Tabellen vorhanden
+- [x] DAOs vorhanden
+- [x] Seed-Daten vorhanden
+- [x] Auftragsliste aus lokaler DB sichtbar
 
 ### Milestone 3 — Auftragsflow offline
 
-- [ ] Auftrag starten
-- [ ] Checkliste bearbeiten
-- [ ] Messwerte erfassen
+- [x] Auftrag starten
+- [x] Checkliste bearbeiten
+- [x] Messwerte erfassen
 - [ ] Mängel erfassen
 - [ ] Fotos aufnehmen
 - [ ] Zeit erfassen
 - [ ] Material erfassen
-- [ ] Auftrag abschließen
+- [x] Auftrag abschließen
 
 ### Milestone 4 — Bericht
 
@@ -1935,8 +1936,8 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 
 ### Milestone 6 — Qualität & Beta
 
-- [ ] Tests für Kernflows
-- [ ] Crash-/Fehlerlogging vorbereitet
+- [x] Tests für Kernflows
+- [x] Crash-/Fehlerlogging vorbereitet
 - [ ] App Icons
 - [ ] Staging Environment
 - [ ] Android Internal Test
@@ -1961,27 +1962,27 @@ Codex soll diese Reihenfolge strikt befolgen.
 - [x] Ordnerstruktur erstellen
 - [x] Theme erstellen
 - [x] Router erstellen
-- [ ] Error Handling Grundlage
-- [ ] Logging Grundlage
-- [ ] Environment Config
+- [x] Error Handling Grundlage
+- [x] Logging Grundlage
+- [x] Environment Config
 
 ### Block C — Lokale Datenbank
 
 - [x] Drift installieren
-- [ ] AppDatabase erstellen
-- [ ] Tabellen erstellen
-- [ ] DAOs erstellen
-- [ ] Migrationen vorbereiten
-- [ ] Seed Data erstellen
-- [ ] DB Tests schreiben
+- [x] AppDatabase erstellen
+- [x] Tabellen erstellen
+- [x] DAOs erstellen
+- [x] Migrationen vorbereiten
+- [x] Seed Data erstellen
+- [x] DB Tests schreiben
 
 ### Block D — Repositories & Use Cases
 
-- [ ] Domain Entities definieren
-- [ ] Repository Interfaces definieren
-- [ ] Repository Implementierungen bauen
-- [ ] Use Cases für WorkOrders bauen
-- [ ] Use Cases für Checklisten bauen
+- [x] Domain Entities definieren
+- [x] Repository Interfaces definieren
+- [x] Repository Implementierungen bauen
+- [x] Use Cases für WorkOrders bauen
+- [x] Use Cases für Checklisten bauen
 - [ ] Use Cases für Abschluss bauen
 - [ ] Tests schreiben
 
@@ -1990,16 +1991,16 @@ Codex soll diese Reihenfolge strikt befolgen.
 - [x] Login Screen (Platzhalter)
 - [ ] Initial Sync Screen
 - [x] Dashboard (Platzhalter)
-- [ ] Auftragsliste
-- [ ] Auftragsdetail
+- [x] Auftragsliste
+- [x] Auftragsdetail
 - [ ] Customer/Object Detail
 - [ ] Settings
 
 ### Block F — Auftrag bearbeiten
 
-- [ ] Statuswechsel
-- [ ] Checklisten
-- [ ] Messungen
+- [x] Statuswechsel
+- [x] Checklisten
+- [x] Messungen
 - [ ] Mängel
 - [ ] Fotos
 - [ ] Zeiten
@@ -2021,11 +2022,11 @@ Codex soll diese Reihenfolge strikt befolgen.
 - [ ] Auth Repository
 - [ ] Initial Sync
 - [ ] Pull Sync
-- [ ] Outbox
+- [x] Outbox
 - [ ] Push Sync
 - [ ] File Upload Sync
 - [ ] Conflict Resolver
-- [ ] Sync UI
+- [x] Sync UI
 
 ### Block I — Release-Härtung
 
@@ -2139,8 +2140,8 @@ Die App gilt als fachlich fertig, wenn folgende Punkte erfüllt sind:
 - [ ] Dashboard zeigt heutige Aufträge
 - [ ] Auftrag kann gestartet werden
 - [ ] Kunde, Objekt und Anlagen sind sichtbar
-- [ ] Checklisten können offline ausgefüllt werden
-- [ ] Messwerte können offline erfasst werden
+- [x] Checklisten können offline ausgefüllt werden
+- [x] Messwerte können offline erfasst werden
 - [ ] Mängel können offline erfasst werden
 - [ ] Fotos können offline aufgenommen werden
 - [ ] Zeiten können offline erfasst werden
@@ -2250,9 +2251,10 @@ Jeder Codex-Task ist erst fertig, wenn:
 
 **Status 2026-06-08**
 
-- Gilt für die bisher abgeschlossenen Tasks Block A und Prompt 2.
-- Validierung wurde lokal abgeschlossen: `scripts/generate.sh`, `dart format --set-exit-if-changed .`, `flutter analyze`, `flutter test`, `flutter build apk --debug`, `flutter build ios --simulator --debug`.
-- Änderungen wurden committed: `ae3db8d Initial Flutter app scaffold`.
+- Gilt für die bisher abgeschlossenen Tasks Block A, Prompt 2, Block C, den WorkOrder-Listen/Detail/Status-Slice, das Offline-Checklistenmodul und die Offline-Messwerterfassung.
+- Validierung Block A/Prompt 2 wurde lokal abgeschlossen: `scripts/generate.sh`, `dart format --set-exit-if-changed .`, `flutter analyze`, `flutter test`, `flutter build apk --debug`, `flutter build ios --simulator --debug`.
+- Validierung Block C/WorkOrder/Checklisten/Messwerte-Slice wurde lokal abgeschlossen: `dart run build_runner build`, `dart format .`, `flutter analyze`, `flutter test`.
+- Bisheriger Scaffold-Stand wurde committed: `ae3db8d Initial Flutter app scaffold`; der aktuelle Block-C/WorkOrder/Checklisten/Messwerte-Slice ist lokal validiert und noch nicht committed.
 - Remote-CI-Lauf ist noch nicht bestätigt; deshalb bleibt `CI läuft` in Milestone 1 offen.
 
 ---
@@ -2283,7 +2285,7 @@ Du bist Codex im Repository kaminfeger-app. Lies app.md vollständig. Beginne mi
   - `flutter test`
   - `flutter build apk --debug`
   - `flutter build ios --simulator --debug`
-- Offen: Block C Drift/SQLite-Datenbank mit Schema, DAOs, Migrationen, Seed-Daten und DB-Tests.
+- Offen als nächste sinnvolle Schritte: Initial Sync/Auth, Mängel/Fotos, Zeit-/Material-UI, Report/PDF/Signatur und die vollständige Sync Engine.
 
 ---
 
