@@ -15,6 +15,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/photo_attachment.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/photo_providers.dart';
 
@@ -28,12 +29,12 @@ class PhotoScreen extends ConsumerWidget {
     final photos = ref.watch(photosForWorkOrderProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Fotos')),
+      appBar: AppBar(title: Text(context.l10n.photosTitle)),
       body: SafeArea(
         child: photos.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Fotos konnten nicht geladen werden',
+            title: context.l10n.photosLoadErrorTitle,
             message: error.toString(),
             onRetry: () =>
                 ref.invalidate(photosForWorkOrderProvider(workOrderId)),
@@ -65,10 +66,10 @@ class _PhotoContent extends ConsumerWidget {
         _PhotoActions(workOrderId: workOrderId),
         const SizedBox(height: AppSpacing.lg),
         if (photos.isEmpty)
-          const EmptyState(
+          EmptyState(
             icon: Icons.photo_camera_outlined,
-            title: 'Keine Fotos gespeichert',
-            message: 'Fotos werden lokal im App-Verzeichnis abgelegt.',
+            title: context.l10n.photosEmptyTitle,
+            message: context.l10n.photosEmptyMessage,
           )
         else
           ...photos.map(
@@ -96,7 +97,7 @@ class _PhotoActions extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Foto hinzufügen',
+              context.l10n.photoAddTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -108,7 +109,7 @@ class _PhotoActions extends ConsumerWidget {
                   child: FilledButton.icon(
                     onPressed: () => _pick(context, ref, ImageSource.camera),
                     icon: const Icon(Icons.photo_camera_outlined),
-                    label: const Text('Kamera'),
+                    label: Text(context.l10n.cameraAction),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -116,7 +117,7 @@ class _PhotoActions extends ConsumerWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _pick(context, ref, ImageSource.gallery),
                     icon: const Icon(Icons.photo_library_outlined),
-                    label: const Text('Galerie'),
+                    label: Text(context.l10n.galleryAction),
                   ),
                 ),
               ],
@@ -169,9 +170,9 @@ class _PhotoActions extends ConsumerWidget {
         ),
       );
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto lokal gespeichert.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.photoSavedMessage)));
       }
     } catch (error) {
       if (context.mounted) {
@@ -232,12 +233,14 @@ class _PhotoCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    Text('${(photo.sizeBytes / 1024).toStringAsFixed(0)} KB'),
+                    Text(
+                      '${context.formatDecimal(photo.sizeBytes / 1024, decimalDigits: 0)} KB',
+                    ),
                     const SizedBox(height: AppSpacing.sm),
                     StatusBadge(
                       label: photo.isPendingUpload
-                          ? 'Upload offen'
-                          : 'Uploaded',
+                          ? context.l10n.uploadPendingStatus
+                          : context.l10n.uploadedStatus,
                       icon: photo.isPendingUpload
                           ? Icons.cloud_upload_outlined
                           : Icons.cloud_done_outlined,

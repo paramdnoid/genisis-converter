@@ -11,6 +11,7 @@ import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/db/database_providers.dart';
 import '../../../domain/entities/report.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/pdf_report_generator.dart';
 import '../application/report_data_aggregator.dart';
@@ -41,12 +42,12 @@ class ReportScreen extends ConsumerWidget {
     final preview = ref.watch(reportPreviewBytesProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Rapport')),
+      appBar: AppBar(title: Text(context.l10n.reportTitle)),
       body: SafeArea(
         child: reports.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Rapporte konnten nicht geladen werden',
+            title: context.l10n.reportsLoadErrorTitle,
             message: error.toString(),
             onRetry: () =>
                 ref.invalidate(reportsForWorkOrderProvider(workOrderId)),
@@ -64,17 +65,17 @@ class ReportScreen extends ConsumerWidget {
               _PreviewCard(preview: preview),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'Lokale Rapportdateien',
+                context.l10n.localReportFilesTitle,
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: AppSpacing.md),
               if (reports.isEmpty)
-                const EmptyState(
+                EmptyState(
                   icon: Icons.picture_as_pdf_outlined,
-                  title: 'Noch kein PDF erzeugt',
-                  message: 'Der Rapport kann offline generiert werden.',
+                  title: context.l10n.reportNoPdfTitle,
+                  message: context.l10n.reportNoPdfMessage,
                 )
               else
                 ...reports.map(
@@ -105,20 +106,18 @@ class _ReportActions extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'PDF-Bericht',
+              context.l10n.pdfReportTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.sm),
-            const Text(
-              'Rapportdaten werden aus der lokalen Datenbank geladen.',
-            ),
+            Text(context.l10n.pdfReportSourceMessage),
             const SizedBox(height: AppSpacing.lg),
             FilledButton.icon(
               onPressed: () => _generate(context, ref),
               icon: const Icon(Icons.picture_as_pdf_outlined),
-              label: const Text('PDF lokal speichern'),
+              label: Text(context.l10n.reportSavePdfAction),
             ),
           ],
         ),
@@ -150,9 +149,9 @@ class _ReportActions extends ConsumerWidget {
     );
     ref.invalidate(reportPreviewBytesProvider(workOrderId));
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('PDF lokal gespeichert.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.reportPdfSavedMessage)),
+      );
     }
   }
 }
@@ -172,15 +171,15 @@ class _PreviewCard extends StatelessWidget {
           child: preview.when(
             loading: () => const LoadingSkeleton(itemCount: 3),
             error: (error, stackTrace) => ErrorState(
-              title: 'Vorschau konnte nicht erstellt werden',
+              title: context.l10n.reportPreviewErrorTitle,
               message: error.toString(),
             ),
             data: (bytes) {
               if (bytes == null) {
-                return const EmptyState(
+                return EmptyState(
                   icon: Icons.picture_as_pdf_outlined,
-                  title: 'Keine Vorschau',
-                  message: 'Der Auftrag ist lokal nicht vorhanden.',
+                  title: context.l10n.reportNoPreviewTitle,
+                  message: context.l10n.reportNoPreviewMessage,
                 );
               }
               return PdfPreview(

@@ -1,4 +1,4 @@
-package ch.example.kaminfeger.kaminfeger_mobile
+package ch.kaminfeger.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

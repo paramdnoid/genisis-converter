@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
+import '../../../l10n/app_localizations_x.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -45,7 +46,7 @@ class SplashScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Einsätze, Rapporte und lokale Arbeitsdaten für den Feldalltag.',
+                context.l10n.splashTagline,
                 style: textTheme.bodyLarge?.copyWith(height: 1.45),
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -54,7 +55,7 @@ class SplashScreen extends StatelessWidget {
               FilledButton.icon(
                 onPressed: () => context.go(AppRoutes.login),
                 icon: const Icon(Icons.login),
-                label: const Text('Zur Anmeldung'),
+                label: Text(context.l10n.goToLoginAction),
               ),
             ],
           ),

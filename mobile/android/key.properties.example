@@ -1,0 +1,6 @@
+# Copy this file to key.properties and fill in real local or CI secret values.
+# The real key.properties file is ignored by git.
+storePassword=change-me
+keyPassword=change-me
+keyAlias=upload
+storeFile=/absolute/path/to/upload-keystore.jks

@@ -8,6 +8,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/material_usage.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../application/material_providers.dart';
 
 class MaterialScreen extends ConsumerWidget {
@@ -21,12 +22,12 @@ class MaterialScreen extends ConsumerWidget {
     final catalog = ref.watch(materialCatalogProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Material')),
+      appBar: AppBar(title: Text(context.l10n.materialTitle)),
       body: SafeArea(
         child: usages.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Material konnte nicht geladen werden',
+            title: context.l10n.materialLoadErrorTitle,
             message: error.toString(),
             onRetry: () =>
                 ref.invalidate(materialsForWorkOrderProvider(workOrderId)),
@@ -34,7 +35,7 @@ class MaterialScreen extends ConsumerWidget {
           data: (usages) => catalog.when(
             loading: () => const LoadingSkeleton(itemCount: 4),
             error: (error, stackTrace) => ErrorState(
-              title: 'Materialstamm konnte nicht geladen werden',
+              title: context.l10n.materialCatalogLoadErrorTitle,
               message: error.toString(),
               onRetry: () => ref.invalidate(materialCatalogProvider),
             ),
@@ -49,10 +50,10 @@ class MaterialScreen extends ConsumerWidget {
                 _MaterialForm(workOrderId: workOrderId, catalog: catalog),
                 const SizedBox(height: AppSpacing.lg),
                 if (usages.isEmpty)
-                  const EmptyState(
+                  EmptyState(
                     icon: Icons.inventory_2_outlined,
-                    title: 'Kein Material erfasst',
-                    message: 'Verbrauch wird lokal am Auftrag gespeichert.',
+                    title: context.l10n.materialEmptyTitle,
+                    message: context.l10n.materialEmptyMessage,
                   )
                 else
                   ...usages.map(
@@ -105,7 +106,7 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Material erfassen',
+              context.l10n.materialAddTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -114,9 +115,9 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
             DropdownButtonFormField<String?>(
               initialValue: _materialId,
               items: [
-                const DropdownMenuItem<String?>(
+                DropdownMenuItem<String?>(
                   value: null,
-                  child: Text('Freitext'),
+                  child: Text(context.l10n.freeTextOption),
                 ),
                 ...widget.catalog.map(
                   (item) => DropdownMenuItem<String?>(
@@ -141,17 +142,17 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
                   }
                 });
               },
-              decoration: const InputDecoration(
-                labelText: 'Materialstamm',
-                prefixIcon: Icon(Icons.inventory_2_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.materialCatalogFieldLabel,
+                prefixIcon: const Icon(Icons.inventory_2_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Bezeichnung',
-                prefixIcon: Icon(Icons.edit_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.nameFieldLabel,
+                prefixIcon: const Icon(Icons.edit_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -166,14 +167,18 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                     ],
-                    decoration: const InputDecoration(labelText: 'Menge'),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.quantityFieldLabel,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: TextField(
                     controller: _unitController,
-                    decoration: const InputDecoration(labelText: 'Einheit'),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.unitFieldLabel,
+                    ),
                   ),
                 ),
               ],
@@ -183,16 +188,16 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
               controller: _notesController,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Notizen',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.notesFieldLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Material speichern'),
+              label: Text(context.l10n.saveMaterialAction),
             ),
           ],
         ),
@@ -259,7 +264,9 @@ class _MaterialCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('${usage.quantity} ${usage.unit}'),
+                  Text(
+                    '${context.formatDecimal(usage.quantity, decimalDigits: 2)} ${usage.unit}',
+                  ),
                   if (usage.notes != null) Text(usage.notes!),
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,36 @@ import 'package:kaminfeger_mobile/data/db/app_database.dart';
 import 'package:kaminfeger_mobile/data/db/database_providers.dart';
 
 void main() {
+  late ConnectivityPlatform originalConnectivityPlatform;
+
+  setUp(() {
+    originalConnectivityPlatform = ConnectivityPlatform.instance;
+  });
+
+  tearDown(() {
+    ConnectivityPlatform.instance = originalConnectivityPlatform;
+  });
+
+  testWidgets('starts and reaches dashboard without internet', (tester) async {
+    ConnectivityPlatform.instance = _OfflineConnectivityPlatform();
+    final database = await _pumpApp(tester);
+
+    expect(find.text('Kaminfeger Techniker'), findsOneWidget);
+    expect(find.text('Zur Anmeldung'), findsOneWidget);
+
+    await tester.tap(find.text('Zur Anmeldung'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Demo-Sitzung öffnen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Minimaldaten laden'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Heute'), findsOneWidget);
+    expect(find.text('Jahreskontrolle Cheminée'), findsOneWidget);
+
+    await _disposeApp(tester, database);
+  });
+
   testWidgets('opens splash screen and navigates to dashboard', (tester) async {
     final database = await _pumpApp(tester);
 
@@ -101,7 +132,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Messwert lokal gespeichert.'), findsOneWidget);
-    expect(find.text('18.0 ppm'), findsOneWidget);
+    expect(find.text('18,0 ppm'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
@@ -124,6 +155,18 @@ void main() {
 
     await _disposeApp(tester, database);
   });
+}
+
+final class _OfflineConnectivityPlatform extends ConnectivityPlatform {
+  @override
+  Future<List<ConnectivityResult>> checkConnectivity() async {
+    return [ConnectivityResult.none];
+  }
+
+  @override
+  Stream<List<ConnectivityResult>> get onConnectivityChanged {
+    return Stream.value([ConnectivityResult.none]);
+  }
 }
 
 Future<AppDatabase> _pumpApp(WidgetTester tester) async {

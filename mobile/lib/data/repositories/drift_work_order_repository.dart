@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import '../../domain/entities/customer.dart';
-import '../../domain/entities/customer_object.dart';
 import '../../domain/entities/installation.dart';
 import '../../domain/entities/work_order.dart';
 import '../../domain/entities/work_order_detail.dart';
-import '../../domain/enums/work_order_status.dart';
 import '../../domain/repositories/work_order_repository.dart';
 import '../db/app_database.dart';
+import 'drift_entity_mappers.dart';
 
 final class DriftWorkOrderRepository implements WorkOrderRepository {
   const DriftWorkOrderRepository({
@@ -48,9 +46,9 @@ final class DriftWorkOrderRepository implements WorkOrderRepository {
 
       controller.add(
         WorkOrderDetail(
-          workOrder: _mapRow(currentHeader.workOrder),
-          customer: _mapCustomerRow(currentHeader.customer),
-          object: _mapObjectRow(currentHeader.object),
+          workOrder: mapWorkOrderRow(currentHeader.workOrder),
+          customer: mapCustomerRow(currentHeader.customer),
+          object: mapCustomerObjectRow(currentHeader.object),
           installations: installations,
         ),
       );
@@ -73,7 +71,7 @@ final class DriftWorkOrderRepository implements WorkOrderRepository {
                 .watchForObject(tenantId, nextHeader.object.id)
                 .listen((rows) {
                   installations = rows
-                      .map(_mapInstallationRow)
+                      .map(mapInstallationRow)
                       .toList(growable: false);
                   emit();
                 }, onError: controller.addError);
@@ -110,91 +108,5 @@ final class DriftWorkOrderRepository implements WorkOrderRepository {
 }
 
 List<WorkOrder> _mapRows(List<WorkOrderRow> rows) {
-  return rows.map(_mapRow).toList(growable: false);
-}
-
-WorkOrder _mapRow(WorkOrderRow row) {
-  return WorkOrder(
-    id: row.id,
-    tenantId: row.tenantId,
-    orderNumber: row.orderNumber,
-    title: row.title,
-    type: row.type,
-    status: WorkOrderStatus.parse(row.status),
-    priority: WorkOrderPriority.parse(row.priority),
-    version: row.version,
-    syncStatus: row.syncStatus,
-    description: row.description,
-    customerId: row.customerId,
-    objectId: row.objectId,
-    assignedUserId: row.assignedUserId,
-    scheduledStart: _parseDate(row.scheduledStart),
-    scheduledEnd: _parseDate(row.scheduledEnd),
-    actualStart: _parseDate(row.actualStart),
-    actualEnd: _parseDate(row.actualEnd),
-    completionNotes: row.completionNotes,
-  );
-}
-
-DateTime? _parseDate(String? value) {
-  if (value == null) {
-    return null;
-  }
-
-  return DateTime.tryParse(value);
-}
-
-Customer _mapCustomerRow(CustomerRow row) {
-  return Customer(
-    id: row.id,
-    tenantId: row.tenantId,
-    type: row.type,
-    displayName: row.displayName,
-    firstName: row.firstName,
-    lastName: row.lastName,
-    companyName: row.companyName,
-    email: row.email,
-    phone: row.phone,
-    mobile: row.mobile,
-    billingAddress: row.billingAddress,
-    notes: row.notes,
-  );
-}
-
-CustomerObject _mapObjectRow(CustomerObjectRow row) {
-  return CustomerObject(
-    id: row.id,
-    tenantId: row.tenantId,
-    customerId: row.customerId,
-    name: row.name,
-    street: row.street,
-    houseNumber: row.houseNumber,
-    postalCode: row.postalCode,
-    city: row.city,
-    country: row.country,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    accessNotes: row.accessNotes,
-    safetyNotes: row.safetyNotes,
-    objectNotes: row.objectNotes,
-  );
-}
-
-Installation _mapInstallationRow(InstallationRow row) {
-  return Installation(
-    id: row.id,
-    tenantId: row.tenantId,
-    objectId: row.objectId,
-    type: row.type,
-    manufacturer: row.manufacturer,
-    model: row.model,
-    serialNumber: row.serialNumber,
-    fuelType: row.fuelType,
-    installationYear: row.installationYear,
-    locationDescription: row.locationDescription,
-    intervalMonths: row.intervalMonths,
-    lastServiceDate: _parseDate(row.lastServiceDate),
-    nextServiceDate: _parseDate(row.nextServiceDate),
-    notes: row.notes,
-  );
+  return rows.map(mapWorkOrderRow).toList(growable: false);
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/errors/app_error.dart';
@@ -11,6 +10,7 @@ import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/installation.dart';
 import '../../../domain/entities/measurement.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/measurement_providers.dart';
 
@@ -24,21 +24,21 @@ class MeasurementScreen extends ConsumerWidget {
     final detail = ref.watch(workOrderDetailProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Messungen')),
+      appBar: AppBar(title: Text(context.l10n.measurementsTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Auftrag konnte nicht geladen werden',
+            title: context.l10n.workOrderLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(workOrderDetailProvider(workOrderId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.monitor_heart_outlined,
-                title: 'Keine Messungen möglich',
-                message: 'Der Auftrag ist lokal nicht vorhanden.',
+                title: context.l10n.measurementsUnavailableTitle,
+                message: context.l10n.reportNoPreviewMessage,
               );
             }
 
@@ -71,7 +71,7 @@ class _MeasurementContent extends ConsumerWidget {
     return measurements.when(
       loading: () => const LoadingSkeleton(itemCount: 4),
       error: (error, stackTrace) => ErrorState(
-        title: 'Messungen konnten nicht geladen werden',
+        title: context.l10n.measurementsLoadErrorTitle,
         message: error.toString(),
         onRetry: () =>
             ref.invalidate(measurementsForWorkOrderProvider(workOrderId)),
@@ -90,17 +90,17 @@ class _MeasurementContent extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Erfasste Messungen',
+            context.l10n.recordedMeasurementsTitle,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: AppSpacing.md),
           if (measurements.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: Icons.speed_outlined,
-              title: 'Keine Messwerte erfasst',
-              message: 'Neue Messwerte werden lokal gespeichert.',
+              title: context.l10n.measurementsEmptyTitle,
+              message: context.l10n.measurementsEmptyMessage,
             )
           else
             ...measurements.map(
@@ -177,18 +177,18 @@ class _MeasurementFormState extends ConsumerState<_MeasurementForm> {
                   _unit = MeasurementRules.forType(type).defaultUnit;
                 });
               },
-              decoration: const InputDecoration(
-                labelText: 'Messart',
-                prefixIcon: Icon(Icons.monitor_heart_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.measurementTypeLabel,
+                prefixIcon: const Icon(Icons.monitor_heart_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             DropdownButtonFormField<String?>(
               initialValue: _installationId,
               items: [
-                const DropdownMenuItem<String?>(
+                DropdownMenuItem<String?>(
                   value: null,
-                  child: Text('Keine Anlage'),
+                  child: Text(context.l10n.noInstallationOption),
                 ),
                 ...widget.installations.map(
                   (installation) => DropdownMenuItem<String?>(
@@ -200,9 +200,9 @@ class _MeasurementFormState extends ConsumerState<_MeasurementForm> {
               onChanged: (installationId) {
                 setState(() => _installationId = installationId);
               },
-              decoration: const InputDecoration(
-                labelText: 'Anlage',
-                prefixIcon: Icon(Icons.fireplace_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.installationFieldLabel,
+                prefixIcon: const Icon(Icons.fireplace_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -218,9 +218,9 @@ class _MeasurementFormState extends ConsumerState<_MeasurementForm> {
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9.,-]')),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Wert',
-                      prefixIcon: Icon(Icons.pin_outlined),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.valueFieldLabel,
+                      prefixIcon: const Icon(Icons.pin_outlined),
                     ),
                   ),
                 ),
@@ -243,7 +243,9 @@ class _MeasurementFormState extends ConsumerState<_MeasurementForm> {
                         setState(() => _unit = unit);
                       }
                     },
-                    decoration: const InputDecoration(labelText: 'Einheit'),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.unitFieldLabel,
+                    ),
                   ),
                 ),
               ],
@@ -253,16 +255,16 @@ class _MeasurementFormState extends ConsumerState<_MeasurementForm> {
               controller: _notesController,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Notizen',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.notesFieldLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Messwert speichern'),
+              label: Text(context.l10n.saveMeasurementAction),
             ),
           ],
         ),
@@ -340,21 +342,19 @@ class _MeasurementCard extends StatelessWidget {
                   ),
                 ),
                 if (measurement.isDirty)
-                  const StatusBadge(
-                    label: 'Lokal',
+                  StatusBadge(
+                    label: context.l10n.locallyChangedStatus,
                     icon: Icons.cloud_upload_outlined,
                     tone: StatusBadgeTone.warning,
                   ),
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text('${measurement.value} ${measurement.unit}'),
-            const SizedBox(height: AppSpacing.xs),
             Text(
-              DateFormat(
-                'dd.MM.yyyy HH:mm',
-              ).format(measurement.measuredAt.toLocal()),
+              '${context.formatDecimal(measurement.value)} ${measurement.unit}',
             ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(context.formatShortDateTime(measurement.measuredAt)),
             if (measurement.notes != null) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(measurement.notes!),

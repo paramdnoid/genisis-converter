@@ -39,7 +39,9 @@ Build smoke artifacts with runtime flavors:
 
 ```bash
 scripts/build_android.sh staging
+scripts/build_android_bundle.sh prod
 scripts/build_ios_simulator.sh dev
+scripts/build_ios_archive.sh prod
 ```
 
 Run the app:

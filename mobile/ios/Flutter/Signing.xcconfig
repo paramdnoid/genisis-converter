@@ -1,0 +1,5 @@
+// Shared iOS signing settings. Keep real team values in Signing.local.xcconfig.
+#include? "Signing.local.xcconfig"
+
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM = $(IOS_DEVELOPMENT_TEAM)

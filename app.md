@@ -1050,8 +1050,15 @@ GET    /reports/:id
 - [x] Auth Guard in GoRouter einbauen
 - [x] Offline Login mit vorhandener Session erlauben
 - [x] Tests für Login Success schreiben
-- [ ] Tests für Login Error schreiben
-- [ ] Tests für abgelaufene Session schreiben
+- [x] Tests für Login Error schreiben
+- [x] Tests für abgelaufene Session schreiben
+
+**Status 2026-06-08**
+
+- `AuthApi` mappt HTTP-Fehler bei Login und Token Refresh auf `AuthError`.
+- Repository-Tests prüfen, dass fehlgeschlagene Logins keine Secure-Storage-Sitzung schreiben.
+- Repository-Tests prüfen, dass abgelaufene Refresh-Sessions als Auth-Fehler sichtbar werden und vorhandene lokale Sitzungsdaten nicht zerstören.
+- Validiert mit `flutter test test/data/repositories/secure_auth_repository_test.dart`.
 
 ---
 
@@ -1080,7 +1087,14 @@ Nach erstem Login lädt die App die benötigten Daten für den Techniker:
 - [x] Abbruch verhindern, solange keine Minimaldaten vorhanden sind
 - [x] Nach erfolgreichem Initial Sync zum Dashboard navigieren
 - [x] Tests für erfolgreichen Initial Sync schreiben
-- [ ] Tests für Fehlerfälle schreiben
+- [x] Tests für Fehlerfälle schreiben
+
+**Status 2026-06-08**
+
+- Initial-Sync-Fehlerfall ist per Widget-Test abgedeckt: Fehlertext, Retry-Button und kein Dashboard-Wechsel.
+- Retry invalidiert `databaseReadyProvider`, damit ein fehlgeschlagener Initial Sync wirklich erneut ausgeführt wird.
+- Retry-nach-Fehler-und-danach-Erfolg ist per Widget-Test abgedeckt.
+- Validiert mit `flutter test test/features/sync_status/initial_sync_screen_test.dart`.
 
 ---
 
@@ -1141,9 +1155,16 @@ completed -> synced
 - [x] Suchfeld bauen
 - [x] Filter-Chips bauen
 - [x] Pull-to-refresh mit Sync verbinden
-- [ ] Offline-Filter testen
+- [x] Offline-Filter testen
 - [x] Unit Tests für Statusmodell schreiben
 - [x] Widget Tests für Liste schreiben
+
+**Status 2026-06-08**
+
+- Offline-Filter sind per dediziertem Widget-Test mit In-Memory-Drift-Datenbank abgedeckt.
+- Statusfilter `In Arbeit` und `Geplant` werden gegen lokale Daten geprüft.
+- Kombinierte Suche + Statusfilter inklusive Empty State und Filter-Reset ist abgedeckt.
+- Validiert mit `flutter test test/features/work_orders/work_order_list_screen_test.dart`.
 
 ---
 
@@ -1202,8 +1223,8 @@ completed -> synced
 
 ### 20.2 Codex-Aufgaben
 
-- [ ] Customer Entity/DAO/Repository erstellen
-- [ ] Object Entity/DAO/Repository erstellen
+- [x] Customer Entity/DAO/Repository erstellen
+- [x] Object Entity/DAO/Repository erstellen
 - [x] Customer Detail Screen bauen
 - [x] Object Detail Screen bauen
 - [x] Historienliste bauen
@@ -1211,6 +1232,14 @@ completed -> synced
 - [x] Editierbare Notizen bauen
 - [x] Änderungen in Outbox schreiben
 - [x] Tests schreiben
+
+**Status 2026-06-08**
+
+- Customer/Object-Repository-Interfaces und Drift-Implementierungen wurden ergänzt.
+- Customer- und Object-Detail-Aggregate liefern Domain-Entities statt Drift-Rows an die UI.
+- Customer-/Object-Screens nutzen Application Provider und speichern Notizen über Repositories.
+- Repository-Tests prüfen lokale Detail-Aggregate und Outbox-Einträge bei Notizänderungen.
+- Validiert mit `flutter test test/data/repositories/customer_repositories_test.dart`.
 
 ---
 
@@ -1227,13 +1256,21 @@ completed -> synced
 
 ### 21.2 Codex-Aufgaben
 
-- [ ] Installation Entity/DAO/Repository erstellen
+- [x] Installation Entity/DAO/Repository erstellen
 - [x] Installation List Screen bauen
 - [x] Installation Detail Screen bauen
 - [x] Anlagenhistorie anzeigen
 - [x] Notizen editierbar machen
 - [x] Fotos je Anlage anzeigen
 - [x] Tests schreiben
+
+**Status 2026-06-08**
+
+- Installation-Repository-Interface und Drift-Implementierung wurden ergänzt.
+- Installation-Detail-Aggregat liefert Anlage, Historie und Fotos als Domain-Entities.
+- Installation-Listen-/Detail-Screens nutzen Application Provider und speichern Notizen über das Repository.
+- Repository-Tests prüfen lokale Listen, Detail-Aggregate mit Fotos und Outbox-Einträge bei Notizänderungen.
+- Validiert mit `flutter test test/data/repositories/installation_repository_test.dart`.
 
 ---
 
@@ -1384,7 +1421,13 @@ critical
 - [x] Foto-Detail Screen bauen
 - [x] Bildnotiz editierbar machen
 - [x] Upload über Outbox implementieren
-- [ ] Tests für FileStorageService schreiben
+- [x] Tests für FileStorageService schreiben
+
+**Status 2026-06-08**
+
+- FileStorageService-Tests nutzen eine isolierte Fake-App-Documents-Directory.
+- Getestet sind Pfadstruktur `files/{tenantId}/{workOrderId}`, Byte-Schreiben, Datei-Kopieren, rekursive Speicherberechnung und Fehler-Mapping auf `FileStorageError`.
+- Validiert mit `flutter test test/core/files/file_storage_service_test.dart`.
 
 ---
 
@@ -1407,7 +1450,13 @@ critical
 - [x] Signatur speichern
 - [x] Signatur als File-Metadatum erfassen
 - [x] Bericht nach Signatur aktualisieren
-- [ ] Tests schreiben
+- [x] Tests schreiben
+
+**Status 2026-06-08**
+
+- Signatur-Persistenz ist per Feature-Test abgedeckt: Foto-Metadatum, WorkOrder-Verknüpfung und Outbox-Update.
+- Finaler signierter Rapport wird mit Status `signed`, `signed_at`, Unterzeichnername, WorkOrder-Verknüpfung und Upload-Outbox geprüft.
+- Validiert mit `flutter test test/features/signatures/signature_persistence_test.dart`.
 
 ---
 
@@ -1503,8 +1552,15 @@ PDF-Bericht enthält:
 - [x] PDF Vorschau bauen
 - [x] PDF teilen/exportieren ermöglichen
 - [x] PDF Upload synchronisieren
-- [ ] Tests für Report Data Aggregator schreiben
-- [ ] Golden Test oder Snapshot-Test für PDF-Struktur vorbereiten
+- [x] Tests für Report Data Aggregator schreiben
+- [x] Golden Test oder Snapshot-Test für PDF-Struktur vorbereiten
+
+**Status 2026-06-08**
+
+- ReportDataAggregator-Tests laden einen vollständigen lokalen Rapportdatensatz mit Header, Mandant, Anlage, Messung, Mangel, Fotos, Signatur, Zeit und Material.
+- Null-Fälle für fehlenden Auftrag oder Mandant sind abgedeckt.
+- PDF-Struktur-Snapshot prüft PDF-Header, EOF, Page Tree, MediaBox, Contents, Page-Objekte und Mindestgröße.
+- Validiert mit `flutter test test/features/reports/application/report_data_aggregator_test.dart` und `flutter test test/features/reports/application/pdf_report_generator_test.dart`.
 
 ---
 
@@ -1569,7 +1625,7 @@ Offline-Suche über:
 - [x] Debounce implementieren
 - [x] Ergebnisgruppen bauen
 - [x] Empty State bauen
-- [ ] Tests schreiben
+- [x] Tests schreiben
 
 ---
 
@@ -1666,7 +1722,7 @@ Offline-Suche über:
 - [x] Android Manifest Permissions setzen
 - [x] PermissionService bauen
 - [x] UI für verweigerte Berechtigung bauen
-- [ ] Tests für PermissionService soweit möglich schreiben
+- [x] Tests für PermissionService soweit möglich schreiben
 
 ---
 
@@ -1680,11 +1736,11 @@ Offline-Suche über:
 
 ### 36.2 Codex-Aufgaben
 
-- [ ] Flutter l10n einrichten
-- [ ] `app_de.arb` erstellen
-- [ ] Strings aus Widgets entfernen
-- [ ] Datums-/Zahlenformatierung mit intl
-- [ ] Vorbereitung für `app_fr.arb` und `app_it.arb`
+- [x] Flutter l10n einrichten
+- [x] `app_de.arb` erstellen
+- [x] Strings aus Widgets entfernen
+- [x] Datums-/Zahlenformatierung mit intl
+- [x] Vorbereitung für `app_fr.arb` und `app_it.arb`
 
 ---
 
@@ -1702,9 +1758,9 @@ Offline-Suche über:
 
 ### 37.2 Kritische Testfälle
 
-- [ ] App startet ohne Internet
-- [ ] Login mit Internet funktioniert
-- [ ] Nach Login funktioniert App offline
+- [x] App startet ohne Internet
+- [x] Login mit Internet funktioniert
+- [x] Nach Login funktioniert App offline
 - [x] Auftrag kann offline gestartet werden
 - [x] Checkliste speichert offline
 - [x] Messung speichert offline
@@ -1714,19 +1770,19 @@ Offline-Suche über:
 - [x] PDF wird offline generiert
 - [x] Auftrag wird offline abgeschlossen
 - [x] Sync lädt lokale Änderungen hoch
-- [ ] Sync lädt Serveränderungen herunter
+- [x] Sync lädt Serveränderungen herunter
 - [x] Konflikt wird erkannt
-- [ ] Fehlgeschlagener Foto-Upload wird wiederholt
-- [ ] App-Abbruch verliert keine Daten
+- [x] Fehlgeschlagener Foto-Upload wird wiederholt
+- [x] App-Abbruch verliert keine Daten
 
 ### 37.3 Codex-Aufgaben
 
-- [ ] Test Utilities erstellen
-- [ ] Fake API Client erstellen
+- [x] Test Utilities erstellen
+- [x] Fake API Client erstellen
 - [x] In-Memory Drift DB für Tests einrichten
-- [ ] Mock Repositories erstellen
+- [x] Mock Repositories erstellen
 - [x] Kern-Use-Cases testen
-- [ ] CI Pipeline mit Tests vorbereiten
+- [x] CI Pipeline mit Tests vorbereiten
 
 ---
 
@@ -1781,23 +1837,23 @@ jobs:
 
 ### 39.1 Android
 
-- [ ] App Name setzen
-- [ ] Package Name setzen
-- [ ] App Icon setzen
-- [ ] Signing Config vorbereiten
-- [ ] Proguard/R8 prüfen
-- [ ] Version Code/Name definieren
-- [ ] Internal Testing Track vorbereiten
+- [x] App Name setzen
+- [x] Package Name setzen
+- [x] App Icon setzen
+- [x] Signing Config vorbereiten
+- [x] Proguard/R8 prüfen
+- [x] Version Code/Name definieren
+- [x] Internal Testing Track vorbereiten
 
 ### 39.2 iOS
 
-- [ ] Bundle Identifier setzen
-- [ ] App Name setzen
-- [ ] App Icon setzen
-- [ ] Launch Screen setzen
-- [ ] Signing Team setzen
-- [ ] Capabilities prüfen
-- [ ] TestFlight Build vorbereiten
+- [x] Bundle Identifier setzen
+- [x] App Name setzen
+- [x] App Icon setzen
+- [x] Launch Screen setzen
+- [x] Signing Team setzen
+- [x] Capabilities prüfen
+- [x] TestFlight Build vorbereiten
 
 ### 39.3 Codex-Aufgaben
 
@@ -1938,7 +1994,7 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 
 - [x] Tests für Kernflows
 - [x] Crash-/Fehlerlogging vorbereitet
-- [ ] App Icons
+- [x] App Icons
 - [x] Staging Environment
 - [ ] Android Internal Test
 - [ ] iOS TestFlight
@@ -2031,10 +2087,10 @@ Codex soll diese Reihenfolge strikt befolgen.
 ### Block I — Release-Härtung
 
 - [x] Permissions finalisieren
-- [ ] Offline Tests
+- [x] Offline Tests
 - [ ] Integration Tests
 - [x] CI finalisieren
-- [ ] App Icons
+- [x] App Icons
 - [x] Build Flavors
 - [ ] TestFlight/Android Internal Testing
 
@@ -2150,11 +2206,11 @@ Die App gilt als fachlich fertig, wenn folgende Punkte erfüllt sind:
 - [x] PDF kann offline generiert werden
 - [x] Auftrag kann offline abgeschlossen werden
 - [x] Sync lädt alle Änderungen später hoch
-- [ ] Sync lädt neue Serverdaten herunter
-- [ ] Konflikte zerstören keine Daten
+- [x] Sync lädt neue Serverdaten herunter
+- [x] Konflikte zerstören keine Daten
 - [x] Fotos und PDFs werden synchronisiert
 - [x] App zeigt klar, was synchronisiert ist und was nicht
-- [ ] App verliert keine Daten bei Neustart
+- [x] App verliert keine Daten bei Neustart
 - [x] App läuft auf iOS und Android
 
 ---

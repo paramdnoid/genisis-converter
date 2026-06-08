@@ -7,42 +7,10 @@ import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
-import '../../../data/db/app_database.dart';
-import '../../../data/db/database_providers.dart';
-import '../../work_orders/application/work_order_providers.dart';
-
-final customerDetailProvider = FutureProvider.autoDispose
-    .family<CustomerDetailData?, String>((ref, customerId) async {
-      final database = await ref.watch(databaseReadyProvider.future);
-      final tenantId = ref.watch(activeTenantIdProvider);
-      final customer = await database.customerDao.getById(customerId);
-      if (customer == null || customer.deletedAt != null) {
-        return null;
-      }
-      final objects = await database.objectDao
-          .watchForCustomer(tenantId, customerId)
-          .first;
-      final history = await database.workOrderDao
-          .watchForCustomer(tenantId, customerId)
-          .first;
-      return CustomerDetailData(
-        customer: customer,
-        objects: objects,
-        history: history,
-      );
-    });
-
-final class CustomerDetailData {
-  const CustomerDetailData({
-    required this.customer,
-    required this.objects,
-    required this.history,
-  });
-
-  final CustomerRow customer;
-  final List<CustomerObjectRow> objects;
-  final List<WorkOrderRow> history;
-}
+import '../../../domain/entities/customer_object.dart';
+import '../../../domain/entities/work_order.dart';
+import '../../../l10n/app_localizations_x.dart';
+import '../application/customer_providers.dart';
 
 class CustomerDetailScreen extends ConsumerWidget {
   const CustomerDetailScreen({required this.customerId, super.key});
@@ -54,21 +22,21 @@ class CustomerDetailScreen extends ConsumerWidget {
     final detail = ref.watch(customerDetailProvider(customerId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Kunde')),
+      appBar: AppBar(title: Text(context.l10n.customerTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 5),
           error: (error, stackTrace) => ErrorState(
-            title: 'Kunde konnte nicht geladen werden',
+            title: context.l10n.customerLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(customerDetailProvider(customerId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.person_off_outlined,
-                title: 'Kunde nicht gefunden',
-                message: 'Der lokale Datensatz ist nicht vorhanden.',
+                title: context.l10n.customerNotFoundTitle,
+                message: context.l10n.localRecordMissingMessage,
               );
             }
             final customer = detail.customer;
@@ -78,10 +46,16 @@ class CustomerDetailScreen extends ConsumerWidget {
                 _InfoCard(
                   title: customer.displayName,
                   rows: [
-                    ('Typ', customer.type),
-                    ('E-Mail', customer.email ?? '-'),
-                    ('Telefon', customer.phone ?? customer.mobile ?? '-'),
-                    ('Rechnungsadresse', customer.billingAddress ?? '-'),
+                    (context.l10n.customerTypeLabel, customer.type),
+                    (context.l10n.emailFieldLabel, customer.email ?? '-'),
+                    (
+                      context.l10n.phoneLabel,
+                      customer.phone ?? customer.mobile ?? '-',
+                    ),
+                    (
+                      context.l10n.billingAddressLabel,
+                      customer.billingAddress ?? '-',
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -147,7 +121,7 @@ class _CustomerNotesCardState extends ConsumerState<_CustomerNotesCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Notizen',
+              context.l10n.notesSectionTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -157,16 +131,16 @@ class _CustomerNotesCardState extends ConsumerState<_CustomerNotesCard> {
               controller: _controller,
               minLines: 3,
               maxLines: 6,
-              decoration: const InputDecoration(
-                labelText: 'Kundennotizen',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.customerNotesLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Notizen speichern'),
+              label: Text(context.l10n.saveNotesAction),
             ),
           ],
         ),
@@ -175,16 +149,16 @@ class _CustomerNotesCardState extends ConsumerState<_CustomerNotesCard> {
   }
 
   Future<void> _save() async {
-    final database = await ref.read(databaseReadyProvider.future);
+    final repository = await ref.read(customerRepositoryProvider.future);
     final notes = _controller.text.trim();
-    await database.customerDao.updateNotesLocal(
+    await repository.updateNotes(
       id: widget.customerId,
       notes: notes.isEmpty ? null : notes,
     );
     ref.invalidate(customerDetailProvider(widget.customerId));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kundennotizen lokal gespeichert.')),
+        SnackBar(content: Text(context.l10n.customerNotesSavedMessage)),
       );
     }
   }
@@ -193,14 +167,14 @@ class _CustomerNotesCardState extends ConsumerState<_CustomerNotesCard> {
 class _ObjectList extends StatelessWidget {
   const _ObjectList({required this.objects});
 
-  final List<CustomerObjectRow> objects;
+  final List<CustomerObject> objects;
 
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Objekte',
+      title: context.l10n.objectsTitle,
       emptyIcon: Icons.home_work_outlined,
-      emptyTitle: 'Keine Objekte',
+      emptyTitle: context.l10n.objectsEmptyTitle,
       children: objects
           .map(
             (object) => ListTile(
@@ -221,23 +195,23 @@ class _ObjectList extends StatelessWidget {
 class _HistoryList extends StatelessWidget {
   const _HistoryList({required this.history});
 
-  final List<WorkOrderRow> history;
+  final List<WorkOrder> history;
 
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Auftragshistorie',
+      title: context.l10n.orderHistoryTitle,
       emptyIcon: Icons.history_outlined,
-      emptyTitle: 'Keine früheren Aufträge',
+      emptyTitle: context.l10n.previousOrdersEmptyTitle,
       children: history
           .map(
             (order) => ListTile(
               leading: const Icon(Icons.assignment_outlined),
               title: Text(order.title),
               subtitle: Text(
-                '${order.orderNumber} · ${_formatDate(order.scheduledStart)}',
+                '${order.orderNumber} · ${_formatDate(context, order.scheduledStart)}',
               ),
-              trailing: Text(order.status),
+              trailing: Text(order.status.label),
               onTap: () =>
                   context.push(AppRoutes.workOrderDetailPath(order.id)),
             ),
@@ -334,12 +308,9 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-String _formatDate(String? value) {
-  final date = value == null ? null : DateTime.tryParse(value)?.toLocal();
-  if (date == null) {
-    return 'ohne Termin';
+String _formatDate(BuildContext context, DateTime? value) {
+  if (value == null) {
+    return context.l10n.noAppointment;
   }
-  final day = date.day.toString().padLeft(2, '0');
-  final month = date.month.toString().padLeft(2, '0');
-  return '$day.$month.${date.year}';
+  return context.formatShortDate(value);
 }

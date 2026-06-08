@@ -7,17 +7,8 @@ import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
-import '../../../data/db/app_database.dart';
-import '../../../data/db/database_providers.dart';
-import '../../work_orders/application/work_order_providers.dart';
-
-final customersProvider = StreamProvider.autoDispose<List<CustomerRow>>((
-  ref,
-) async* {
-  final database = await ref.watch(databaseReadyProvider.future);
-  final tenantId = ref.watch(activeTenantIdProvider);
-  yield* database.customerDao.watchActive(tenantId);
-});
+import '../../../l10n/app_localizations_x.dart';
+import '../application/customer_providers.dart';
 
 class CustomerListScreen extends ConsumerWidget {
   const CustomerListScreen({super.key});
@@ -27,21 +18,21 @@ class CustomerListScreen extends ConsumerWidget {
     final customers = ref.watch(customersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Kunden')),
+      appBar: AppBar(title: Text(context.l10n.customersTitle)),
       body: SafeArea(
         child: customers.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Kunden konnten nicht geladen werden',
+            title: context.l10n.customersLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(customersProvider),
           ),
           data: (customers) {
             if (customers.isEmpty) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.people_outline,
-                title: 'Keine Kunden',
-                message: 'Kundendaten werden nach dem Sync lokal sichtbar.',
+                title: context.l10n.customersEmptyTitle,
+                message: context.l10n.customersEmptyMessage,
               );
             }
             return ListView.builder(

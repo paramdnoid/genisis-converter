@@ -9,6 +9,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/photo_attachment.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../application/photo_providers.dart';
 
 class PhotoDetailScreen extends ConsumerWidget {
@@ -21,21 +22,21 @@ class PhotoDetailScreen extends ConsumerWidget {
     final photo = ref.watch(photoDetailProvider(photoId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Foto')),
+      appBar: AppBar(title: Text(context.l10n.photoTitle)),
       body: SafeArea(
         child: photo.when(
           loading: () => const LoadingSkeleton(itemCount: 3),
           error: (error, stackTrace) => ErrorState(
-            title: 'Foto konnte nicht geladen werden',
+            title: context.l10n.photoLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(photoDetailProvider(photoId)),
           ),
           data: (photo) {
             if (photo == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.broken_image_outlined,
-                title: 'Foto nicht gefunden',
-                message: 'Die lokale Fotometadatei ist nicht vorhanden.',
+                title: context.l10n.photoNotFoundTitle,
+                message: context.l10n.photoMetadataMissingMessage,
               );
             }
             return _PhotoDetailContent(photo: photo);
@@ -117,9 +118,9 @@ class _PhotoDetailContentState extends ConsumerState<_PhotoDetailContent> {
                   controller: _captionController,
                   minLines: 2,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'Bildnotiz',
-                    prefixIcon: Icon(Icons.notes_outlined),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.photoCaptionLabel,
+                    prefixIcon: const Icon(Icons.notes_outlined),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -129,8 +130,8 @@ class _PhotoDetailContentState extends ConsumerState<_PhotoDetailContent> {
                   children: [
                     StatusBadge(
                       label: photo.isPendingUpload
-                          ? 'Upload offen'
-                          : 'Uploaded',
+                          ? context.l10n.uploadPendingStatus
+                          : context.l10n.uploadedStatus,
                       icon: photo.isPendingUpload
                           ? Icons.cloud_upload_outlined
                           : Icons.cloud_done_outlined,
@@ -139,8 +140,8 @@ class _PhotoDetailContentState extends ConsumerState<_PhotoDetailContent> {
                           : StatusBadgeTone.success,
                     ),
                     if (photo.defectId != null)
-                      const StatusBadge(
-                        label: 'Mangel zugeordnet',
+                      StatusBadge(
+                        label: context.l10n.defectAssignedStatus,
                         icon: Icons.report_problem_outlined,
                         tone: StatusBadgeTone.warning,
                       ),
@@ -150,7 +151,7 @@ class _PhotoDetailContentState extends ConsumerState<_PhotoDetailContent> {
                 FilledButton.icon(
                   onPressed: _saveCaption,
                   icon: const Icon(Icons.save_outlined),
-                  label: const Text('Bildnotiz speichern'),
+                  label: Text(context.l10n.savePhotoCaptionAction),
                 ),
               ],
             ),
@@ -158,7 +159,7 @@ class _PhotoDetailContentState extends ConsumerState<_PhotoDetailContent> {
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          '${photo.fileName} · ${(photo.sizeBytes / 1024).toStringAsFixed(0)} KB',
+          '${photo.fileName} · ${context.formatDecimal(photo.sizeBytes / 1024, decimalDigits: 0)} KB',
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
@@ -175,7 +176,7 @@ class _PhotoDetailContentState extends ConsumerState<_PhotoDetailContent> {
     ref.invalidate(photoDetailProvider(widget.photo.id));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bildnotiz lokal gespeichert.')),
+        SnackBar(content: Text(context.l10n.photoCaptionSavedMessage)),
       );
     }
   }

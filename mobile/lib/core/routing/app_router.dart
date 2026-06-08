@@ -27,6 +27,7 @@ import '../../features/time_entries/presentation/time_entry_screen.dart';
 import '../../features/work_orders/presentation/work_order_completion_screen.dart';
 import '../../features/work_orders/presentation/work_order_detail_screen.dart';
 import '../../features/work_orders/presentation/work_order_list_screen.dart';
+import '../../l10n/app_localizations_x.dart';
 
 abstract final class AppRoutes {
   static const splash = '/';
@@ -359,11 +360,11 @@ GoRouter createAppRouter() {
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text('Seite nicht gefunden')),
+      appBar: AppBar(title: Text(context.l10n.notFoundTitle)),
       body: Center(
         child: FilledButton(
           onPressed: () => context.go(AppRoutes.dashboard),
-          child: const Text('Zum Dashboard'),
+          child: Text(context.l10n.backToDashboardAction),
         ),
       ),
     ),

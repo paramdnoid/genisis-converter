@@ -9,6 +9,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/defect.dart';
 import '../../../domain/entities/installation.dart';
 import '../../../domain/entities/photo_attachment.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../photos/application/photo_providers.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/defect_providers.dart';
@@ -23,21 +24,21 @@ class DefectScreen extends ConsumerWidget {
     final detail = ref.watch(workOrderDetailProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mängel')),
+      appBar: AppBar(title: Text(context.l10n.defectsTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Auftrag konnte nicht geladen werden',
+            title: context.l10n.workOrderLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(workOrderDetailProvider(workOrderId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.report_problem_outlined,
-                title: 'Keine Mängel möglich',
-                message: 'Der Auftrag ist lokal nicht vorhanden.',
+                title: context.l10n.defectsUnavailableTitle,
+                message: context.l10n.reportNoPreviewMessage,
               );
             }
             return _DefectContent(
@@ -67,7 +68,7 @@ class _DefectContent extends ConsumerWidget {
     return defects.when(
       loading: () => const LoadingSkeleton(itemCount: 4),
       error: (error, stackTrace) => ErrorState(
-        title: 'Mängel konnten nicht geladen werden',
+        title: context.l10n.defectsLoadErrorTitle,
         message: error.toString(),
         onRetry: () => ref.invalidate(defectsForWorkOrderProvider(workOrderId)),
       ),
@@ -82,17 +83,17 @@ class _DefectContent extends ConsumerWidget {
           _DefectForm(workOrderId: workOrderId, installations: installations),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Erfasste Mängel',
+            context.l10n.recordedDefectsTitle,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: AppSpacing.md),
           if (defects.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: Icons.verified_outlined,
-              title: 'Keine Mängel erfasst',
-              message: 'Neue Mängel werden lokal gespeichert.',
+              title: context.l10n.defectsEmptyTitle,
+              message: context.l10n.defectsEmptyMessage,
             )
           else
             ...defects.map(
@@ -141,7 +142,7 @@ class _DefectFormState extends ConsumerState<_DefectForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Mangel erfassen',
+              context.l10n.defectAddTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -162,18 +163,18 @@ class _DefectFormState extends ConsumerState<_DefectForm> {
                   setState(() => _severity = severity);
                 }
               },
-              decoration: const InputDecoration(
-                labelText: 'Schweregrad',
-                prefixIcon: Icon(Icons.priority_high),
+              decoration: InputDecoration(
+                labelText: context.l10n.severityLabel,
+                prefixIcon: const Icon(Icons.priority_high),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             DropdownButtonFormField<String?>(
               initialValue: _installationId,
               items: [
-                const DropdownMenuItem<String?>(
+                DropdownMenuItem<String?>(
                   value: null,
-                  child: Text('Keine Anlage'),
+                  child: Text(context.l10n.noInstallationOption),
                 ),
                 ...widget.installations.map(
                   (installation) => DropdownMenuItem<String?>(
@@ -183,17 +184,17 @@ class _DefectFormState extends ConsumerState<_DefectForm> {
                 ),
               ],
               onChanged: (value) => setState(() => _installationId = value),
-              decoration: const InputDecoration(
-                labelText: 'Anlage',
-                prefixIcon: Icon(Icons.fireplace_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.installationFieldLabel,
+                prefixIcon: const Icon(Icons.fireplace_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Titel',
-                prefixIcon: Icon(Icons.title),
+              decoration: InputDecoration(
+                labelText: context.l10n.titleFieldLabel,
+                prefixIcon: const Icon(Icons.title),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -201,9 +202,9 @@ class _DefectFormState extends ConsumerState<_DefectForm> {
               controller: _descriptionController,
               minLines: 2,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Beschreibung',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.descriptionFieldLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -211,16 +212,16 @@ class _DefectFormState extends ConsumerState<_DefectForm> {
               controller: _actionController,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Empfohlene Massnahme',
-                prefixIcon: Icon(Icons.build_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.recommendedActionLabel,
+                prefixIcon: const Icon(Icons.build_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Mangel speichern'),
+              label: Text(context.l10n.saveDefectAction),
             ),
           ],
         ),
@@ -318,7 +319,9 @@ class _DefectCard extends ConsumerWidget {
             Text(defect.description),
             if (defect.recommendedAction != null) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text('Massnahme: ${defect.recommendedAction!}'),
+              Text(
+                '${context.l10n.measureLabel}: ${defect.recommendedAction!}',
+              ),
             ],
             const SizedBox(height: AppSpacing.md),
             linkedPhotos.when(
@@ -330,8 +333,8 @@ class _DefectCard extends ConsumerWidget {
             Row(
               children: [
                 if (defect.isDirty)
-                  const StatusBadge(
-                    label: 'Lokal',
+                  StatusBadge(
+                    label: context.l10n.locallyChangedStatus,
                     icon: Icons.cloud_upload_outlined,
                     tone: StatusBadgeTone.warning,
                   ),
@@ -340,7 +343,7 @@ class _DefectCard extends ConsumerWidget {
                   onPressed: () =>
                       _showPhotoAssignment(context, ref, availablePhotos),
                   icon: const Icon(Icons.add_photo_alternate_outlined),
-                  label: const Text('Foto zuordnen'),
+                  label: Text(context.l10n.assignPhotoAction),
                 ),
                 TextButton.icon(
                   onPressed: defect.resolved
@@ -352,7 +355,11 @@ class _DefectCard extends ConsumerWidget {
                           await resolve(defect.id);
                         },
                   icon: const Icon(Icons.task_alt),
-                  label: Text(defect.resolved ? 'Erledigt' : 'Erledigen'),
+                  label: Text(
+                    defect.resolved
+                        ? context.l10n.resolvedStatus
+                        : context.l10n.resolveAction,
+                  ),
                 ),
               ],
             ),
@@ -369,7 +376,7 @@ class _DefectCard extends ConsumerWidget {
   ) async {
     if (photos.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Noch keine Fotos im Auftrag.')),
+        SnackBar(content: Text(context.l10n.noPhotosInOrderMessage)),
       );
       return;
     }

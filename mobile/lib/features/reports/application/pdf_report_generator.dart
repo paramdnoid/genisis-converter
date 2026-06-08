@@ -1,11 +1,15 @@
 import 'dart:typed_data';
 import 'dart:io';
 
+import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../../../core/files/file_storage_service.dart';
+import '../../../l10n/generated/app_localizations_de.dart';
 import 'report_data_aggregator.dart';
+
+final _pdfL10n = AppLocalizationsDe();
 
 final class PdfReportGenerator {
   const PdfReportGenerator({this.storage = const FileStorageService()});
@@ -19,6 +23,14 @@ final class PdfReportGenerator {
     final object = data.header.object;
     final logo = _loadLocalImage(data.logoPhoto?.localPath);
     final signature = _loadLocalImage(data.signaturePhoto?.localPath);
+    final decimal = NumberFormat.decimalPatternDigits(
+      locale: 'de',
+      decimalDigits: 1,
+    );
+    final quantity = NumberFormat.decimalPatternDigits(
+      locale: 'de',
+      decimalDigits: 2,
+    );
 
     document.addPage(
       pw.MultiPage(
@@ -82,7 +94,7 @@ final class PdfReportGenerator {
                 .map(
                   (row) => [
                     row.measurementType,
-                    row.value.toStringAsFixed(1),
+                    decimal.format(row.value),
                     row.unit,
                     row.notes ?? '',
                   ],
@@ -110,7 +122,7 @@ final class PdfReportGenerator {
                 .map(
                   (row) => [
                     row.name,
-                    row.quantity.toStringAsFixed(2),
+                    quantity.format(row.quantity),
                     row.unit,
                     row.notes ?? '',
                   ],
@@ -231,14 +243,14 @@ final class PdfReportGenerator {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(
-            'Kundensignatur',
+            _pdfL10n.customerSignatureTitle,
             style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 6),
-          pw.Text('Unterzeichner: ${customerName ?? '-'}'),
+          pw.Text('${_pdfL10n.pdfSignerLabel}: ${customerName ?? '-'}'),
           pw.SizedBox(height: 8),
           if (signature == null)
-            pw.Text('Keine Signatur gespeichert.')
+            pw.Text(_pdfL10n.pdfNoSignatureMessage)
           else
             pw.Container(
               width: 220,
@@ -280,7 +292,7 @@ final class PdfReportGenerator {
           ),
           pw.SizedBox(height: 6),
           if (rows.isEmpty)
-            pw.Text('Keine Einträge.')
+            pw.Text(_pdfL10n.pdfNoEntriesMessage)
           else
             pw.TableHelper.fromTextArray(
               headers: headers,

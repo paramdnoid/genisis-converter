@@ -7,6 +7,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/files/file_storage_service.dart';
 import '../../../data/db/database_providers.dart';
 import '../../../domain/entities/photo_attachment.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../photos/application/photo_providers.dart';
 import '../../reports/application/pdf_report_generator.dart';
 import '../../reports/application/report_data_aggregator.dart';
@@ -46,7 +47,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Unterschrift')),
+      appBar: AppBar(title: Text(context.l10n.signatureTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -63,7 +64,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kundenunterschrift',
+                      context.l10n.customerSignatureTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -71,9 +72,9 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
                     const SizedBox(height: AppSpacing.md),
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name Unterzeichner',
-                        prefixIcon: Icon(Icons.person_outline),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.signerNameLabel,
+                        prefixIcon: const Icon(Icons.person_outline),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -99,7 +100,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _signatureController.clear,
                             icon: const Icon(Icons.clear),
-                            label: const Text('Leeren'),
+                            label: Text(context.l10n.clearAction),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -107,7 +108,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _signatureController.undo,
                             icon: const Icon(Icons.undo),
-                            label: const Text('Undo'),
+                            label: Text(context.l10n.undoAction),
                           ),
                         ),
                       ],
@@ -116,7 +117,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
                     FilledButton.icon(
                       onPressed: _save,
                       icon: const Icon(Icons.save_outlined),
-                      label: const Text('Signatur speichern'),
+                      label: Text(context.l10n.saveSignatureAction),
                     ),
                   ],
                 ),

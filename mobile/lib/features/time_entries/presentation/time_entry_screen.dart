@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -9,6 +8,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/time_entry.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/time_entry_providers.dart';
 
@@ -22,12 +22,12 @@ class TimeEntryScreen extends ConsumerWidget {
     final entries = ref.watch(timeEntriesForWorkOrderProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Zeiten')),
+      appBar: AppBar(title: Text(context.l10n.timeEntriesTitle)),
       body: SafeArea(
         child: entries.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Zeiten konnten nicht geladen werden',
+            title: context.l10n.timeEntriesLoadErrorTitle,
             message: error.toString(),
             onRetry: () =>
                 ref.invalidate(timeEntriesForWorkOrderProvider(workOrderId)),
@@ -43,10 +43,10 @@ class TimeEntryScreen extends ConsumerWidget {
               _TimeEntryForm(workOrderId: workOrderId),
               const SizedBox(height: AppSpacing.lg),
               if (entries.isEmpty)
-                const EmptyState(
+                EmptyState(
                   icon: Icons.timer_outlined,
-                  title: 'Keine Zeiten erfasst',
-                  message: 'Start/Stop-Zeiten werden lokal gespeichert.',
+                  title: context.l10n.timeEntriesEmptyTitle,
+                  message: context.l10n.timeEntriesEmptyMessage,
                 )
               else
                 ...entries.map(
@@ -93,7 +93,7 @@ class _TimeEntryFormState extends ConsumerState<_TimeEntryForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Zeit erfassen',
+              context.l10n.timeEntryAddTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -112,9 +112,9 @@ class _TimeEntryFormState extends ConsumerState<_TimeEntryForm> {
                   setState(() => _type = type);
                 }
               },
-              decoration: const InputDecoration(
-                labelText: 'Zeittyp',
-                prefixIcon: Icon(Icons.timer_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.timeEntryTypeLabel,
+                prefixIcon: const Icon(Icons.timer_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -122,9 +122,9 @@ class _TimeEntryFormState extends ConsumerState<_TimeEntryForm> {
               controller: _durationController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Dauer in Minuten',
-                prefixIcon: Icon(Icons.more_time),
+              decoration: InputDecoration(
+                labelText: context.l10n.durationMinutesLabel,
+                prefixIcon: const Icon(Icons.more_time),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -132,16 +132,16 @@ class _TimeEntryFormState extends ConsumerState<_TimeEntryForm> {
               controller: _notesController,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Notizen',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.notesFieldLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Zeit speichern'),
+              label: Text(context.l10n.saveTimeEntryAction),
             ),
           ],
         ),
@@ -152,7 +152,7 @@ class _TimeEntryFormState extends ConsumerState<_TimeEntryForm> {
   Future<void> _save() async {
     final minutes = int.tryParse(_durationController.text) ?? 0;
     if (minutes <= 0) {
-      _showMessage('Dauer muss groesser als 0 sein.');
+      _showMessage(context.l10n.durationPositiveError);
       return;
     }
 
@@ -190,8 +190,6 @@ class _TimeEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatter = DateFormat('dd.MM. HH:mm');
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -221,8 +219,8 @@ class _TimeEntryCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              '${formatter.format(entry.startTime.toLocal())} - '
-              '${entry.endTime == null ? '--:--' : formatter.format(entry.endTime!.toLocal())}',
+              '${context.formatShortDateTime(entry.startTime)} - '
+              '${entry.endTime == null ? '--:--' : context.formatShortDateTime(entry.endTime!)}',
             ),
             if (entry.notes != null) ...[
               const SizedBox(height: AppSpacing.sm),

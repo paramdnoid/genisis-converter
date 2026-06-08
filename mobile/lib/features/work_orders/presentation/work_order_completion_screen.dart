@@ -9,6 +9,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/use_cases/completion_validator.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../application/work_order_providers.dart';
 
 class WorkOrderCompletionScreen extends ConsumerWidget {
@@ -21,21 +22,21 @@ class WorkOrderCompletionScreen extends ConsumerWidget {
     final detail = ref.watch(workOrderDetailProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Auftrag abschließen')),
+      appBar: AppBar(title: Text(context.l10n.completeWorkOrderTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Abschluss konnte nicht geladen werden',
+            title: context.l10n.completionLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(workOrderDetailProvider(workOrderId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.assignment_late_outlined,
-                title: 'Auftrag nicht gefunden',
-                message: 'Der lokale Auftrag ist nicht vorhanden.',
+                title: context.l10n.workOrderNotFoundTitle,
+                message: context.l10n.localWorkOrderMissingMessage,
               );
             }
             final result = const CompletionValidator().validate(detail);
@@ -57,13 +58,15 @@ class WorkOrderCompletionScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                'Abschlussprüfung',
+                                context.l10n.completionCheckTitle,
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(fontWeight: FontWeight.w800),
                               ),
                             ),
                             StatusBadge(
-                              label: result.canComplete ? 'Bereit' : 'Offen',
+                              label: result.canComplete
+                                  ? context.l10n.readyStatus
+                                  : context.l10n.openStatus,
                               icon: result.canComplete
                                   ? Icons.task_alt
                                   : Icons.warning_amber,
@@ -75,9 +78,7 @@ class WorkOrderCompletionScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         if (result.missingItems.isEmpty)
-                          const Text(
-                            'Alle lokalen Mindestdaten sind vorhanden.',
-                          )
+                          Text(context.l10n.completionReadyMessage)
                         else
                           ...result.missingItems.map(
                             (item) => Padding(
@@ -94,7 +95,7 @@ class WorkOrderCompletionScreen extends ConsumerWidget {
                           children: [
                             ActionChip(
                               avatar: const Icon(Icons.draw, size: 18),
-                              label: const Text('Signatur'),
+                              label: Text(context.l10n.signatureTitle),
                               onPressed: () => context.push(
                                 AppRoutes.workOrderSignaturePath(workOrderId),
                               ),
@@ -104,7 +105,7 @@ class WorkOrderCompletionScreen extends ConsumerWidget {
                                 Icons.picture_as_pdf_outlined,
                                 size: 18,
                               ),
-                              label: const Text('Bericht'),
+                              label: Text(context.l10n.reportTitle),
                               onPressed: () => context.push(
                                 AppRoutes.workOrderReportPath(workOrderId),
                               ),
@@ -129,7 +130,7 @@ class WorkOrderCompletionScreen extends ConsumerWidget {
                                 }
                               : null,
                           icon: const Icon(Icons.task_alt),
-                          label: const Text('Lokal abschließen'),
+                          label: Text(context.l10n.saveLocallyCompleteAction),
                         ),
                       ],
                     ),

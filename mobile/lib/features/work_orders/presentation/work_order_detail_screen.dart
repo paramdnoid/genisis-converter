@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_spacing.dart';
@@ -14,6 +13,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/installation.dart';
 import '../../../domain/entities/work_order_detail.dart';
 import '../../../domain/enums/work_order_status.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../application/work_order_providers.dart';
 
 class WorkOrderDetailScreen extends ConsumerWidget {
@@ -26,21 +26,21 @@ class WorkOrderDetailScreen extends ConsumerWidget {
     final detail = ref.watch(workOrderDetailProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Auftragsdetail')),
+      appBar: AppBar(title: Text(context.l10n.workOrderDetailTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Auftrag konnte nicht geladen werden',
+            title: context.l10n.workOrderLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(workOrderDetailProvider(workOrderId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.assignment_late_outlined,
-                title: 'Auftrag nicht gefunden',
-                message: 'Der lokale Datensatz ist nicht vorhanden.',
+                title: context.l10n.workOrderNotFoundTitle,
+                message: context.l10n.localRecordMissingMessage,
               );
             }
 
@@ -121,7 +121,7 @@ class _HeaderCard extends StatelessWidget {
               runSpacing: AppSpacing.sm,
               children: [
                 StatusBadge(
-                  label: _formattedAppointment(order.scheduledStart),
+                  label: _formattedAppointment(context, order.scheduledStart),
                   icon: Icons.event,
                 ),
                 StatusBadge(
@@ -134,8 +134,8 @@ class _HeaderCard extends StatelessWidget {
                       : StatusBadgeTone.neutral,
                 ),
                 if (order.isDirty)
-                  const StatusBadge(
-                    label: 'Lokal geändert',
+                  StatusBadge(
+                    label: context.l10n.locallyChangedStatus,
                     icon: Icons.cloud_upload_outlined,
                     tone: StatusBadgeTone.warning,
                   ),
@@ -148,7 +148,7 @@ class _HeaderCard extends StatelessWidget {
             if (order.actualStart != null || order.actualEnd != null) ...[
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Ist-Zeit: ${_formattedTime(order.actualStart)} - ${_formattedTime(order.actualEnd)}',
+                '${context.l10n.actualTimeLabel}: ${_formattedTime(context, order.actualStart)} - ${_formattedTime(context, order.actualEnd)}',
               ),
             ],
           ],
@@ -181,19 +181,19 @@ class _ActionGrid extends ConsumerWidget {
           children: [
             _ActionButton(
               icon: Icons.navigation_outlined,
-              label: 'Navigation',
+              label: context.l10n.navigationAction,
               onPressed: () => _openMaps(context, detail),
             ),
             _ActionButton(
               icon: Icons.call_outlined,
-              label: 'Anrufen',
+              label: context.l10n.callAction,
               onPressed: detail.hasPhone
                   ? () => _callCustomer(context, detail)
                   : null,
             ),
             _ActionButton(
               icon: Icons.play_arrow,
-              label: 'Starten',
+              label: context.l10n.startOrderAction,
               onPressed: order.status.canStart
                   ? () => _runAction(context, () async {
                       final useCase = await ref.read(
@@ -205,7 +205,7 @@ class _ActionGrid extends ConsumerWidget {
             ),
             _ActionButton(
               icon: Icons.pause,
-              label: 'Pausieren',
+              label: context.l10n.pauseOrderAction,
               onPressed: order.status.canPause
                   ? () => _runAction(context, () async {
                       final useCase = await ref.read(
@@ -217,7 +217,7 @@ class _ActionGrid extends ConsumerWidget {
             ),
             _ActionButton(
               icon: Icons.replay,
-              label: 'Fortsetzen',
+              label: context.l10n.resumeOrderAction,
               onPressed: order.status.canResume
                   ? () => _runAction(context, () async {
                       final useCase = await ref.read(
@@ -229,7 +229,7 @@ class _ActionGrid extends ConsumerWidget {
             ),
             _ActionButton(
               icon: Icons.task_alt,
-              label: 'Abschließen',
+              label: context.l10n.completeOrderTooltip,
               onPressed: order.status.canComplete
                   ? () =>
                         context.push(AppRoutes.workOrderCompletePath(order.id))
@@ -273,21 +273,30 @@ class _CustomerCard extends StatelessWidget {
     final customer = detail.customer;
 
     return _SectionCard(
-      title: 'Kunde',
+      title: context.l10n.customerTitle,
       icon: Icons.person_outline,
       children: [
-        _InfoRow(label: 'Name', value: customer.displayName),
-        _InfoRow(label: 'Telefon', value: customer.preferredPhone ?? '-'),
-        _InfoRow(label: 'E-Mail', value: customer.email ?? '-'),
+        _InfoRow(
+          label: context.l10n.nameFieldLabel,
+          value: customer.displayName,
+        ),
+        _InfoRow(
+          label: context.l10n.phoneLabel,
+          value: customer.preferredPhone ?? '-',
+        ),
+        _InfoRow(
+          label: context.l10n.emailFieldLabel,
+          value: customer.email ?? '-',
+        ),
         if (customer.notes != null)
-          _InfoRow(label: 'Notizen', value: customer.notes!),
+          _InfoRow(label: context.l10n.notesFieldLabel, value: customer.notes!),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: () =>
                 context.push(AppRoutes.customerDetailPath(customer.id)),
             icon: const Icon(Icons.open_in_new),
-            label: const Text('Kunde öffnen'),
+            label: Text(context.l10n.customerOpenAction),
           ),
         ),
       ],
@@ -305,24 +314,33 @@ class _ObjectCard extends StatelessWidget {
     final object = detail.object;
 
     return _SectionCard(
-      title: 'Objekt',
+      title: context.l10n.objectTitle,
       icon: Icons.home_work_outlined,
       children: [
-        _InfoRow(label: 'Name', value: object.name),
-        _InfoRow(label: 'Adresse', value: object.addressLine),
+        _InfoRow(label: context.l10n.nameFieldLabel, value: object.name),
+        _InfoRow(label: context.l10n.addressLabel, value: object.addressLine),
         if (object.accessNotes != null)
-          _InfoRow(label: 'Zugang', value: object.accessNotes!),
+          _InfoRow(
+            label: context.l10n.accessNotesLabel,
+            value: object.accessNotes!,
+          ),
         if (object.safetyNotes != null)
-          _InfoRow(label: 'Sicherheit', value: object.safetyNotes!),
+          _InfoRow(
+            label: context.l10n.safetyNotesLabel,
+            value: object.safetyNotes!,
+          ),
         if (object.objectNotes != null)
-          _InfoRow(label: 'Notizen', value: object.objectNotes!),
+          _InfoRow(
+            label: context.l10n.notesFieldLabel,
+            value: object.objectNotes!,
+          ),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: () =>
                 context.push(AppRoutes.objectDetailPath(object.id)),
             icon: const Icon(Icons.open_in_new),
-            label: const Text('Objekt öffnen'),
+            label: Text(context.l10n.objectOpenAction),
           ),
         ),
       ],
@@ -338,10 +356,10 @@ class _InstallationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Anlagen',
+      title: context.l10n.installationsTitle,
       icon: Icons.fireplace_outlined,
       children: installations.isEmpty
-          ? const [Text('Keine Anlagen verknüpft.')]
+          ? [Text(context.l10n.noLinkedInstallations)]
           : installations
                 .map((installation) {
                   return Padding(
@@ -390,7 +408,7 @@ class _WorkflowShortcuts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Bearbeitung',
+      title: context.l10n.processingSectionTitle,
       icon: Icons.build_circle_outlined,
       children: [
         Wrap(
@@ -399,49 +417,49 @@ class _WorkflowShortcuts extends StatelessWidget {
           children: [
             ActionChip(
               avatar: const Icon(Icons.checklist, size: 18),
-              label: const Text('Checkliste'),
+              label: Text(context.l10n.checklistTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderChecklistPath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.monitor_heart_outlined, size: 18),
-              label: const Text('Messungen'),
+              label: Text(context.l10n.measurementsTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderMeasurementsPath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.report_problem_outlined, size: 18),
-              label: const Text('Mängel'),
+              label: Text(context.l10n.defectsTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderDefectsPath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.photo_camera_outlined, size: 18),
-              label: const Text('Fotos'),
+              label: Text(context.l10n.photosTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderPhotosPath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.timer_outlined, size: 18),
-              label: const Text('Zeiten'),
+              label: Text(context.l10n.timeEntriesTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderTimePath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.inventory_2_outlined, size: 18),
-              label: const Text('Material'),
+              label: Text(context.l10n.materialTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderMaterialsPath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-              label: const Text('Bericht'),
+              label: Text(context.l10n.reportTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderReportPath(orderId)),
             ),
             ActionChip(
               avatar: const Icon(Icons.draw, size: 18),
-              label: const Text('Signatur'),
+              label: Text(context.l10n.signatureTitle),
               onPressed: () =>
                   context.push(AppRoutes.workOrderSignaturePath(orderId)),
             ),
@@ -576,18 +594,14 @@ Future<void> _openMaps(BuildContext context, WorkOrderDetail detail) async {
     'query': detail.object.addressLine,
   });
 
-  await _launchExternal(
-    context,
-    uri,
-    'Navigation konnte nicht geöffnet werden.',
-  );
+  await _launchExternal(context, uri, context.l10n.navigationOpenError);
 }
 
 Future<void> _callCustomer(BuildContext context, WorkOrderDetail detail) async {
   final phone = detail.primaryPhone.replaceAll(RegExp(r'\s+'), '');
   final uri = Uri(scheme: 'tel', path: phone);
 
-  await _launchExternal(context, uri, 'Anruf konnte nicht gestartet werden.');
+  await _launchExternal(context, uri, context.l10n.callOpenError);
 }
 
 Future<void> _launchExternal(
@@ -605,18 +619,18 @@ void _showMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
 
-String _formattedAppointment(DateTime? value) {
+String _formattedAppointment(BuildContext context, DateTime? value) {
   if (value == null) {
-    return 'ohne Termin';
+    return context.l10n.noAppointment;
   }
 
-  return DateFormat('dd.MM.yyyy HH:mm').format(value.toLocal());
+  return context.formatShortDateTime(value);
 }
 
-String _formattedTime(DateTime? value) {
+String _formattedTime(BuildContext context, DateTime? value) {
   if (value == null) {
     return '--:--';
   }
 
-  return DateFormat('HH:mm').format(value.toLocal());
+  return context.formatShortTime(value);
 }

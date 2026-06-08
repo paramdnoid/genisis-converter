@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations_x.dart';
 import '../constants/app_spacing.dart';
 
 class ErrorState extends StatelessWidget {
@@ -50,7 +51,7 @@ class ErrorState extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: onRetry,
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Erneut versuchen'),
+                  label: Text(context.l10n.retryAction),
                 ),
               ],
             ],

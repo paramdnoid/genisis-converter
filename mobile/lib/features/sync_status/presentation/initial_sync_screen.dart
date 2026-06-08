@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../data/db/database_providers.dart';
+import '../../../l10n/app_localizations_x.dart';
 
 class InitialSyncScreen extends ConsumerStatefulWidget {
   const InitialSyncScreen({super.key});
@@ -15,14 +16,14 @@ class InitialSyncScreen extends ConsumerStatefulWidget {
 
 class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
   var _progress = 0.0;
-  String _label = 'Bereit';
+  String? _label;
   bool _running = false;
   String? _error;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Initialer Sync')),
+      appBar: AppBar(title: Text(context.l10n.initialSyncTitle)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -37,13 +38,13 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
               Text(
-                'Arbeitsdaten laden',
+                context.l10n.initialSyncLoadTitle,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text(_label),
+              Text(_label ?? context.l10n.initialSyncReadyLabel),
               if (_error != null) ...[
                 const SizedBox(height: AppSpacing.md),
                 Text(
@@ -58,7 +59,9 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
                 onPressed: _running ? null : _run,
                 icon: Icon(_error == null ? Icons.sync : Icons.refresh),
                 label: Text(
-                  _error == null ? 'Minimaldaten laden' : 'Erneut versuchen',
+                  _error == null
+                      ? context.l10n.initialSyncLoadMinimalAction
+                      : context.l10n.retryAction,
                 ),
               ),
             ],
@@ -69,22 +72,24 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
   }
 
   Future<void> _run() async {
+    final l10n = context.l10n;
+    final steps = [
+      l10n.initialSyncProfileStep,
+      l10n.initialSyncOrdersStep,
+      l10n.initialSyncObjectsStep,
+      l10n.initialSyncChecklistStep,
+    ];
+
     setState(() {
       _running = true;
       _progress = 0.15;
-      _label = 'Lokale Datenbank öffnen';
+      _label = l10n.initialSyncOpenDatabaseStep;
       _error = null;
     });
 
     try {
+      ref.invalidate(databaseReadyProvider);
       await ref.read(databaseReadyProvider.future);
-
-      final steps = const [
-        'Benutzerprofil prüfen',
-        'Aufträge und Kunden bereitstellen',
-        'Objekte und Anlagen bereitstellen',
-        'Checklisten und Materialstamm bereitstellen',
-      ];
 
       for (var i = 0; i < steps.length; i += 1) {
         await Future<void>.delayed(const Duration(milliseconds: 180));
@@ -105,7 +110,7 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
         return;
       }
       setState(() {
-        _label = 'Initialer Sync fehlgeschlagen';
+        _label = l10n.initialSyncFailedLabel;
         _error = error.toString();
         _running = false;
       });

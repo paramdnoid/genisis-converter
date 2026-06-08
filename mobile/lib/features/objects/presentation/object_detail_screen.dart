@@ -7,42 +7,11 @@ import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
-import '../../../data/db/app_database.dart';
-import '../../../data/db/database_providers.dart';
-import '../../work_orders/application/work_order_providers.dart';
-
-final objectDetailProvider = FutureProvider.autoDispose
-    .family<ObjectDetailData?, String>((ref, objectId) async {
-      final database = await ref.watch(databaseReadyProvider.future);
-      final tenantId = ref.watch(activeTenantIdProvider);
-      final object = await database.objectDao.getById(objectId);
-      if (object == null || object.deletedAt != null) {
-        return null;
-      }
-      final installations = await database.installationDao
-          .watchForObject(tenantId, objectId)
-          .first;
-      final history = await database.workOrderDao
-          .watchForObject(tenantId, objectId)
-          .first;
-      return ObjectDetailData(
-        object: object,
-        installations: installations,
-        history: history,
-      );
-    });
-
-final class ObjectDetailData {
-  const ObjectDetailData({
-    required this.object,
-    required this.installations,
-    required this.history,
-  });
-
-  final CustomerObjectRow object;
-  final List<InstallationRow> installations;
-  final List<WorkOrderRow> history;
-}
+import '../../../domain/entities/customer_object.dart';
+import '../../../domain/entities/installation.dart';
+import '../../../domain/entities/work_order.dart';
+import '../../../l10n/app_localizations_x.dart';
+import '../application/customer_object_providers.dart';
 
 class ObjectDetailScreen extends ConsumerWidget {
   const ObjectDetailScreen({required this.objectId, super.key});
@@ -51,24 +20,25 @@ class ObjectDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final detail = ref.watch(objectDetailProvider(objectId));
+    final detail = ref.watch(customerObjectDetailProvider(objectId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Objekt')),
+      appBar: AppBar(title: Text(context.l10n.objectTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 5),
           error: (error, stackTrace) => ErrorState(
-            title: 'Objekt konnte nicht geladen werden',
+            title: context.l10n.objectLoadErrorTitle,
             message: error.toString(),
-            onRetry: () => ref.invalidate(objectDetailProvider(objectId)),
+            onRetry: () =>
+                ref.invalidate(customerObjectDetailProvider(objectId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.home_work_outlined,
-                title: 'Objekt nicht gefunden',
-                message: 'Der lokale Datensatz ist nicht vorhanden.',
+                title: context.l10n.objectNotFoundTitle,
+                message: context.l10n.localRecordMissingMessage,
               );
             }
             final object = detail.object;
@@ -97,7 +67,7 @@ class ObjectDetailScreen extends ConsumerWidget {
 class _ObjectHeader extends StatelessWidget {
   const _ObjectHeader({required this.object});
 
-  final CustomerObjectRow object;
+  final CustomerObject object;
 
   @override
   Widget build(BuildContext context) {
@@ -120,11 +90,11 @@ class _ObjectHeader extends StatelessWidget {
             ),
             if (object.accessNotes != null) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text('Zugang: ${object.accessNotes!}'),
+              Text('${context.l10n.accessNotesLabel}: ${object.accessNotes!}'),
             ],
             if (object.safetyNotes != null) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text('Sicherheit: ${object.safetyNotes!}'),
+              Text('${context.l10n.safetyNotesLabel}: ${object.safetyNotes!}'),
             ],
           ],
         ),
@@ -175,7 +145,7 @@ class _ObjectNotesCardState extends ConsumerState<_ObjectNotesCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Objektnotizen',
+              context.l10n.objectNotesTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -185,16 +155,16 @@ class _ObjectNotesCardState extends ConsumerState<_ObjectNotesCard> {
               controller: _controller,
               minLines: 3,
               maxLines: 6,
-              decoration: const InputDecoration(
-                labelText: 'Notizen zum Objekt',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.objectNotesLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Notizen speichern'),
+              label: Text(context.l10n.saveNotesAction),
             ),
           ],
         ),
@@ -203,16 +173,16 @@ class _ObjectNotesCardState extends ConsumerState<_ObjectNotesCard> {
   }
 
   Future<void> _save() async {
-    final database = await ref.read(databaseReadyProvider.future);
+    final repository = await ref.read(customerObjectRepositoryProvider.future);
     final notes = _controller.text.trim();
-    await database.objectDao.updateNotesLocal(
+    await repository.updateNotes(
       id: widget.objectId,
       notes: notes.isEmpty ? null : notes,
     );
-    ref.invalidate(objectDetailProvider(widget.objectId));
+    ref.invalidate(customerObjectDetailProvider(widget.objectId));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Objektnotizen lokal gespeichert.')),
+        SnackBar(content: Text(context.l10n.objectNotesSavedMessage)),
       );
     }
   }
@@ -221,14 +191,14 @@ class _ObjectNotesCardState extends ConsumerState<_ObjectNotesCard> {
 class _InstallationList extends StatelessWidget {
   const _InstallationList({required this.installations});
 
-  final List<InstallationRow> installations;
+  final List<Installation> installations;
 
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Anlagen',
+      title: context.l10n.installationsTitle,
       emptyIcon: Icons.fireplace_outlined,
-      emptyTitle: 'Keine Anlagen',
+      emptyTitle: context.l10n.installationsEmptyTitle,
       children: installations
           .map(
             (installation) => ListTile(
@@ -250,23 +220,23 @@ class _InstallationList extends StatelessWidget {
 class _HistoryList extends StatelessWidget {
   const _HistoryList({required this.history});
 
-  final List<WorkOrderRow> history;
+  final List<WorkOrder> history;
 
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Objekthistorie',
+      title: context.l10n.objectHistoryTitle,
       emptyIcon: Icons.history_outlined,
-      emptyTitle: 'Keine Aufträge',
+      emptyTitle: context.l10n.ordersEmptyTitle,
       children: history
           .map(
             (order) => ListTile(
               leading: const Icon(Icons.assignment_outlined),
               title: Text(order.title),
               subtitle: Text(
-                '${order.orderNumber} · ${_formatDate(order.scheduledStart)}',
+                '${order.orderNumber} · ${_formatDate(context, order.scheduledStart)}',
               ),
-              trailing: Text(order.status),
+              trailing: Text(order.status.label),
               onTap: () =>
                   context.push(AppRoutes.workOrderDetailPath(order.id)),
             ),
@@ -317,20 +287,13 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-String _installationTitle(InstallationRow installation) {
-  final title = [
-    installation.manufacturer,
-    installation.model,
-  ].whereType<String>().where((part) => part.trim().isNotEmpty).join(' ');
-  return title.isEmpty ? installation.type : title;
+String _installationTitle(Installation installation) {
+  return installation.displayName;
 }
 
-String _formatDate(String? value) {
-  final date = value == null ? null : DateTime.tryParse(value)?.toLocal();
-  if (date == null) {
-    return 'ohne Termin';
+String _formatDate(BuildContext context, DateTime? value) {
+  if (value == null) {
+    return context.l10n.noAppointment;
   }
-  final day = date.day.toString().padLeft(2, '0');
-  final month = date.month.toString().padLeft(2, '0');
-  return '$day.$month.${date.year}';
+  return context.formatShortDate(value);
 }

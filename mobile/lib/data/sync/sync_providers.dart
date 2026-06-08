@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/config/environment_providers.dart';
+import '../api/api_client.dart';
 import '../db/database_providers.dart';
 import '../../features/work_orders/application/work_order_providers.dart';
 import 'file_upload_sync_service.dart';
@@ -19,11 +21,15 @@ final networkMonitorProvider = Provider<NetworkMonitor>((ref) {
 final syncOrchestratorProvider = FutureProvider<SyncOrchestrator>((ref) async {
   final database = await ref.watch(databaseReadyProvider.future);
   final tenantId = ref.watch(activeTenantIdProvider);
+  final environment = ref.watch(appEnvironmentProvider);
   final orchestrator = SyncOrchestrator(
     database: database,
     tenantId: tenantId,
     networkMonitor: ref.watch(networkMonitorProvider),
-    pullSyncService: PullSyncService(database: database),
+    pullSyncService: PullSyncService(
+      database: database,
+      client: DioPullSyncClient(ApiClient(environment: environment)),
+    ),
     outboxProcessor: OutboxProcessor(
       database: database,
       pushSyncService: const PushSyncService(),

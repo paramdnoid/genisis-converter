@@ -11,6 +11,7 @@ import '../../../core/files/file_storage_service.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../data/db/database_providers.dart';
 import '../../../features/auth/application/auth_providers.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
 final storageUsageProvider = FutureProvider.autoDispose<int>((ref) {
@@ -26,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
     final session = ref.watch(authSessionProvider).session;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Einstellungen')),
+      appBar: AppBar(title: Text(context.l10n.settingsTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -38,35 +39,35 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             _SettingsTile(
               icon: Icons.person_outline,
-              title: 'Profil',
-              value: session?.email ?? 'Demo-Techniker',
+              title: context.l10n.profileTitle,
+              value: session?.email ?? context.l10n.demoTechnician,
               onTap: () => context.push(AppRoutes.settingsProfile),
             ),
             _SettingsTile(
               icon: Icons.storage_outlined,
-              title: 'Speicher',
+              title: context.l10n.storageTitle,
               value: usage.maybeWhen(
                 data: (bytes) =>
-                    '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB',
-                orElse: () => 'wird berechnet',
+                    '${context.formatDecimal(bytes / 1024 / 1024)} MB',
+                orElse: () => context.l10n.calculatingStatus,
               ),
             ),
             _SettingsTile(
               icon: Icons.info_outline,
-              title: 'App-Version',
+              title: context.l10n.appVersionTitle,
               value: '1.0.0+1',
             ),
             const SizedBox(height: AppSpacing.lg),
             FilledButton.icon(
               onPressed: () => context.push(AppRoutes.syncStatus),
               icon: const Icon(Icons.sync),
-              label: const Text('Sync-Status öffnen'),
+              label: Text(context.l10n.openSyncStatusAction),
             ),
             const SizedBox(height: AppSpacing.md),
             OutlinedButton.icon(
               onPressed: () => _exportDebug(context, ref),
               icon: const Icon(Icons.ios_share_outlined),
-              label: const Text('Debug Export erstellen'),
+              label: Text(context.l10n.createDebugExportAction),
             ),
             const SizedBox(height: AppSpacing.md),
             OutlinedButton.icon(
@@ -78,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                 }
               },
               icon: const Icon(Icons.logout),
-              label: const Text('Logout'),
+              label: Text(context.l10n.logoutAction),
             ),
           ],
         ),
@@ -117,9 +118,9 @@ class SettingsScreen extends ConsumerWidget {
       flush: true,
     );
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Debug Export: ${file.path}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.debugExportMessage(file.path))),
+      );
     }
   }
 }

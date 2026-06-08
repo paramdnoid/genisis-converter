@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+
+import '../../core/errors/app_error.dart';
 import 'api_client.dart';
 
 final class AuthTokens {
@@ -27,26 +30,58 @@ final class AuthApi {
       );
     }
 
-    final response = await _client.dio.post<Map<String, Object?>>(
-      '/auth/login',
-      data: {'email': email, 'password': password},
-    );
-    final data = response.data ?? const {};
-    return AuthTokens(
-      accessToken: data['accessToken']?.toString() ?? '',
-      refreshToken: data['refreshToken']?.toString() ?? '',
-    );
+    try {
+      final response = await _client.dio.post<Map<String, Object?>>(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
+      return _parseTokens(response.data ?? const {});
+    } on DioException catch (error, stackTrace) {
+      throw AuthError(
+        message: 'Login failed.',
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<AuthTokens> refresh(String refreshToken) async {
-    final response = await _client.dio.post<Map<String, Object?>>(
-      '/auth/refresh',
-      data: {'refreshToken': refreshToken},
-    );
-    final data = response.data ?? const {};
-    return AuthTokens(
-      accessToken: data['accessToken']?.toString() ?? '',
-      refreshToken: data['refreshToken']?.toString() ?? refreshToken,
-    );
+    if (refreshToken.trim().isEmpty) {
+      throw const AuthError(message: 'No refresh token available.');
+    }
+
+    try {
+      final response = await _client.dio.post<Map<String, Object?>>(
+        '/auth/refresh',
+        data: {'refreshToken': refreshToken},
+      );
+      return _parseTokens(
+        response.data ?? const {},
+        fallbackRefreshToken: refreshToken,
+      );
+    } on DioException catch (error, stackTrace) {
+      throw AuthError(
+        message: 'Session refresh failed.',
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  AuthTokens _parseTokens(
+    Map<String, Object?> data, {
+    String? fallbackRefreshToken,
+  }) {
+    final accessToken = data['accessToken']?.toString() ?? '';
+    final refreshToken =
+        data['refreshToken']?.toString() ?? fallbackRefreshToken ?? '';
+
+    if (accessToken.isEmpty || refreshToken.isEmpty) {
+      throw const AuthError(
+        message: 'Authentication response did not include valid tokens.',
+      );
+    }
+
+    return AuthTokens(accessToken: accessToken, refreshToken: refreshToken);
   }
 }

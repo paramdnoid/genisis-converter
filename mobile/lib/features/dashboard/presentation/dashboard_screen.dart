@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
@@ -13,6 +12,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../data/sync/sync_providers.dart';
 import '../../../domain/entities/work_order.dart';
 import '../../../domain/enums/work_order_status.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -29,10 +29,10 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Heute'),
+        title: Text(context.l10n.dashboardTitle),
         actions: [
           IconButton(
-            tooltip: 'Synchronisieren',
+            tooltip: context.l10n.syncActionTooltip,
             onPressed: () => ref.invalidate(syncNowProvider),
             icon: const Icon(Icons.sync),
           ),
@@ -43,7 +43,7 @@ class DashboardScreen extends ConsumerWidget {
         child: todayOrders.when(
           loading: () => const LoadingSkeleton(itemCount: 3),
           error: (error, stackTrace) => ErrorState(
-            title: 'Lokale Aufträge konnten nicht geladen werden',
+            title: context.l10n.dashboardLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(todayWorkOrdersProvider),
           ),
@@ -78,12 +78,12 @@ class _DashboardContent extends StatelessWidget {
         if (orders.isEmpty)
           EmptyState(
             icon: Icons.event_available,
-            title: 'Keine Aufträge für heute',
-            message: 'Neue Daten werden nach dem nächsten Sync lokal sichtbar.',
+            title: context.l10n.dashboardEmptyTodayTitle,
+            message: context.l10n.dashboardEmptyTodayMessage,
             action: FilledButton.icon(
               onPressed: () => context.go(AppRoutes.workOrders),
               icon: const Icon(Icons.list_alt),
-              label: const Text('Alle Aufträge öffnen'),
+              label: Text(context.l10n.dashboardOpenAllOrders),
             ),
           )
         else
@@ -123,8 +123,8 @@ class _OfflineBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 pendingSyncs == 0
-                    ? 'Offline bereit. Lokale Daten sind synchron.'
-                    : '$pendingSyncs lokale Änderung(en) warten auf Sync.',
+                    ? context.l10n.offlineReadyMessage
+                    : context.l10n.pendingLocalChangesMessage(pendingSyncs),
               ),
             ),
           ],
@@ -158,17 +158,17 @@ class _MetricGrid extends StatelessWidget {
           childAspectRatio: isWide ? 1.9 : 1.45,
           children: [
             _MetricCard(
-              label: 'Aufträge',
+              label: context.l10n.ordersMetricLabel,
               value: orders.length.toString(),
               icon: Icons.event_note,
             ),
             _MetricCard(
-              label: 'Offene Syncs',
+              label: context.l10n.openSyncsMetricLabel,
               value: pendingSyncs.toString(),
               icon: Icons.sync,
             ),
             _MetricCard(
-              label: 'Dringend',
+              label: context.l10n.urgentMetricLabel,
               value: criticalCount.toString(),
               icon: Icons.warning_amber,
             ),
@@ -232,7 +232,7 @@ class _NextOrderCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Nächster Auftrag',
+                    context.l10n.nextOrderTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -249,7 +249,7 @@ class _NextOrderCard extends ConsumerWidget {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text('${order.orderNumber} · ${_timeRange(order)}'),
+            Text('${order.orderNumber} · ${_timeRange(context, order)}'),
             const SizedBox(height: AppSpacing.lg),
             Row(
               children: [
@@ -264,12 +264,12 @@ class _NextOrderCard extends ConsumerWidget {
                           }
                         : null,
                     icon: const Icon(Icons.play_arrow),
-                    label: const Text('Starten'),
+                    label: Text(context.l10n.startOrderAction),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 IconButton.outlined(
-                  tooltip: 'Alle Aufträge',
+                  tooltip: context.l10n.allOrdersTooltip,
                   onPressed: () => context.go(AppRoutes.workOrders),
                   icon: const Icon(Icons.list_alt),
                 ),
@@ -299,7 +299,7 @@ class _SyncStatusCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Sync-Status',
+                    context.l10n.syncStatusTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -307,14 +307,16 @@ class _SyncStatusCard extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     pendingSyncs == 0
-                        ? 'Keine lokalen Änderungen in der Outbox.'
-                        : 'Outbox wartet auf die nächste Verbindung.',
+                        ? context.l10n.syncStatusCleanMessage
+                        : context.l10n.syncStatusWaitingMessage,
                   ),
                 ],
               ),
             ),
             StatusBadge(
-              label: pendingSyncs == 0 ? 'Synchron' : '$pendingSyncs offen',
+              label: pendingSyncs == 0
+                  ? context.l10n.syncStatusSynchronized
+                  : context.l10n.syncStatusOpenCount(pendingSyncs),
               icon: pendingSyncs == 0 ? Icons.cloud_done : Icons.cloud_upload,
               tone: pendingSyncs == 0
                   ? StatusBadgeTone.success
@@ -336,7 +338,7 @@ class _QuickActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Schnellaktionen',
+          context.l10n.quickActionsTitle,
           style: Theme.of(
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -348,7 +350,7 @@ class _QuickActions extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () => context.go(AppRoutes.search),
                 icon: const Icon(Icons.search),
-                label: const Text('Suche'),
+                label: Text(context.l10n.searchAction),
               ),
             ),
             const SizedBox(width: AppSpacing.md),
@@ -356,7 +358,7 @@ class _QuickActions extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () => context.go(AppRoutes.settings),
                 icon: const Icon(Icons.settings_outlined),
-                label: const Text('Einstellungen'),
+                label: Text(context.l10n.settingsTitle),
               ),
             ),
           ],
@@ -394,18 +396,17 @@ class _WorkOrderStatusBadge extends StatelessWidget {
   }
 }
 
-String _timeRange(WorkOrder order) {
-  final formatter = DateFormat('HH:mm');
+String _timeRange(BuildContext context, WorkOrder order) {
   final start = order.scheduledStart?.toLocal();
   final end = order.scheduledEnd?.toLocal();
 
   if (start == null && end == null) {
-    return 'ohne Termin';
+    return context.l10n.noAppointment;
   }
 
   if (start != null && end != null) {
-    return '${formatter.format(start)}-${formatter.format(end)}';
+    return '${context.formatShortTime(start)}-${context.formatShortTime(end)}';
   }
 
-  return formatter.format(start ?? end!);
+  return context.formatShortTime(start ?? end!);
 }

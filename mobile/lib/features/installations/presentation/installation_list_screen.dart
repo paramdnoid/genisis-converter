@@ -7,35 +7,9 @@ import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
-import '../../../data/db/app_database.dart';
-import '../../../data/db/database_providers.dart';
-import '../../work_orders/application/work_order_providers.dart';
-
-final installationListProvider = StreamProvider.autoDispose
-    .family<List<InstallationRow>, String>((ref, query) async* {
-      final database = await ref.watch(databaseReadyProvider.future);
-      final tenantId = ref.watch(activeTenantIdProvider);
-      final normalized = query.trim().toLowerCase();
-      await for (final rows in database.installationDao.watchActive(tenantId)) {
-        if (normalized.isEmpty) {
-          yield rows;
-          continue;
-        }
-        yield rows
-            .where((row) {
-              final haystack = [
-                row.type,
-                row.manufacturer,
-                row.model,
-                row.serialNumber,
-                row.locationDescription,
-                row.fuelType,
-              ].whereType<String>().join(' ').toLowerCase();
-              return haystack.contains(normalized);
-            })
-            .toList(growable: false);
-      }
-    });
+import '../../../domain/entities/installation.dart';
+import '../../../l10n/app_localizations_x.dart';
+import '../application/installation_providers.dart';
 
 class InstallationListScreen extends ConsumerStatefulWidget {
   const InstallationListScreen({super.key});
@@ -54,7 +28,7 @@ class _InstallationListScreenState
     final installations = ref.watch(installationListProvider(_query));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Anlagen')),
+      appBar: AppBar(title: Text(context.l10n.installationsTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -66,24 +40,24 @@ class _InstallationListScreenState
           children: [
             TextField(
               onChanged: (value) => setState(() => _query = value),
-              decoration: const InputDecoration(
-                labelText: 'Anlage suchen',
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                labelText: context.l10n.installationListSearchLabel,
+                prefixIcon: const Icon(Icons.search),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             installations.when(
               loading: () => const LoadingSkeleton(itemCount: 5),
               error: (error, stackTrace) => ErrorState(
-                title: 'Anlagen konnten nicht geladen werden',
+                title: context.l10n.installationsLoadErrorTitle,
                 message: error.toString(),
               ),
               data: (items) {
                 if (items.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.fireplace_outlined,
-                    title: 'Keine Anlagen',
-                    message: 'Die Anlagen werden aus der lokalen DB geladen.',
+                    title: context.l10n.installationsEmptyTitle,
+                    message: context.l10n.installationsEmptyMessage,
                   );
                 }
                 return Column(
@@ -120,10 +94,6 @@ class _InstallationListScreenState
   }
 }
 
-String _installationTitle(InstallationRow installation) {
-  final title = [
-    installation.manufacturer,
-    installation.model,
-  ].whereType<String>().where((part) => part.trim().isNotEmpty).join(' ');
-  return title.isEmpty ? installation.type : title;
+String _installationTitle(Installation installation) {
+  return installation.displayName;
 }

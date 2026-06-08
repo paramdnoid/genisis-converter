@@ -9,66 +9,11 @@ import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
-import '../../../data/db/app_database.dart';
-import '../../../data/db/database_providers.dart';
+import '../../../domain/entities/installation.dart';
 import '../../../domain/entities/photo_attachment.dart';
-import '../../work_orders/application/work_order_providers.dart';
-
-final installationDetailProvider = FutureProvider.autoDispose
-    .family<InstallationDetailData?, String>((ref, installationId) async {
-      final database = await ref.watch(databaseReadyProvider.future);
-      final tenantId = ref.watch(activeTenantIdProvider);
-      final installation = await database.installationDao.getById(
-        installationId,
-      );
-      if (installation == null || installation.deletedAt != null) {
-        return null;
-      }
-      final history = await database.workOrderDao
-          .watchForInstallation(tenantId, installationId)
-          .first;
-      final photos = await database.photoDao
-          .watchForInstallation(tenantId, installationId)
-          .first;
-      return InstallationDetailData(
-        installation: installation,
-        history: history,
-        photos: photos
-            .map(
-              (row) => PhotoAttachment(
-                id: row.id,
-                tenantId: row.tenantId,
-                workOrderId: row.workOrderId,
-                objectId: row.objectId,
-                installationId: row.installationId,
-                defectId: row.defectId,
-                localPath: row.localPath,
-                remoteUrl: row.remoteUrl,
-                fileName: row.fileName,
-                mimeType: row.mimeType,
-                sizeBytes: row.sizeBytes,
-                caption: row.caption,
-                takenAt: DateTime.parse(row.takenAt),
-                uploadStatus: row.uploadStatus,
-                version: row.version,
-                syncStatus: row.syncStatus,
-              ),
-            )
-            .toList(growable: false),
-      );
-    });
-
-final class InstallationDetailData {
-  const InstallationDetailData({
-    required this.installation,
-    required this.history,
-    required this.photos,
-  });
-
-  final InstallationRow installation;
-  final List<WorkOrderRow> history;
-  final List<PhotoAttachment> photos;
-}
+import '../../../domain/entities/work_order.dart';
+import '../../../l10n/app_localizations_x.dart';
+import '../application/installation_providers.dart';
 
 class InstallationDetailScreen extends ConsumerWidget {
   const InstallationDetailScreen({required this.installationId, super.key});
@@ -80,22 +25,22 @@ class InstallationDetailScreen extends ConsumerWidget {
     final detail = ref.watch(installationDetailProvider(installationId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Anlage')),
+      appBar: AppBar(title: Text(context.l10n.installationTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 5),
           error: (error, stackTrace) => ErrorState(
-            title: 'Anlage konnte nicht geladen werden',
+            title: context.l10n.installationLoadErrorTitle,
             message: error.toString(),
             onRetry: () =>
                 ref.invalidate(installationDetailProvider(installationId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.fireplace_outlined,
-                title: 'Anlage nicht gefunden',
-                message: 'Der lokale Datensatz ist nicht vorhanden.',
+                title: context.l10n.installationNotFoundTitle,
+                message: context.l10n.localRecordMissingMessage,
               );
             }
             final installation = detail.installation;
@@ -124,7 +69,7 @@ class InstallationDetailScreen extends ConsumerWidget {
 class _InstallationHeader extends StatelessWidget {
   const _InstallationHeader({required this.installation});
 
-  final InstallationRow installation;
+  final Installation installation;
 
   @override
   Widget build(BuildContext context) {
@@ -141,13 +86,21 @@ class _InstallationHeader extends StatelessWidget {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.md),
-            Text('Typ: ${installation.type}'),
-            Text('Brennstoff: ${installation.fuelType ?? '-'}'),
-            Text('Standort: ${installation.locationDescription ?? '-'}'),
-            Text('Seriennummer: ${installation.serialNumber ?? '-'}'),
-            Text('Letzte Arbeit: ${_formatDate(installation.lastServiceDate)}'),
+            Text('${context.l10n.typeLabel}: ${installation.type}'),
             Text(
-              'Nächste Arbeit: ${_formatDate(installation.nextServiceDate)}',
+              '${context.l10n.fuelTypeLabel}: ${installation.fuelType ?? '-'}',
+            ),
+            Text(
+              '${context.l10n.locationLabel}: ${installation.locationDescription ?? '-'}',
+            ),
+            Text(
+              '${context.l10n.serialNumberLabel}: ${installation.serialNumber ?? '-'}',
+            ),
+            Text(
+              '${context.l10n.lastServiceLabel}: ${_formatDate(context, installation.lastServiceDate)}',
+            ),
+            Text(
+              '${context.l10n.nextServiceLabel}: ${_formatDate(context, installation.nextServiceDate)}',
             ),
           ],
         ),
@@ -203,7 +156,7 @@ class _InstallationNotesCardState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Anlagennotizen',
+              context.l10n.installationNotesTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -213,16 +166,16 @@ class _InstallationNotesCardState
               controller: _controller,
               minLines: 3,
               maxLines: 6,
-              decoration: const InputDecoration(
-                labelText: 'Notizen zur Anlage',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.installationNotesLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Notizen speichern'),
+              label: Text(context.l10n.saveNotesAction),
             ),
           ],
         ),
@@ -231,16 +184,16 @@ class _InstallationNotesCardState
   }
 
   Future<void> _save() async {
-    final database = await ref.read(databaseReadyProvider.future);
+    final repository = await ref.read(installationRepositoryProvider.future);
     final notes = _controller.text.trim();
-    await database.installationDao.updateNotesLocal(
+    await repository.updateNotes(
       id: widget.installationId,
       notes: notes.isEmpty ? null : notes,
     );
     ref.invalidate(installationDetailProvider(widget.installationId));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Anlagennotizen lokal gespeichert.')),
+        SnackBar(content: Text(context.l10n.installationNotesSavedMessage)),
       );
     }
   }
@@ -254,16 +207,16 @@ class _PhotoList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Fotos zur Anlage',
+      title: context.l10n.installationPhotosTitle,
       emptyIcon: Icons.photo_camera_outlined,
-      emptyTitle: 'Keine Anlagenfotos',
+      emptyTitle: context.l10n.installationPhotosEmptyTitle,
       children: photos
           .map(
             (photo) => ListTile(
               leading: _PhotoThumb(photo: photo),
               title: Text(photo.caption ?? photo.fileName),
               subtitle: Text(
-                '${(photo.sizeBytes / 1024).toStringAsFixed(0)} KB',
+                '${context.formatDecimal(photo.sizeBytes / 1024, decimalDigits: 0)} KB',
               ),
               onTap: photo.workOrderId == null
                   ? null
@@ -283,23 +236,23 @@ class _PhotoList extends StatelessWidget {
 class _HistoryList extends StatelessWidget {
   const _HistoryList({required this.history});
 
-  final List<WorkOrderRow> history;
+  final List<WorkOrder> history;
 
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Anlagenhistorie',
+      title: context.l10n.installationHistoryTitle,
       emptyIcon: Icons.history_outlined,
-      emptyTitle: 'Keine Aufträge',
+      emptyTitle: context.l10n.ordersEmptyTitle,
       children: history
           .map(
             (order) => ListTile(
               leading: const Icon(Icons.assignment_outlined),
               title: Text(order.title),
               subtitle: Text(
-                '${order.orderNumber} · ${_formatDate(order.scheduledStart)}',
+                '${order.orderNumber} · ${_formatDate(context, order.scheduledStart)}',
               ),
-              trailing: Text(order.status),
+              trailing: Text(order.status.label),
               onTap: () =>
                   context.push(AppRoutes.workOrderDetailPath(order.id)),
             ),
@@ -368,20 +321,13 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-String _installationTitle(InstallationRow installation) {
-  final title = [
-    installation.manufacturer,
-    installation.model,
-  ].whereType<String>().where((part) => part.trim().isNotEmpty).join(' ');
-  return title.isEmpty ? installation.type : title;
+String _installationTitle(Installation installation) {
+  return installation.displayName;
 }
 
-String _formatDate(String? value) {
-  final date = value == null ? null : DateTime.tryParse(value)?.toLocal();
-  if (date == null) {
-    return 'ohne Datum';
+String _formatDate(BuildContext context, DateTime? value) {
+  if (value == null) {
+    return context.l10n.noDate;
   }
-  final day = date.day.toString().padLeft(2, '0');
-  final month = date.month.toString().padLeft(2, '0');
-  return '$day.$month.${date.year}';
+  return context.formatShortDate(value);
 }

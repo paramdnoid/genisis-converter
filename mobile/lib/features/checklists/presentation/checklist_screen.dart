@@ -12,6 +12,7 @@ import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/checklist.dart';
 import '../../../domain/enums/checklist_answer_type.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/checklist_providers.dart';
 
@@ -25,21 +26,21 @@ class ChecklistScreen extends ConsumerWidget {
     final detail = ref.watch(workOrderDetailProvider(workOrderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkliste')),
+      appBar: AppBar(title: Text(context.l10n.checklistTitle)),
       body: SafeArea(
         child: detail.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Auftrag konnte nicht geladen werden',
+            title: context.l10n.workOrderLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(workOrderDetailProvider(workOrderId)),
           ),
           data: (detail) {
             if (detail == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.checklist,
-                title: 'Keine Checkliste verfügbar',
-                message: 'Der Auftrag ist lokal nicht vorhanden.',
+                title: context.l10n.checklistUnavailableTitle,
+                message: context.l10n.reportNoPreviewMessage,
               );
             }
 
@@ -52,7 +53,7 @@ class ChecklistScreen extends ConsumerWidget {
             return items.when(
               loading: () => const LoadingSkeleton(itemCount: 6),
               error: (error, stackTrace) => ErrorState(
-                title: 'Checkliste konnte nicht geladen werden',
+                title: context.l10n.checklistLoadErrorTitle,
                 message: error.toString(),
                 onRetry: () => ref.invalidate(checklistItemsProvider(request)),
               ),
@@ -85,11 +86,10 @@ class _ChecklistContent extends StatelessWidget {
         _ProgressCard(progress: progress),
         const SizedBox(height: AppSpacing.lg),
         if (items.isEmpty)
-          const EmptyState(
+          EmptyState(
             icon: Icons.checklist_rtl,
-            title: 'Keine Vorlage gefunden',
-            message:
-                'Für diesen Auftragstyp existiert lokal keine aktive Vorlage.',
+            title: context.l10n.checklistTemplateMissingTitle,
+            message: context.l10n.checklistMissingTemplateMessage,
           )
         else
           ...items.map(
@@ -242,15 +242,15 @@ class _ChecklistAnswerCardState extends ConsumerState<_ChecklistAnswerCard> {
                 _comment = value;
                 _scheduleSave();
               },
-              decoration: const InputDecoration(
-                labelText: 'Kommentar',
-                prefixIcon: Icon(Icons.notes_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.commentFieldLabel,
+                prefixIcon: const Icon(Icons.notes_outlined),
               ),
             ),
             if (widget.state.answer.isDirty) ...[
               const SizedBox(height: AppSpacing.md),
-              const StatusBadge(
-                label: 'Lokal gespeichert',
+              StatusBadge(
+                label: context.l10n.locallySavedStatus,
                 icon: Icons.cloud_upload_outlined,
                 tone: StatusBadgeTone.warning,
               ),
@@ -264,9 +264,9 @@ class _ChecklistAnswerCardState extends ConsumerState<_ChecklistAnswerCard> {
   Widget _buildAnswerWidget(ChecklistTemplateItem item) {
     return switch (item.answerType) {
       ChecklistAnswerType.yesNo => SegmentedButton<String>(
-        segments: const [
-          ButtonSegment(value: 'yes', label: Text('Ja')),
-          ButtonSegment(value: 'no', label: Text('Nein')),
+        segments: [
+          ButtonSegment(value: 'yes', label: Text(context.l10n.yesOption)),
+          ButtonSegment(value: 'no', label: Text(context.l10n.noOption)),
         ],
         selected: _answerValue == null || _answerValue!.isEmpty
             ? <String>{}
@@ -282,9 +282,9 @@ class _ChecklistAnswerCardState extends ConsumerState<_ChecklistAnswerCard> {
         minLines: 1,
         maxLines: 4,
         onChanged: (value) => _setAnswer(value, debounce: true),
-        decoration: const InputDecoration(
-          labelText: 'Antwort',
-          prefixIcon: Icon(Icons.short_text),
+        decoration: InputDecoration(
+          labelText: context.l10n.answerFieldLabel,
+          prefixIcon: const Icon(Icons.short_text),
         ),
       ),
       ChecklistAnswerType.number => TextField(
@@ -294,9 +294,9 @@ class _ChecklistAnswerCardState extends ConsumerState<_ChecklistAnswerCard> {
           FilteringTextInputFormatter.allow(RegExp(r'[0-9.,-]')),
         ],
         onChanged: (value) => _setAnswer(value, debounce: true),
-        decoration: const InputDecoration(
-          labelText: 'Zahl',
-          prefixIcon: Icon(Icons.pin_outlined),
+        decoration: InputDecoration(
+          labelText: context.l10n.numberFieldLabel,
+          prefixIcon: const Icon(Icons.pin_outlined),
         ),
       ),
       ChecklistAnswerType.singleSelect => DropdownButtonFormField<String>(
@@ -308,9 +308,9 @@ class _ChecklistAnswerCardState extends ConsumerState<_ChecklistAnswerCard> {
             )
             .toList(growable: false),
         onChanged: (value) => _setAnswer(value),
-        decoration: const InputDecoration(
-          labelText: 'Auswahl',
-          prefixIcon: Icon(Icons.radio_button_checked),
+        decoration: InputDecoration(
+          labelText: context.l10n.selectionFieldLabel,
+          prefixIcon: const Icon(Icons.radio_button_checked),
         ),
       ),
       ChecklistAnswerType.multiSelect => Wrap(
@@ -341,10 +341,12 @@ class _ChecklistAnswerCardState extends ConsumerState<_ChecklistAnswerCard> {
         onChanged: (checked) {
           _setAnswer(checked == true ? 'acknowledged' : null, isOk: checked);
         },
-        title: const Text('Fotopflicht notiert'),
+        title: Text(context.l10n.photoRequiredRecordedTitle),
         controlAffinity: ListTileControlAffinity.leading,
       ),
-      ChecklistAnswerType.unknown => const Text('Unbekannter Antworttyp.'),
+      ChecklistAnswerType.unknown => Text(
+        context.l10n.unknownAnswerTypeMessage,
+      ),
     };
   }
 

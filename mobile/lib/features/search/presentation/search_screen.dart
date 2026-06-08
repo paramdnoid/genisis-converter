@@ -8,6 +8,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../data/db/database_providers.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
 final searchResultsProvider = FutureProvider.autoDispose
@@ -32,7 +33,7 @@ final searchResultsProvider = FutureProvider.autoDispose
         if (haystack.contains(query)) {
           results.add(
             SearchResult(
-              group: 'Aufträge',
+              groupKey: SearchResultGroup.orders,
               title: order.title,
               subtitle: order.orderNumber,
               route: AppRoutes.workOrderDetailPath(order.id),
@@ -52,7 +53,7 @@ final searchResultsProvider = FutureProvider.autoDispose
         if (haystack.contains(query)) {
           results.add(
             SearchResult(
-              group: 'Kunden',
+              groupKey: SearchResultGroup.customers,
               title: customer.displayName,
               subtitle: customer.email ?? customer.phone ?? '',
               route: AppRoutes.customerDetailPath(customer.id),
@@ -73,7 +74,7 @@ final searchResultsProvider = FutureProvider.autoDispose
         if (haystack.contains(query)) {
           results.add(
             SearchResult(
-              group: 'Objekte',
+              groupKey: SearchResultGroup.objects,
               title: object.name,
               subtitle:
                   '${object.street} ${object.houseNumber}, ${object.postalCode} ${object.city}',
@@ -97,7 +98,7 @@ final searchResultsProvider = FutureProvider.autoDispose
         if (haystack.contains(query)) {
           results.add(
             SearchResult(
-              group: 'Anlagen',
+              groupKey: SearchResultGroup.installations,
               title: [
                 installation.manufacturer,
                 installation.model,
@@ -114,17 +115,19 @@ final searchResultsProvider = FutureProvider.autoDispose
 
 final class SearchResult {
   const SearchResult({
-    required this.group,
+    required this.groupKey,
     required this.title,
     required this.subtitle,
     required this.route,
   });
 
-  final String group;
+  final SearchResultGroup groupKey;
   final String title;
   final String subtitle;
   final String route;
 }
+
+enum SearchResultGroup { orders, customers, objects, installations }
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -148,7 +151,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final results = ref.watch(searchResultsProvider(_query));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Suche')),
+      appBar: AppBar(title: Text(context.l10n.searchTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -161,9 +164,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             TextField(
               autofocus: true,
               onChanged: _scheduleSearch,
-              decoration: const InputDecoration(
-                labelText: 'Auftrag, Kunde, Adresse oder Anlage suchen',
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                labelText: context.l10n.searchFieldLabel,
+                prefixIcon: const Icon(Icons.search),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -172,10 +175,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               error: (error, stackTrace) => Text(error.toString()),
               data: (items) {
                 if (items.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.search_off,
-                    title: 'Keine Treffer',
-                    message: 'Mindestens zwei Zeichen eingeben.',
+                    title: context.l10n.searchNoResultsTitle,
+                    message: context.l10n.searchNoResultsMessage,
                   );
                 }
                 return Column(
@@ -188,7 +191,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               leading: const Icon(Icons.search),
                               title: Text(item.title),
                               subtitle: Text(
-                                '${item.group} · ${item.subtitle}',
+                                '${_groupLabel(context, item.groupKey)} · ${item.subtitle}',
                               ),
                               onTap: () => context.push(item.route),
                             ),
@@ -213,4 +216,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       }
     });
   }
+}
+
+String _groupLabel(BuildContext context, SearchResultGroup group) {
+  return switch (group) {
+    SearchResultGroup.orders => context.l10n.searchGroupOrders,
+    SearchResultGroup.customers => context.l10n.searchGroupCustomers,
+    SearchResultGroup.objects => context.l10n.searchGroupObjects,
+    SearchResultGroup.installations => context.l10n.searchGroupInstallations,
+  };
 }

@@ -7,6 +7,7 @@ import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../data/db/app_database.dart';
 import '../../../data/db/database_providers.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
 final profileDataProvider = FutureProvider.autoDispose<ProfileData?>((
@@ -42,21 +43,21 @@ class ProfileScreen extends ConsumerWidget {
     final profile = ref.watch(profileDataProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
+      appBar: AppBar(title: Text(context.l10n.profileTitle)),
       body: SafeArea(
         child: profile.when(
           loading: () => const LoadingSkeleton(itemCount: 3),
           error: (error, stackTrace) => ErrorState(
-            title: 'Profil konnte nicht geladen werden',
+            title: context.l10n.profileLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(profileDataProvider),
           ),
           data: (profile) {
             if (profile == null) {
-              return const EmptyState(
+              return EmptyState(
                 icon: Icons.person_off_outlined,
-                title: 'Profil nicht verfügbar',
-                message: 'Die lokalen Stammdaten fehlen.',
+                title: context.l10n.profileUnavailableTitle,
+                message: context.l10n.profileUnavailableMessage,
               );
             }
 
@@ -66,23 +67,23 @@ class ProfileScreen extends ConsumerWidget {
                 _InfoCard(
                   title: '${profile.user.firstName} ${profile.user.lastName}',
                   rows: [
-                    ('Rolle', profile.user.role),
-                    ('E-Mail', profile.user.email),
-                    ('Telefon', profile.user.phone ?? '-'),
+                    (context.l10n.roleLabel, profile.user.role),
+                    (context.l10n.emailFieldLabel, profile.user.email),
+                    (context.l10n.phoneLabel, profile.user.phone ?? '-'),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _InfoCard(
                   title: profile.tenant.name,
                   rows: [
-                    ('Adresse', profile.tenant.address),
+                    (context.l10n.addressLabel, profile.tenant.address),
                     (
-                      'Ort',
+                      context.l10n.cityLabel,
                       '${profile.tenant.postalCode} ${profile.tenant.city}',
                     ),
-                    ('Land', profile.tenant.country),
-                    ('Telefon', profile.tenant.phone),
-                    ('E-Mail', profile.tenant.email),
+                    (context.l10n.countryLabel, profile.tenant.country),
+                    (context.l10n.phoneLabel, profile.tenant.phone),
+                    (context.l10n.emailFieldLabel, profile.tenant.email),
                   ],
                 ),
               ],

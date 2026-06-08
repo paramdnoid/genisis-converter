@@ -9,6 +9,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../data/db/app_database.dart';
 import '../../../data/db/database_providers.dart';
 import '../../../data/sync/sync_providers.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
 final pendingOutboxEntriesProvider = StreamProvider.autoDispose
@@ -27,10 +28,10 @@ class SyncStatusScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sync-Status'),
+        title: Text(context.l10n.syncStatusTitle),
         actions: [
           IconButton(
-            tooltip: 'Jetzt synchronisieren',
+            tooltip: context.l10n.syncNowTooltip,
             onPressed: () => ref.invalidate(syncNowProvider),
             icon: const Icon(Icons.sync),
           ),
@@ -40,7 +41,7 @@ class SyncStatusScreen extends ConsumerWidget {
         child: entries.when(
           loading: () => const LoadingSkeleton(itemCount: 4),
           error: (error, stackTrace) => ErrorState(
-            title: 'Sync-Status konnte nicht geladen werden',
+            title: context.l10n.syncStatusLoadErrorTitle,
             message: error.toString(),
             onRetry: () =>
                 ref.invalidate(pendingOutboxEntriesProvider(tenantId)),
@@ -54,10 +55,10 @@ class SyncStatusScreen extends ConsumerWidget {
             ),
             children: [
               if (entries.isEmpty)
-                const EmptyState(
+                EmptyState(
                   icon: Icons.cloud_done_outlined,
-                  title: 'Keine offenen Sync-Einträge',
-                  message: 'Lokale Änderungen sind abgearbeitet.',
+                  title: context.l10n.syncEntriesEmptyTitle,
+                  message: context.l10n.syncEntriesEmptyMessage,
                 )
               else
                 ...entries.map(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
@@ -12,6 +11,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../data/sync/sync_providers.dart';
 import '../../../domain/entities/work_order.dart';
 import '../../../domain/enums/work_order_status.dart';
+import '../../../l10n/app_localizations_x.dart';
 import '../application/work_order_providers.dart';
 
 class WorkOrderListScreen extends ConsumerStatefulWidget {
@@ -37,12 +37,12 @@ class _WorkOrderListScreenState extends ConsumerState<WorkOrderListScreen> {
     final workOrders = ref.watch(workOrdersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Aufträge')),
+      appBar: AppBar(title: Text(context.l10n.workOrdersTitle)),
       body: SafeArea(
         child: workOrders.when(
           loading: () => const LoadingSkeleton(),
           error: (error, stackTrace) => ErrorState(
-            title: 'Aufträge konnten nicht geladen werden',
+            title: context.l10n.workOrdersLoadErrorTitle,
             message: error.toString(),
             onRetry: () => ref.invalidate(workOrdersProvider),
           ),
@@ -68,9 +68,9 @@ class _WorkOrderListScreenState extends ConsumerState<WorkOrderListScreen> {
                     controller: _searchController,
                     textInputAction: TextInputAction.search,
                     onChanged: (_) => setState(() {}),
-                    decoration: const InputDecoration(
-                      labelText: 'Aufträge suchen',
-                      prefixIcon: Icon(Icons.search),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.workOrdersSearchLabel,
+                      prefixIcon: const Icon(Icons.search),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -84,8 +84,8 @@ class _WorkOrderListScreenState extends ConsumerState<WorkOrderListScreen> {
                   if (filteredOrders.isEmpty)
                     EmptyState(
                       icon: Icons.assignment_outlined,
-                      title: 'Keine passenden Aufträge',
-                      message: 'Passe Suche oder Statusfilter an.',
+                      title: context.l10n.workOrdersEmptyFilteredTitle,
+                      message: context.l10n.workOrdersEmptyFilteredMessage,
                       action: OutlinedButton.icon(
                         onPressed: () {
                           setState(() {
@@ -94,7 +94,7 @@ class _WorkOrderListScreenState extends ConsumerState<WorkOrderListScreen> {
                           });
                         },
                         icon: const Icon(Icons.clear),
-                        label: const Text('Filter zurücksetzen'),
+                        label: Text(context.l10n.resetFilterAction),
                       ),
                     )
                   else
@@ -158,7 +158,7 @@ class _StatusFilterBar extends StatelessWidget {
             FilterChip(
               selected: selectedStatus == filter,
               onSelected: (_) => onChanged(filter),
-              label: Text(filter?.label ?? 'Alle'),
+              label: Text(filter?.label ?? context.l10n.allFilterLabel),
               avatar: Icon(
                 filter == null ? Icons.list_alt : Icons.circle,
                 size: 16,
@@ -204,7 +204,9 @@ class _WorkOrderCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.xs),
-              Text('${order.orderNumber} · ${_formattedAppointment(order)}'),
+              Text(
+                '${order.orderNumber} · ${_formattedAppointment(context, order)}',
+              ),
               if (order.description != null) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Text(order.description!),
@@ -223,14 +225,14 @@ class _WorkOrderCard extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   if (order.isDirty)
-                    const StatusBadge(
-                      label: 'Lokal geändert',
+                    StatusBadge(
+                      label: context.l10n.locallyChangedStatus,
                       icon: Icons.cloud_upload_outlined,
                       tone: StatusBadgeTone.warning,
                     ),
                   const Spacer(),
                   IconButton.outlined(
-                    tooltip: 'Starten',
+                    tooltip: context.l10n.startOrderAction,
                     onPressed: order.status.canStart
                         ? () => _startOrder(ref, order.id)
                         : null,
@@ -238,7 +240,7 @@ class _WorkOrderCard extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   IconButton.outlined(
-                    tooltip: 'Abschließen',
+                    tooltip: context.l10n.completeOrderTooltip,
                     onPressed: order.status.canComplete
                         ? () => context.push(
                             AppRoutes.workOrderCompletePath(order.id),
@@ -289,17 +291,17 @@ class _WorkOrderStatusBadge extends StatelessWidget {
   }
 }
 
-String _formattedAppointment(WorkOrder order) {
+String _formattedAppointment(BuildContext context, WorkOrder order) {
   final start = order.scheduledStart?.toLocal();
   final end = order.scheduledEnd?.toLocal();
 
   if (start == null) {
-    return 'ohne Termin';
+    return context.l10n.noAppointment;
   }
 
-  final date = DateFormat('dd.MM.yyyy').format(start);
-  final time = DateFormat('HH:mm').format(start);
-  final endTime = end == null ? null : DateFormat('HH:mm').format(end);
+  final date = context.formatShortDate(start);
+  final time = context.formatShortTime(start);
+  final endTime = end == null ? null : context.formatShortTime(end);
 
   return endTime == null ? '$date · $time' : '$date · $time-$endTime';
 }
