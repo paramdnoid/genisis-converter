@@ -1870,41 +1870,50 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 
 ### 40.1 Backend Setup
 
-- [ ] `backend` Projekt erstellen
-- [ ] Framework wählen: NestJS empfohlen
-- [ ] PostgreSQL verbinden
-- [ ] Migration Tool einrichten
-- [ ] `.env.example` erstellen
-- [ ] Healthcheck Endpoint erstellen
-- [ ] Auth Modul erstellen
-- [ ] Tenant Middleware erstellen
+- [x] `backend` Projekt erstellen
+- [x] Framework wählen: NestJS empfohlen
+- [x] PostgreSQL verbinden
+- [x] Migration Tool einrichten
+- [x] `.env.example` erstellen
+- [x] Healthcheck Endpoint erstellen
+- [x] Auth Modul erstellen
+- [x] Tenant Middleware erstellen
 
 ### 40.2 Backend Module
 
-- [ ] Auth
-- [ ] Tenants
-- [ ] Users
-- [ ] Customers
-- [ ] Objects
-- [ ] Installations
-- [ ] WorkOrders
-- [ ] Checklists
-- [ ] Measurements
-- [ ] Defects
-- [ ] Photos/Files
-- [ ] Reports
-- [ ] Sync
+- [x] Auth
+- [x] Tenants
+- [x] Users
+- [x] Customers
+- [x] Objects
+- [x] Installations
+- [x] WorkOrders
+- [x] Checklists
+- [x] Measurements
+- [x] Defects
+- [x] Photos/Files
+- [x] Reports
+- [x] Sync
 
 ### 40.3 Backend Sync
 
-- [ ] Tabellen mit `version`, `updated_at`, `deleted_at`
-- [ ] Sync Pull Endpoint
-- [ ] Sync Push Endpoint
-- [ ] Idempotency über Outbox IDs
-- [ ] Konflikterkennung über Version
-- [ ] File Upload Flow
-- [ ] Audit Log
-- [ ] Tests
+- [x] Tabellen mit `version`, `updated_at`, `deleted_at`
+- [x] Sync Pull Endpoint
+- [x] Sync Push Endpoint
+- [x] Idempotency über Outbox IDs
+- [x] Konflikterkennung über Version
+- [x] File Upload Flow
+- [x] Audit Log
+- [x] Tests
+
+**Status 2026-06-08**
+
+- `backend/` ist als NestJS-Projekt mit Prisma/PostgreSQL, initialer Migration, JWT-Auth, globalem Guard, Tenant Middleware, Healthcheck und Backend-`.env.example` implementiert.
+- Prisma-Schema deckt Mandanten, Benutzer, Kunden, Objekte, Anlagen, Aufträge, Checklisten, Messungen, Mängel, Fotos, Zeiten, Material, Rapporte, Uploads, Sync-Outbox-Idempotency und Audit Logs ab.
+- Tenant-scoped REST-CRUD ist für alle Backend-Module aus Abschnitt 40.2 verfügbar; Reports haben zusätzlich `POST /reports/generate`.
+- Sync unterstützt entity-spezifisches Pull-Format für die bestehende mobile App, den Roadmap-Pull über Collections, idempotentes Push-Replay, Konflikterkennung per `baseVersion`, Soft Delete und Audit Logs.
+- File Upload Flow ist über `POST /files/upload/init`, `PUT /files/upload/:id` und `POST /files/upload/complete` implementiert.
+- Validiert mit `cd backend && npm run prisma:generate`, `npm run build` und `npm test`.
 
 ---
 

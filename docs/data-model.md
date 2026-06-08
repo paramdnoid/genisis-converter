@@ -1,6 +1,6 @@
 # Data Model
 
-All business tables are tenant-aware and will share the following fields:
+The backend Prisma schema in `backend/prisma/schema.prisma` and initial migration in `backend/prisma/migrations/20260608000000_initial_backend/migration.sql` implement the mobile/backend data model for PostgreSQL. Business tables are tenant-aware and share the following fields where applicable:
 
 ```text
 id TEXT PRIMARY KEY
@@ -13,4 +13,27 @@ sync_status TEXT NOT NULL DEFAULT 'synced'
 last_synced_at TEXT NULL
 ```
 
-The first Drift implementation will cover tenants, users, customers, objects, installations, work orders, checklist templates, checklist answers, measurements, defects, photos, time entries, materials, reports, outbox entries, and sync state.
+Implemented backend models:
+
+- `Tenant`
+- `User`
+- `Customer`
+- `CustomerObject`
+- `Installation`
+- `WorkOrder`
+- `WorkOrderInstallation`
+- `ChecklistTemplate`
+- `ChecklistTemplateItem`
+- `ChecklistAnswer`
+- `Measurement`
+- `Defect`
+- `Photo`
+- `TimeEntry`
+- `Material`
+- `WorkOrderMaterial`
+- `Report`
+- `FileUpload`
+- `SyncOutboxEntry`
+- `AuditLog`
+
+`SyncOutboxEntry` stores processed mobile outbox IDs for idempotent push replay. `AuditLog` records sync and file-completion events.

@@ -1,0 +1,537 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id           String    @id @default(uuid())
+  name         String
+  address      String
+  postalCode   String    @map("postal_code")
+  city         String
+  country      String
+  phone        String
+  email        String
+  logoFileId   String?   @map("logo_file_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  users                  User[]
+  customers              Customer[]
+  objects                CustomerObject[]
+  installations          Installation[]
+  workOrders             WorkOrder[]
+  workOrderInstallations WorkOrderInstallation[]
+  checklistTemplates     ChecklistTemplate[]
+  checklistTemplateItems ChecklistTemplateItem[]
+  checklistAnswers       ChecklistAnswer[]
+  measurements           Measurement[]
+  defects                Defect[]
+  photos                 Photo[]
+  timeEntries            TimeEntry[]
+  materials              Material[]
+  workOrderMaterials     WorkOrderMaterial[]
+  reports                Report[]
+  fileUploads            FileUpload[]
+  syncOutboxEntries      SyncOutboxEntry[]
+  auditLogs              AuditLog[]
+
+  @@map("tenants")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  email        String
+  phone        String?
+  role         String
+  passwordHash String    @map("password_hash")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, email])
+  @@index([tenantId, updatedAt])
+  @@map("users")
+}
+
+model Customer {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  type           String
+  displayName    String    @map("display_name")
+  firstName      String?   @map("first_name")
+  lastName       String?   @map("last_name")
+  companyName    String?   @map("company_name")
+  email          String?
+  phone          String?
+  mobile         String?
+  billingAddress String?   @map("billing_address")
+  notes          String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  version        Int       @default(1)
+  syncStatus     String    @default("synced") @map("sync_status")
+  lastSyncedAt   DateTime? @map("last_synced_at")
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id])
+  objects    CustomerObject[]
+  workOrders WorkOrder[]
+
+  @@index([tenantId, updatedAt])
+  @@map("customers")
+}
+
+model CustomerObject {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  customerId   String    @map("customer_id")
+  name         String
+  street       String
+  houseNumber  String    @map("house_number")
+  postalCode   String    @map("postal_code")
+  city         String
+  country      String
+  latitude     Float?
+  longitude    Float?
+  accessNotes  String?   @map("access_notes")
+  safetyNotes  String?   @map("safety_notes")
+  objectNotes  String?   @map("object_notes")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  installations Installation[]
+  workOrders    WorkOrder[]
+  photos        Photo[]
+
+  @@index([tenantId, updatedAt])
+  @@map("objects")
+}
+
+model Installation {
+  id                  String    @id @default(uuid())
+  tenantId            String    @map("tenant_id")
+  objectId            String    @map("object_id")
+  type                String
+  manufacturer        String?
+  model               String?
+  serialNumber        String?   @map("serial_number")
+  fuelType            String?   @map("fuel_type")
+  installationYear    Int?      @map("installation_year")
+  locationDescription String?   @map("location_description")
+  intervalMonths      Int?      @map("interval_months")
+  lastServiceDate     DateTime? @map("last_service_date")
+  nextServiceDate     DateTime? @map("next_service_date")
+  notes               String?
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
+  version             Int       @default(1)
+  syncStatus          String    @default("synced") @map("sync_status")
+  lastSyncedAt        DateTime? @map("last_synced_at")
+
+  tenant                 Tenant                  @relation(fields: [tenantId], references: [id])
+  object                 CustomerObject          @relation(fields: [objectId], references: [id])
+  workOrderInstallations WorkOrderInstallation[]
+  measurements           Measurement[]
+  defects                Defect[]
+  photos                 Photo[]
+
+  @@index([tenantId, updatedAt])
+  @@map("installations")
+}
+
+model WorkOrder {
+  id                      String    @id @default(uuid())
+  tenantId                String    @map("tenant_id")
+  customerId              String    @map("customer_id")
+  objectId                String    @map("object_id")
+  assignedUserId          String?   @map("assigned_user_id")
+  orderNumber             String    @map("order_number")
+  title                   String
+  description             String?
+  type                    String
+  status                  String
+  priority                String
+  scheduledStart          DateTime? @map("scheduled_start")
+  scheduledEnd            DateTime? @map("scheduled_end")
+  actualStart             DateTime? @map("actual_start")
+  actualEnd               DateTime? @map("actual_end")
+  customerSignatureFileId String?   @map("customer_signature_file_id")
+  reportFileId            String?   @map("report_file_id")
+  completionNotes         String?   @map("completion_notes")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  deletedAt               DateTime? @map("deleted_at")
+  version                 Int       @default(1)
+  syncStatus              String    @default("synced") @map("sync_status")
+  lastSyncedAt            DateTime? @map("last_synced_at")
+
+  tenant        Tenant                  @relation(fields: [tenantId], references: [id])
+  customer      Customer                @relation(fields: [customerId], references: [id])
+  object        CustomerObject          @relation(fields: [objectId], references: [id])
+  installations WorkOrderInstallation[]
+  checklist     ChecklistAnswer[]
+  measurements  Measurement[]
+  defects       Defect[]
+  photos        Photo[]
+  timeEntries   TimeEntry[]
+  materials     WorkOrderMaterial[]
+  reports       Report[]
+
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId, updatedAt])
+  @@map("work_orders")
+}
+
+model WorkOrderInstallation {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  workOrderId    String    @map("work_order_id")
+  installationId String    @map("installation_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  version        Int       @default(1)
+  syncStatus     String    @default("synced") @map("sync_status")
+  lastSyncedAt   DateTime? @map("last_synced_at")
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  workOrder    WorkOrder    @relation(fields: [workOrderId], references: [id])
+  installation Installation @relation(fields: [installationId], references: [id])
+
+  @@unique([tenantId, workOrderId, installationId])
+  @@index([tenantId, updatedAt])
+  @@map("work_order_installations")
+}
+
+model ChecklistTemplate {
+  id            String    @id @default(uuid())
+  tenantId      String    @map("tenant_id")
+  name          String
+  type          String
+  versionNumber Int       @map("version_number")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+  version       Int       @default(1)
+  syncStatus    String    @default("synced") @map("sync_status")
+  lastSyncedAt  DateTime? @map("last_synced_at")
+
+  tenant Tenant                  @relation(fields: [tenantId], references: [id])
+  items  ChecklistTemplateItem[]
+
+  @@index([tenantId, updatedAt])
+  @@map("checklist_templates")
+}
+
+model ChecklistTemplateItem {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  templateId   String    @map("template_id")
+  position     Int
+  label        String
+  helpText     String?   @map("help_text")
+  answerType   String    @map("answer_type")
+  required     Boolean   @default(false)
+  optionsJson  String?   @map("options_json")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  tenant   Tenant            @relation(fields: [tenantId], references: [id])
+  template ChecklistTemplate @relation(fields: [templateId], references: [id])
+  answers  ChecklistAnswer[]
+
+  @@index([tenantId, updatedAt])
+  @@map("checklist_template_items")
+}
+
+model ChecklistAnswer {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  workOrderId    String    @map("work_order_id")
+  templateItemId String    @map("template_item_id")
+  answerValue    String?   @map("answer_value")
+  comment        String?
+  isOk           Boolean?  @map("is_ok")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  version        Int       @default(1)
+  syncStatus     String    @default("synced") @map("sync_status")
+  lastSyncedAt   DateTime? @map("last_synced_at")
+
+  tenant       Tenant                @relation(fields: [tenantId], references: [id])
+  workOrder    WorkOrder             @relation(fields: [workOrderId], references: [id])
+  templateItem ChecklistTemplateItem @relation(fields: [templateItemId], references: [id])
+
+  @@index([tenantId, updatedAt])
+  @@map("checklist_answers")
+}
+
+model Measurement {
+  id              String    @id @default(uuid())
+  tenantId        String    @map("tenant_id")
+  workOrderId     String    @map("work_order_id")
+  installationId  String?   @map("installation_id")
+  measurementType String    @map("measurement_type")
+  value           Float
+  unit            String
+  measuredAt      DateTime  @map("measured_at")
+  deviceName      String?   @map("device_name")
+  deviceSerial    String?   @map("device_serial")
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  version         Int       @default(1)
+  syncStatus      String    @default("synced") @map("sync_status")
+  lastSyncedAt    DateTime? @map("last_synced_at")
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  workOrder    WorkOrder     @relation(fields: [workOrderId], references: [id])
+  installation Installation? @relation(fields: [installationId], references: [id])
+
+  @@index([tenantId, updatedAt])
+  @@map("measurements")
+}
+
+model Defect {
+  id                String    @id @default(uuid())
+  tenantId          String    @map("tenant_id")
+  workOrderId       String    @map("work_order_id")
+  installationId    String?   @map("installation_id")
+  severity          String
+  title             String
+  description       String
+  recommendedAction String?   @map("recommended_action")
+  dueDate           DateTime? @map("due_date")
+  resolved          Boolean   @default(false)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+  version           Int       @default(1)
+  syncStatus        String    @default("synced") @map("sync_status")
+  lastSyncedAt      DateTime? @map("last_synced_at")
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  workOrder    WorkOrder     @relation(fields: [workOrderId], references: [id])
+  installation Installation? @relation(fields: [installationId], references: [id])
+  photos       Photo[]
+
+  @@index([tenantId, updatedAt])
+  @@map("defects")
+}
+
+model Photo {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  workOrderId    String?   @map("work_order_id")
+  objectId       String?   @map("object_id")
+  installationId String?   @map("installation_id")
+  defectId       String?   @map("defect_id")
+  localPath      String    @map("local_path")
+  remoteUrl      String?   @map("remote_url")
+  fileName       String    @map("file_name")
+  mimeType       String    @map("mime_type")
+  sizeBytes      Int       @map("size_bytes")
+  caption        String?
+  takenAt        DateTime  @map("taken_at")
+  uploadStatus   String    @default("pending") @map("upload_status")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  version        Int       @default(1)
+  syncStatus     String    @default("synced") @map("sync_status")
+  lastSyncedAt   DateTime? @map("last_synced_at")
+
+  tenant       Tenant          @relation(fields: [tenantId], references: [id])
+  workOrder    WorkOrder?      @relation(fields: [workOrderId], references: [id])
+  object       CustomerObject? @relation(fields: [objectId], references: [id])
+  installation Installation?   @relation(fields: [installationId], references: [id])
+  defect       Defect?         @relation(fields: [defectId], references: [id])
+
+  @@index([tenantId, updatedAt])
+  @@map("photos")
+}
+
+model TimeEntry {
+  id              String    @id @default(uuid())
+  tenantId        String    @map("tenant_id")
+  workOrderId     String    @map("work_order_id")
+  userId          String    @map("user_id")
+  type            String
+  startTime       DateTime  @map("start_time")
+  endTime         DateTime? @map("end_time")
+  durationMinutes Int?      @map("duration_minutes")
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  version         Int       @default(1)
+  syncStatus      String    @default("synced") @map("sync_status")
+  lastSyncedAt    DateTime? @map("last_synced_at")
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  @@index([tenantId, updatedAt])
+  @@map("time_entries")
+}
+
+model Material {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  sku          String?
+  name         String
+  unit         String
+  defaultPrice Float?    @map("default_price")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  tenant Tenant              @relation(fields: [tenantId], references: [id])
+  usages WorkOrderMaterial[]
+
+  @@index([tenantId, updatedAt])
+  @@map("materials")
+}
+
+model WorkOrderMaterial {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  workOrderId  String    @map("work_order_id")
+  materialId   String?   @map("material_id")
+  name         String
+  quantity     Float
+  unit         String
+  notes        String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id])
+  material  Material? @relation(fields: [materialId], references: [id])
+
+  @@index([tenantId, updatedAt])
+  @@map("work_order_materials")
+}
+
+model Report {
+  id                 String    @id @default(uuid())
+  tenantId           String    @map("tenant_id")
+  workOrderId        String    @map("work_order_id")
+  reportNumber       String    @map("report_number")
+  status             String
+  pdfLocalPath       String?   @map("pdf_local_path")
+  pdfRemoteUrl       String?   @map("pdf_remote_url")
+  generatedAt        DateTime? @map("generated_at")
+  signedAt           DateTime? @map("signed_at")
+  customerNameSigned String?   @map("customer_name_signed")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
+  version            Int       @default(1)
+  syncStatus         String    @default("synced") @map("sync_status")
+  lastSyncedAt       DateTime? @map("last_synced_at")
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  @@unique([tenantId, reportNumber])
+  @@index([tenantId, updatedAt])
+  @@map("reports")
+}
+
+model FileUpload {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  entityType  String    @map("entity_type")
+  entityId    String    @map("entity_id")
+  fileName    String    @map("file_name")
+  mimeType    String    @map("mime_type")
+  sizeBytes   Int?      @map("size_bytes")
+  storageKey  String    @map("storage_key")
+  status      String    @default("pending")
+  checksum    String?
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, entityType, entityId])
+  @@map("file_uploads")
+}
+
+model SyncOutboxEntry {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  outboxId      String   @map("outbox_id")
+  entityType    String   @map("entity_type")
+  entityId      String   @map("entity_id")
+  operation     String
+  status        String
+  serverVersion Int?     @map("server_version")
+  reason        String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, outboxId])
+  @@index([tenantId, entityType, entityId])
+  @@map("sync_outbox_entries")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  userId     String?  @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, entityType, entityId])
+  @@map("audit_logs")
+}

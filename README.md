@@ -4,7 +4,7 @@
 
 Offline-first mobile app for chimney sweep technicians on iOS and Android.
 
-The repository follows the roadmap in [app.md](app.md). The current implementation covers the Flutter app shell, core architecture folders, routing, theme, documentation stubs, validation scripts, release build helpers, the mobile dependency graph, and an offline-first local MVP with Drift/SQLite, seed data, DAOs, repositories/use cases, dashboard data, work-order list/detail, customer/object/installation detail histories, editable notes, dynamic checklists, measurements, defects with photo linking, photos with detail captions, signatures, time entries, material usage, PDF reports, search, settings/profile/debug export, and sync status.
+The repository follows the roadmap in [app.md](app.md). The current implementation covers the Flutter app shell, core architecture folders, routing, theme, documentation stubs, validation scripts, release build helpers, the mobile dependency graph, an offline-first local MVP with Drift/SQLite, seed data, DAOs, repositories/use cases, dashboard data, work-order list/detail, customer/object/installation detail histories, editable notes, dynamic checklists, measurements, defects with photo linking, photos with detail captions, signatures, time entries, material usage, PDF reports, search, settings/profile/debug export, sync status, and a NestJS/PostgreSQL backend API scaffold with auth, tenant isolation, CRUD modules, file uploads, reports, sync pull/push, idempotency, conflict detection, audit logging, and focused tests.
 
 ## Stack
 
@@ -13,13 +13,15 @@ The repository follows the roadmap in [app.md](app.md). The current implementati
 - Riverpod as the state-management foundation
 - Drift/SQLite, Dio, code generation, connectivity, secure storage, camera/file access, PDF, printing, signatures, geolocation, permissions, and URL launching are installed for the roadmap blocks
 - Local database schema, DAOs, development seed data, outbox tracking, feature repositories, work-order list/detail, dynamic checklists, measurements, defects, photos, signatures, time entries, material usage, report generation, settings/search/profile, permission flows, and a local sync processor with conflict status and retry backoff are implemented
-- Backend API integration remains a demo shell until the backend project is implemented
+- NestJS and Prisma for the backend API
+- PostgreSQL as the backend database target
+- JWT auth, tenant isolation, REST CRUD routes, file upload lifecycle, report generation metadata, cursor pull sync, idempotent push sync, version conflict detection, and audit logging are implemented
 
 ## Structure
 
 ```text
 mobile/      Flutter iOS/Android app
-backend/     Backend placeholder for later implementation
+backend/     NestJS API and Prisma/PostgreSQL backend
 docs/        Architecture, API, sync, data model, security, release notes
 scripts/     Local setup, format, test, and generation helpers
 ```
@@ -33,6 +35,27 @@ dart run build_runner build
 dart format .
 flutter analyze
 flutter test
+```
+
+Backend setup:
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+docker compose up -d postgres
+npm run prisma:generate
+npm run prisma:migrate
+npm run seed
+npm run start:dev
+```
+
+Backend verification:
+
+```bash
+cd backend
+npm run build
+npm test
 ```
 
 Build smoke artifacts with runtime flavors:
@@ -64,6 +87,8 @@ flutter run
 - Customer, object, and installation detail screens show local history and support offline note edits.
 - Photo details support caption edits; defects can link existing work-order photos.
 - Saving a signature creates a final local PDF report and enqueues the PDF for upload.
-- Sync services process local outbox entries against a local demo push/file-upload implementation, mark conflicts, and retry failed entries with backoff; real backend endpoints remain open.
+- Sync services process local outbox entries against a local demo push/file-upload implementation, mark conflicts, and retry failed entries with backoff; the backend now exposes the matching `/sync/pull`, `/sync/push`, and `/files/upload/*` contracts.
+- Backend endpoints are protected by JWT except `/health`, `/auth/login`, and `/auth/refresh`.
+- Backend CRUD routes are tenant-scoped and use soft deletes with server-side version increments.
 - Native debug builds have been validated for Android APK and iOS Simulator with the current dependency set.
-- No secrets are required for the current app shell. Copy `.env.example` only when backend/API work begins.
+- No secrets are committed. Copy `.env.example` for local mobile/backend environment values.
