@@ -410,6 +410,38 @@ class AppDatabase extends _$AppDatabase {
     required String operation,
     required Map<String, Object?> payload,
   }) async {
+    final payloadJson = jsonEncode(payload);
+    final now = _utcNowIso();
+
+    if (operation == 'update') {
+      final existingUpdate =
+          await (select(outboxEntries)
+                ..where(
+                  (table) =>
+                      table.tenantId.equals(tenantId) &
+                      table.entityType.equals(entityType) &
+                      table.entityId.equals(entityId) &
+                      table.operation.equals('update') &
+                      table.status.equals('pending') &
+                      table.deletedAt.isNull(),
+                )
+                ..orderBy([(table) => OrderingTerm.asc(table.createdAt)])
+                ..limit(1))
+              .getSingleOrNull();
+
+      if (existingUpdate != null) {
+        await update(outboxEntries).replace(
+          existingUpdate.copyWith(
+            payloadJson: payloadJson,
+            updatedAt: now,
+            errorMessage: const Value(null),
+            syncStatus: 'pending',
+          ),
+        );
+        return;
+      }
+    }
+
     await into(outboxEntries).insert(
       OutboxEntriesCompanion.insert(
         id: _uuid.v4(),
@@ -417,7 +449,9 @@ class AppDatabase extends _$AppDatabase {
         entityType: entityType,
         entityId: entityId,
         operation: operation,
-        payloadJson: jsonEncode(payload),
+        payloadJson: payloadJson,
+        createdAt: Value(now),
+        updatedAt: Value(now),
         status: const Value('pending'),
         syncStatus: const Value('pending'),
       ),

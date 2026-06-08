@@ -922,7 +922,7 @@ GET    /reports/:id
 - [x] Jedes lokale Update erzeugt `operation=update`
 - [x] Jedes lokale Delete erzeugt `operation=delete` und setzt `deleted_at`
 - [x] Foto-Uploads erzeugen `operation=upload_file`
-- [ ] Mehrere Updates derselben Entität dürfen zusammengeführt werden, aber nur wenn sicher
+- [x] Mehrere Updates derselben Entität dürfen zusammengeführt werden, aber nur wenn sicher
 - [x] Nach erfolgreichem Push wird `sync_status=synced` gesetzt
 - [x] Nach Konflikt wird `sync_status=conflict` gesetzt
 - [x] Nach permanentem Fehler wird `sync_status=failed` gesetzt
@@ -944,7 +944,7 @@ GET    /reports/:id
 - [x] Auto-Sync bei Netzwerk-Wiederkehr bauen
 - [x] Retry mit Backoff bauen
 - [x] Tests für erfolgreichen Sync schreiben
-- [ ] Tests für Offline-Modus schreiben
+- [x] Tests für Offline-Modus schreiben
 - [x] Tests für Konflikte schreiben
 - [ ] Tests für Datei-Upload-Fehler schreiben
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -409,6 +411,42 @@ void main() {
       );
     },
   );
+
+  test('coalesces repeated pending update outbox entries safely', () async {
+    await database.seedDevelopmentData();
+
+    await database.customerDao.updateNotesLocal(
+      id: DevelopmentSeed.customerId,
+      notes: 'Erste Notiz',
+    );
+    await database.customerDao.updateNotesLocal(
+      id: DevelopmentSeed.customerId,
+      notes: 'Zweite Notiz',
+    );
+
+    final customer = await database.customerDao.getById(
+      DevelopmentSeed.customerId,
+    );
+    final pendingOutbox = await database.outboxDao
+        .watchPending(DevelopmentSeed.tenantId)
+        .first;
+    final customerUpdates = pendingOutbox
+        .where(
+          (entry) =>
+              entry.entityType == 'customer' &&
+              entry.entityId == DevelopmentSeed.customerId &&
+              entry.operation == 'update',
+        )
+        .toList(growable: false);
+    final payload =
+        jsonDecode(customerUpdates.single.payloadJson) as Map<String, Object?>;
+
+    expect(customer?.notes, 'Zweite Notiz');
+    expect(customer?.version, 3);
+    expect(customerUpdates, hasLength(1));
+    expect(payload['notes'], 'Zweite Notiz');
+    expect(customerUpdates.single.status, 'pending');
+  });
 
   test('updates photo caption and associates photo with defect', () async {
     await database.seedDevelopmentData();
