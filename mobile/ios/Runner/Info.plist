@@ -26,6 +26,14 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Die App benötigt die Kamera, um Fotos zum Rapport lokal zu erfassen.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Die App kann den Standort optional für Objekt- und Navigationsfunktionen verwenden.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Fotos, wenn Bilder aus der Galerie zum Auftrag hinzugefügt werden.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Die App kann Rapportbilder lokal in der Fotobibliothek speichern, wenn du dies auswählst.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

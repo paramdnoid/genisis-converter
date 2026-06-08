@@ -1,17 +1,23 @@
-# kaminfeger_mobile
+# Kaminfeger Mobile
 
-A new Flutter project.
+Offline-first Flutter app for Kaminfeger technicians.
 
-## Getting Started
+## Development
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+dart run build_runner build
+dart format .
+flutter analyze
+flutter test
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Implemented Local MVP
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Drift/SQLite offline database with development seed data
+- Work orders, checklists, measurements, defects, photos, signatures, times, material usage, reports, search, settings, and sync status screens
+- Outbox-based local writes and demo sync processor
+- PDF rapport generation and preview
+- Secure-storage auth shell with demo fallback
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Backend API integration is scaffolded but not connected to a production server yet.

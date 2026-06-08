@@ -921,29 +921,29 @@ GET    /reports/:id
 - [x] Jeder lokale Create erzeugt `operation=create`
 - [x] Jedes lokale Update erzeugt `operation=update`
 - [x] Jedes lokale Delete erzeugt `operation=delete` und setzt `deleted_at`
-- [ ] Foto-Uploads erzeugen `operation=upload_file`
+- [x] Foto-Uploads erzeugen `operation=upload_file`
 - [ ] Mehrere Updates derselben Entität dürfen zusammengeführt werden, aber nur wenn sicher
-- [ ] Nach erfolgreichem Push wird `sync_status=synced` gesetzt
+- [x] Nach erfolgreichem Push wird `sync_status=synced` gesetzt
 - [ ] Nach Konflikt wird `sync_status=conflict` gesetzt
-- [ ] Nach permanentem Fehler wird `sync_status=failed` gesetzt
+- [x] Nach permanentem Fehler wird `sync_status=failed` gesetzt
 
 ### 12.5 Codex-Aufgaben Sync
 
-- [ ] `SyncService` erstellen
-- [ ] `SyncOrchestrator` erstellen
-- [ ] `NetworkMonitor` erstellen
-- [ ] `OutboxProcessor` erstellen
-- [ ] `PullSyncService` erstellen
-- [ ] `PushSyncService` erstellen
-- [ ] `FileUploadSyncService` erstellen
-- [ ] `ConflictResolver` erstellen
+- [x] `SyncService` erstellen
+- [x] `SyncOrchestrator` erstellen
+- [x] `NetworkMonitor` erstellen
+- [x] `OutboxProcessor` erstellen
+- [x] `PullSyncService` erstellen
+- [x] `PushSyncService` erstellen
+- [x] `FileUploadSyncService` erstellen
+- [x] `ConflictResolver` erstellen
 - [x] Sync Status Provider erstellen
 - [x] UI für Sync-Status bauen
-- [ ] Manuelles „Jetzt synchronisieren“ bauen
-- [ ] Auto-Sync beim App-Start bauen
-- [ ] Auto-Sync bei Netzwerk-Wiederkehr bauen
+- [x] Manuelles „Jetzt synchronisieren“ bauen
+- [x] Auto-Sync beim App-Start bauen
+- [x] Auto-Sync bei Netzwerk-Wiederkehr bauen
 - [ ] Retry mit Backoff bauen
-- [ ] Tests für erfolgreichen Sync schreiben
+- [x] Tests für erfolgreichen Sync schreiben
 - [ ] Tests für Offline-Modus schreiben
 - [ ] Tests für Konflikte schreiben
 - [ ] Tests für Datei-Upload-Fehler schreiben
@@ -980,8 +980,8 @@ GET    /reports/:id
 ### 13.2 Codex-Aufgaben Routing
 
 - [x] GoRouter einrichten
-- [ ] Auth Guard einrichten
-- [ ] Offline-fähige Navigation sicherstellen
+- [x] Auth Guard einrichten
+- [x] Offline-fähige Navigation sicherstellen
 - [ ] Deep Links später vorbereiten
 - [x] Fehlerseite erstellen
 - [x] Loading/Splash Screen erstellen
@@ -1039,17 +1039,17 @@ GET    /reports/:id
 
 ### 15.3 Codex-Aufgaben
 
-- [ ] `AuthApi` erstellen
-- [ ] `AuthRepository` erstellen
-- [ ] Secure Storage einrichten
-- [ ] Login Use Case erstellen
-- [ ] Logout Use Case erstellen
-- [ ] Token Refresh Use Case erstellen
-- [ ] Auth State Provider erstellen
+- [x] `AuthApi` erstellen
+- [x] `AuthRepository` erstellen
+- [x] Secure Storage einrichten
+- [x] Login Use Case erstellen
+- [x] Logout Use Case erstellen
+- [x] Token Refresh Use Case erstellen
+- [x] Auth State Provider erstellen
 - [x] Login Screen bauen (Platzhalter)
-- [ ] Auth Guard in GoRouter einbauen
-- [ ] Offline Login mit vorhandener Session erlauben
-- [ ] Tests für Login Success schreiben
+- [x] Auth Guard in GoRouter einbauen
+- [x] Offline Login mit vorhandener Session erlauben
+- [x] Tests für Login Success schreiben
 - [ ] Tests für Login Error schreiben
 - [ ] Tests für abgelaufene Session schreiben
 
@@ -1073,13 +1073,13 @@ Nach erstem Login lädt die App die benötigten Daten für den Techniker:
 
 ### 16.2 Codex-Aufgaben
 
-- [ ] `InitialSyncScreen` erstellen
-- [ ] Fortschrittsanzeige erstellen
-- [ ] Daten stufenweise laden
+- [x] `InitialSyncScreen` erstellen
+- [x] Fortschrittsanzeige erstellen
+- [x] Daten stufenweise laden
 - [ ] Fehler mit Retry anzeigen
-- [ ] Abbruch verhindern, solange keine Minimaldaten vorhanden sind
-- [ ] Nach erfolgreichem Initial Sync zum Dashboard navigieren
-- [ ] Tests für erfolgreichen Initial Sync schreiben
+- [x] Abbruch verhindern, solange keine Minimaldaten vorhanden sind
+- [x] Nach erfolgreichem Initial Sync zum Dashboard navigieren
+- [x] Tests für erfolgreichen Initial Sync schreiben
 - [ ] Tests für Fehlerfälle schreiben
 
 ---
@@ -1140,7 +1140,7 @@ completed -> synced
 - [x] WorkOrder List Screen erstellen
 - [x] Suchfeld bauen
 - [x] Filter-Chips bauen
-- [ ] Pull-to-refresh mit Sync verbinden
+- [x] Pull-to-refresh mit Sync verbinden
 - [ ] Offline-Filter testen
 - [x] Unit Tests für Statusmodell schreiben
 - [x] Widget Tests für Liste schreiben
@@ -1204,10 +1204,10 @@ completed -> synced
 
 - [ ] Customer Entity/DAO/Repository erstellen
 - [ ] Object Entity/DAO/Repository erstellen
-- [ ] Customer Detail Screen bauen
-- [ ] Object Detail Screen bauen
+- [x] Customer Detail Screen bauen
+- [x] Object Detail Screen bauen
 - [ ] Historienliste bauen
-- [ ] Suche nach Kunden bauen
+- [x] Suche nach Kunden bauen
 - [ ] Editierbare Notizen bauen
 - [ ] Änderungen in Outbox schreiben
 - [ ] Tests schreiben
@@ -1229,7 +1229,7 @@ completed -> synced
 
 - [ ] Installation Entity/DAO/Repository erstellen
 - [ ] Installation List Screen bauen
-- [ ] Installation Detail Screen bauen
+- [x] Installation Detail Screen bauen
 - [ ] Anlagenhistorie anzeigen
 - [ ] Notizen editierbar machen
 - [ ] Fotos je Anlage anzeigen
@@ -1311,7 +1311,7 @@ completed -> synced
 - [x] Einheiten-Auswahl bauen
 - [x] Plausibilitätsregeln konfigurierbar machen
 - [x] Anlage-Auswahl integrieren
-- [ ] Messwerte in PDF-Bericht aufnehmen
+- [x] Messwerte in PDF-Bericht aufnehmen
 - [x] Unit Tests für Validierung schreiben
 
 ---
@@ -1340,14 +1340,14 @@ critical
 
 ### 24.3 Codex-Aufgaben
 
-- [ ] Defect Entity/DAO/Repository erstellen
-- [ ] Mängelliste pro Auftrag bauen
-- [ ] Mangel-Formular bauen
+- [x] Defect Entity/DAO/Repository erstellen
+- [x] Mängelliste pro Auftrag bauen
+- [x] Mangel-Formular bauen
 - [ ] Foto-Zuordnung bauen
-- [ ] Validierung bauen
-- [ ] Kritische Mängel im UI hervorheben
-- [ ] Kritische Mängel im PDF hervorheben
-- [ ] Tests schreiben
+- [x] Validierung bauen
+- [x] Kritische Mängel im UI hervorheben
+- [x] Kritische Mängel im PDF hervorheben
+- [x] Tests schreiben
 
 ---
 
@@ -1374,16 +1374,16 @@ critical
 
 ### 25.3 Codex-Aufgaben
 
-- [ ] Photo Entity/DAO/Repository erstellen
-- [ ] FileStorageService erstellen
-- [ ] Camera Permission Flow bauen
-- [ ] Foto aufnehmen implementieren
-- [ ] Foto komprimieren implementieren
-- [ ] Foto-Metadaten speichern
-- [ ] Foto-Galerie pro Auftrag bauen
+- [x] Photo Entity/DAO/Repository erstellen
+- [x] FileStorageService erstellen
+- [x] Camera Permission Flow bauen
+- [x] Foto aufnehmen implementieren
+- [x] Foto komprimieren implementieren
+- [x] Foto-Metadaten speichern
+- [x] Foto-Galerie pro Auftrag bauen
 - [ ] Foto-Detail Screen bauen
 - [ ] Bildnotiz editierbar machen
-- [ ] Upload über Outbox implementieren
+- [x] Upload über Outbox implementieren
 - [ ] Tests für FileStorageService schreiben
 
 ---
@@ -1400,12 +1400,12 @@ critical
 
 ### 26.2 Codex-Aufgaben
 
-- [ ] Signature Screen erstellen
-- [ ] Signatur-Pad integrieren
-- [ ] Name-Unterzeichner-Feld erstellen
-- [ ] Clear/Undo ermöglichen
-- [ ] Signatur speichern
-- [ ] Signatur als File-Metadatum erfassen
+- [x] Signature Screen erstellen
+- [x] Signatur-Pad integrieren
+- [x] Name-Unterzeichner-Feld erstellen
+- [x] Clear/Undo ermöglichen
+- [x] Signatur speichern
+- [x] Signatur als File-Metadatum erfassen
 - [ ] Bericht nach Signatur aktualisieren
 - [ ] Tests schreiben
 
@@ -1424,13 +1424,13 @@ critical
 
 ### 27.2 Codex-Aufgaben
 
-- [ ] TimeEntry Entity/DAO/Repository erstellen
+- [x] TimeEntry Entity/DAO/Repository erstellen
 - [x] Automatischen Eintrag bei Auftrag starten erstellen
 - [x] Automatischen Abschluss bei Auftrag abschließen erstellen
-- [ ] Zeitliste bauen
-- [ ] Zeitformular bauen
+- [x] Zeitliste bauen
+- [x] Zeitformular bauen
 - [x] Dauer automatisch berechnen
-- [ ] Validierung gegen negative Dauer
+- [x] Validierung gegen negative Dauer
 - [x] Tests schreiben
 
 ---
@@ -1447,15 +1447,15 @@ critical
 
 ### 28.2 Codex-Aufgaben
 
-- [ ] Material Entity/DAO/Repository erstellen
-- [ ] WorkOrderMaterial Entity/DAO/Repository erstellen
-- [ ] Materialliste bauen
-- [ ] Materialformular bauen
-- [ ] Suche im Materialstamm bauen
-- [ ] Freitextmaterial erlauben
-- [ ] Validierung Menge > 0
-- [ ] PDF-Integration bauen
-- [ ] Tests schreiben
+- [x] Material Entity/DAO/Repository erstellen
+- [x] WorkOrderMaterial Entity/DAO/Repository erstellen
+- [x] Materialliste bauen
+- [x] Materialformular bauen
+- [x] Suche im Materialstamm bauen
+- [x] Freitextmaterial erlauben
+- [x] Validierung Menge > 0
+- [x] PDF-Integration bauen
+- [x] Tests schreiben
 
 ---
 
@@ -1491,17 +1491,17 @@ PDF-Bericht enthält:
 
 ### 29.3 Codex-Aufgaben
 
-- [ ] Report Entity/DAO/Repository erstellen
-- [ ] Report Data Aggregator bauen
-- [ ] PDF Layout bauen
+- [x] Report Entity/DAO/Repository erstellen
+- [x] Report Data Aggregator bauen
+- [x] PDF Layout bauen
 - [ ] Firmenlogo einbinden
-- [ ] Tabellen für Messungen bauen
-- [ ] Abschnitt Mängel bauen
-- [ ] Foto-Anhang bauen
-- [ ] Signatur einbinden
-- [ ] PDF lokal speichern
-- [ ] PDF Vorschau bauen
-- [ ] PDF teilen/exportieren ermöglichen
+- [x] Tabellen für Messungen bauen
+- [x] Abschnitt Mängel bauen
+- [x] Foto-Anhang bauen
+- [x] Signatur einbinden
+- [x] PDF lokal speichern
+- [x] PDF Vorschau bauen
+- [x] PDF teilen/exportieren ermöglichen
 - [ ] PDF Upload synchronisieren
 - [ ] Tests für Report Data Aggregator schreiben
 - [ ] Golden Test oder Snapshot-Test für PDF-Struktur vorbereiten
@@ -1540,10 +1540,10 @@ Ein Auftrag darf abgeschlossen werden, wenn:
 ### 30.3 Codex-Aufgaben
 
 - [x] CompletionValidator erstellen
-- [ ] Abschluss-Screen erstellen
-- [ ] Fehlende-Punkte-Liste bauen
-- [ ] Berichtsvorschau integrieren
-- [ ] Signatur integrieren
+- [x] Abschluss-Screen erstellen
+- [x] Fehlende-Punkte-Liste bauen
+- [x] Berichtsvorschau integrieren
+- [x] Signatur integrieren
 - [x] Statuswechsel auf completed implementieren
 - [x] Completion Tests schreiben
 
@@ -1564,11 +1564,11 @@ Offline-Suche über:
 
 ### 31.2 Codex-Aufgaben
 
-- [ ] Lokale Suchqueries bauen
-- [ ] Suchscreen erstellen
+- [x] Lokale Suchqueries bauen
+- [x] Suchscreen erstellen
 - [ ] Debounce implementieren
-- [ ] Ergebnisgruppen bauen
-- [ ] Empty State bauen
+- [x] Ergebnisgruppen bauen
+- [x] Empty State bauen
 - [ ] Tests schreiben
 
 ---
@@ -1588,12 +1588,12 @@ Offline-Suche über:
 
 ### 32.2 Codex-Aufgaben
 
-- [ ] Settings Screen erstellen
+- [x] Settings Screen erstellen
 - [ ] Profile Screen erstellen
-- [ ] Sync Status Screen erstellen
-- [ ] Storage Usage berechnen
-- [ ] App Version anzeigen
-- [ ] Logout Flow bauen
+- [x] Sync Status Screen erstellen
+- [x] Storage Usage berechnen
+- [x] App Version anzeigen
+- [x] Logout Flow bauen
 - [ ] Debug Export optional bauen
 
 ---
@@ -1615,7 +1615,7 @@ Offline-Suche über:
 
 - [x] Fehlerklassen erstellen
 - [x] Result/Either Pattern oder Exceptions sauber definieren
-- [ ] Global Error Handler erstellen
+- [x] Global Error Handler erstellen
 - [x] LoggingService erstellen
 - [x] User-freundliche Fehlermeldungen erstellen
 - [ ] Retry-Möglichkeiten bei Sync-Fehlern einbauen
@@ -1640,11 +1640,11 @@ Offline-Suche über:
 
 ### 34.2 Codex-Aufgaben
 
-- [ ] Secure Storage implementieren
-- [ ] API Client erzwingt HTTPS ausser in lokaler Entwicklung
+- [x] Secure Storage implementieren
+- [x] API Client erzwingt HTTPS ausser in lokaler Entwicklung
 - [x] Keine Secrets committen
 - [x] `.env.example` erstellen
-- [ ] Permission Handling sauber implementieren
+- [x] Permission Handling sauber implementieren
 - [x] Datenschutz-Hinweise in docs/security.md dokumentieren
 - [x] Optional: DB-Verschlüsselung evaluieren und als späteres Ticket aufnehmen
 
@@ -1662,10 +1662,10 @@ Offline-Suche über:
 
 ### 35.2 Codex-Aufgaben
 
-- [ ] iOS Info.plist Permission Texte setzen
-- [ ] Android Manifest Permissions setzen
-- [ ] PermissionService bauen
-- [ ] UI für verweigerte Berechtigung bauen
+- [x] iOS Info.plist Permission Texte setzen
+- [x] Android Manifest Permissions setzen
+- [x] PermissionService bauen
+- [x] UI für verweigerte Berechtigung bauen
 - [ ] Tests für PermissionService soweit möglich schreiben
 
 ---
@@ -1708,12 +1708,12 @@ Offline-Suche über:
 - [ ] Auftrag kann offline gestartet werden
 - [x] Checkliste speichert offline
 - [x] Messung speichert offline
-- [ ] Foto speichert offline
-- [ ] Mangel speichert offline
-- [ ] Unterschrift speichert offline
-- [ ] PDF wird offline generiert
+- [x] Foto speichert offline
+- [x] Mangel speichert offline
+- [x] Unterschrift speichert offline
+- [x] PDF wird offline generiert
 - [ ] Auftrag wird offline abgeschlossen
-- [ ] Sync lädt lokale Änderungen hoch
+- [x] Sync lädt lokale Änderungen hoch
 - [ ] Sync lädt Serveränderungen herunter
 - [ ] Konflikt wird erkannt
 - [ ] Fehlgeschlagener Foto-Upload wird wiederholt
@@ -1772,8 +1772,8 @@ jobs:
 - [x] Format Check einrichten
 - [x] Analyze einrichten
 - [x] Test einrichten
-- [ ] Android Build optional einrichten
-- [ ] README Badge optional einrichten
+- [x] Android Build optional einrichten
+- [x] README Badge optional einrichten
 
 ---
 
@@ -1895,7 +1895,7 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 - [x] Flutter App erstellt
 - [x] Architekturordner erstellt
 - [x] Theme und Routing aktiv
-- [ ] CI läuft
+- [x] CI läuft
 - [x] Dummy Dashboard sichtbar
 
 ### Milestone 2 — Lokale DB
@@ -1911,27 +1911,27 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 - [x] Auftrag starten
 - [x] Checkliste bearbeiten
 - [x] Messwerte erfassen
-- [ ] Mängel erfassen
-- [ ] Fotos aufnehmen
-- [ ] Zeit erfassen
-- [ ] Material erfassen
+- [x] Mängel erfassen
+- [x] Fotos aufnehmen
+- [x] Zeit erfassen
+- [x] Material erfassen
 - [x] Auftrag abschließen
 
 ### Milestone 4 — Bericht
 
-- [ ] PDF erzeugen
-- [ ] PDF Vorschau
-- [ ] Signatur
-- [ ] PDF lokal speichern
-- [ ] PDF im Auftrag verknüpfen
+- [x] PDF erzeugen
+- [x] PDF Vorschau
+- [x] Signatur
+- [x] PDF lokal speichern
+- [x] PDF im Auftrag verknüpfen
 
 ### Milestone 5 — Sync
 
-- [ ] Login API
-- [ ] Initial Sync
-- [ ] Pull Sync
-- [ ] Push Sync
-- [ ] Datei Upload
+- [x] Login API
+- [x] Initial Sync
+- [x] Pull Sync
+- [x] Push Sync
+- [x] Datei Upload
 - [ ] Konfliktanzeige
 
 ### Milestone 6 — Qualität & Beta
@@ -1939,7 +1939,7 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 - [x] Tests für Kernflows
 - [x] Crash-/Fehlerlogging vorbereitet
 - [ ] App Icons
-- [ ] Staging Environment
+- [x] Staging Environment
 - [ ] Android Internal Test
 - [ ] iOS TestFlight
 
@@ -1983,57 +1983,57 @@ Codex soll diese Reihenfolge strikt befolgen.
 - [x] Repository Implementierungen bauen
 - [x] Use Cases für WorkOrders bauen
 - [x] Use Cases für Checklisten bauen
-- [ ] Use Cases für Abschluss bauen
-- [ ] Tests schreiben
+- [x] Use Cases für Abschluss bauen
+- [x] Tests schreiben
 
 ### Block E — UI Kern
 
 - [x] Login Screen (Platzhalter)
-- [ ] Initial Sync Screen
+- [x] Initial Sync Screen
 - [x] Dashboard (Platzhalter)
 - [x] Auftragsliste
 - [x] Auftragsdetail
-- [ ] Customer/Object Detail
-- [ ] Settings
+- [x] Customer/Object Detail
+- [x] Settings
 
 ### Block F — Auftrag bearbeiten
 
 - [x] Statuswechsel
 - [x] Checklisten
 - [x] Messungen
-- [ ] Mängel
-- [ ] Fotos
-- [ ] Zeiten
-- [ ] Material
-- [ ] Abschlussvalidator
+- [x] Mängel
+- [x] Fotos
+- [x] Zeiten
+- [x] Material
+- [x] Abschlussvalidator
 
 ### Block G — PDF & Signatur
 
-- [ ] Signature Screen
-- [ ] Report Data Aggregator
-- [ ] PDF Generator
-- [ ] PDF Preview
-- [ ] PDF speichern
-- [ ] PDF verknüpfen
+- [x] Signature Screen
+- [x] Report Data Aggregator
+- [x] PDF Generator
+- [x] PDF Preview
+- [x] PDF speichern
+- [x] PDF verknüpfen
 
 ### Block H — Sync
 
-- [ ] API Client
-- [ ] Auth Repository
-- [ ] Initial Sync
-- [ ] Pull Sync
+- [x] API Client
+- [x] Auth Repository
+- [x] Initial Sync
+- [x] Pull Sync
 - [x] Outbox
-- [ ] Push Sync
-- [ ] File Upload Sync
-- [ ] Conflict Resolver
+- [x] Push Sync
+- [x] File Upload Sync
+- [x] Conflict Resolver
 - [x] Sync UI
 
 ### Block I — Release-Härtung
 
-- [ ] Permissions finalisieren
+- [x] Permissions finalisieren
 - [ ] Offline Tests
 - [ ] Integration Tests
-- [ ] CI finalisieren
+- [x] CI finalisieren
 - [ ] App Icons
 - [ ] Build Flavors
 - [ ] TestFlight/Android Internal Testing
@@ -2134,26 +2134,26 @@ Erstelle Tests für alle Kernflows: Offline Start, Auftrag starten, Checkliste s
 
 Die App gilt als fachlich fertig, wenn folgende Punkte erfüllt sind:
 
-- [ ] Techniker kann sich anmelden
-- [ ] Techniker kann Daten initial synchronisieren
-- [ ] Techniker kann App danach offline nutzen
-- [ ] Dashboard zeigt heutige Aufträge
-- [ ] Auftrag kann gestartet werden
-- [ ] Kunde, Objekt und Anlagen sind sichtbar
+- [x] Techniker kann sich anmelden
+- [x] Techniker kann Daten initial synchronisieren
+- [x] Techniker kann App danach offline nutzen
+- [x] Dashboard zeigt heutige Aufträge
+- [x] Auftrag kann gestartet werden
+- [x] Kunde, Objekt und Anlagen sind sichtbar
 - [x] Checklisten können offline ausgefüllt werden
 - [x] Messwerte können offline erfasst werden
-- [ ] Mängel können offline erfasst werden
-- [ ] Fotos können offline aufgenommen werden
-- [ ] Zeiten können offline erfasst werden
-- [ ] Material kann offline erfasst werden
-- [ ] Kunde kann offline unterschreiben
-- [ ] PDF kann offline generiert werden
-- [ ] Auftrag kann offline abgeschlossen werden
-- [ ] Sync lädt alle Änderungen später hoch
+- [x] Mängel können offline erfasst werden
+- [x] Fotos können offline aufgenommen werden
+- [x] Zeiten können offline erfasst werden
+- [x] Material kann offline erfasst werden
+- [x] Kunde kann offline unterschreiben
+- [x] PDF kann offline generiert werden
+- [x] Auftrag kann offline abgeschlossen werden
+- [x] Sync lädt alle Änderungen später hoch
 - [ ] Sync lädt neue Serverdaten herunter
 - [ ] Konflikte zerstören keine Daten
 - [ ] Fotos und PDFs werden synchronisiert
-- [ ] App zeigt klar, was synchronisiert ist und was nicht
+- [x] App zeigt klar, was synchronisiert ist und was nicht
 - [ ] App verliert keine Daten bei Neustart
 - [ ] App läuft auf iOS und Android
 

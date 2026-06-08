@@ -17025,6 +17025,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final DefectDao defectDao = DefectDao(this as AppDatabase);
   late final PhotoDao photoDao = PhotoDao(this as AppDatabase);
+  late final TimeEntryDao timeEntryDao = TimeEntryDao(this as AppDatabase);
+  late final MaterialDao materialDao = MaterialDao(this as AppDatabase);
   late final ReportDao reportDao = ReportDao(this as AppDatabase);
   late final OutboxDao outboxDao = OutboxDao(this as AppDatabase);
   late final SyncStateDao syncStateDao = SyncStateDao(this as AppDatabase);
@@ -25107,6 +25109,37 @@ class PhotoDaoManager {
   PhotoDaoManager(this._db);
   $$PhotosTableTableManager get photos =>
       $$PhotosTableTableManager(_db.attachedDatabase, _db.photos);
+}
+
+mixin _$TimeEntryDaoMixin on DatabaseAccessor<AppDatabase> {
+  $TimeEntriesTable get timeEntries => attachedDatabase.timeEntries;
+  TimeEntryDaoManager get managers => TimeEntryDaoManager(this);
+}
+
+class TimeEntryDaoManager {
+  final _$TimeEntryDaoMixin _db;
+  TimeEntryDaoManager(this._db);
+  $$TimeEntriesTableTableManager get timeEntries =>
+      $$TimeEntriesTableTableManager(_db.attachedDatabase, _db.timeEntries);
+}
+
+mixin _$MaterialDaoMixin on DatabaseAccessor<AppDatabase> {
+  $MaterialsTable get materials => attachedDatabase.materials;
+  $WorkOrderMaterialsTable get workOrderMaterials =>
+      attachedDatabase.workOrderMaterials;
+  MaterialDaoManager get managers => MaterialDaoManager(this);
+}
+
+class MaterialDaoManager {
+  final _$MaterialDaoMixin _db;
+  MaterialDaoManager(this._db);
+  $$MaterialsTableTableManager get materials =>
+      $$MaterialsTableTableManager(_db.attachedDatabase, _db.materials);
+  $$WorkOrderMaterialsTableTableManager get workOrderMaterials =>
+      $$WorkOrderMaterialsTableTableManager(
+        _db.attachedDatabase,
+        _db.workOrderMaterials,
+      );
 }
 
 mixin _$ReportDaoMixin on DatabaseAccessor<AppDatabase> {

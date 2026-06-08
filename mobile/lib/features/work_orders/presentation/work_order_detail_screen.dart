@@ -231,12 +231,8 @@ class _ActionGrid extends ConsumerWidget {
               icon: Icons.task_alt,
               label: 'Abschließen',
               onPressed: order.status.canComplete
-                  ? () => _runAction(context, () async {
-                      final useCase = await ref.read(
-                        completeWorkOrderProvider.future,
-                      );
-                      await useCase(order.id);
-                    })
+                  ? () =>
+                        context.push(AppRoutes.workOrderCompletePath(order.id))
                   : null,
             ),
           ],
@@ -285,6 +281,15 @@ class _CustomerCard extends StatelessWidget {
         _InfoRow(label: 'E-Mail', value: customer.email ?? '-'),
         if (customer.notes != null)
           _InfoRow(label: 'Notizen', value: customer.notes!),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () =>
+                context.push(AppRoutes.customerDetailPath(customer.id)),
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Kunde öffnen'),
+          ),
+        ),
       ],
     );
   }
@@ -311,6 +316,15 @@ class _ObjectCard extends StatelessWidget {
           _InfoRow(label: 'Sicherheit', value: object.safetyNotes!),
         if (object.objectNotes != null)
           _InfoRow(label: 'Notizen', value: object.objectNotes!),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () =>
+                context.push(AppRoutes.objectDetailPath(object.id)),
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Objekt öffnen'),
+          ),
+        ),
       ],
     );
   }
@@ -335,10 +349,15 @@ class _InstallationList extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          installation.displayName,
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w800),
+                        InkWell(
+                          onTap: () => context.push(
+                            AppRoutes.installationDetailPath(installation.id),
+                          ),
+                          child: Text(
+                            installation.displayName,
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w800),
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
@@ -390,37 +409,45 @@ class _WorkflowShortcuts extends StatelessWidget {
               onPressed: () =>
                   context.push(AppRoutes.workOrderMeasurementsPath(orderId)),
             ),
-            _DisabledShortcut(
-              icon: Icons.report_problem_outlined,
-              label: 'Mängel',
+            ActionChip(
+              avatar: const Icon(Icons.report_problem_outlined, size: 18),
+              label: const Text('Mängel'),
+              onPressed: () =>
+                  context.push(AppRoutes.workOrderDefectsPath(orderId)),
             ),
-            _DisabledShortcut(
-              icon: Icons.photo_camera_outlined,
-              label: 'Fotos',
+            ActionChip(
+              avatar: const Icon(Icons.photo_camera_outlined, size: 18),
+              label: const Text('Fotos'),
+              onPressed: () =>
+                  context.push(AppRoutes.workOrderPhotosPath(orderId)),
             ),
-            _DisabledShortcut(
-              icon: Icons.picture_as_pdf_outlined,
-              label: 'Bericht',
+            ActionChip(
+              avatar: const Icon(Icons.timer_outlined, size: 18),
+              label: const Text('Zeiten'),
+              onPressed: () =>
+                  context.push(AppRoutes.workOrderTimePath(orderId)),
+            ),
+            ActionChip(
+              avatar: const Icon(Icons.inventory_2_outlined, size: 18),
+              label: const Text('Material'),
+              onPressed: () =>
+                  context.push(AppRoutes.workOrderMaterialsPath(orderId)),
+            ),
+            ActionChip(
+              avatar: const Icon(Icons.picture_as_pdf_outlined, size: 18),
+              label: const Text('Bericht'),
+              onPressed: () =>
+                  context.push(AppRoutes.workOrderReportPath(orderId)),
+            ),
+            ActionChip(
+              avatar: const Icon(Icons.draw, size: 18),
+              label: const Text('Signatur'),
+              onPressed: () =>
+                  context.push(AppRoutes.workOrderSignaturePath(orderId)),
             ),
           ],
         ),
       ],
-    );
-  }
-}
-
-class _DisabledShortcut extends StatelessWidget {
-  const _DisabledShortcut({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return ActionChip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-      onPressed: null,
     );
   }
 }

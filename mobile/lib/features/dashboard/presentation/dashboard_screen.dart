@@ -10,6 +10,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../data/sync/sync_providers.dart';
 import '../../../domain/entities/work_order.dart';
 import '../../../domain/enums/work_order_status.dart';
 import '../../work_orders/application/work_order_providers.dart';
@@ -32,7 +33,7 @@ class DashboardScreen extends ConsumerWidget {
         actions: [
           IconButton(
             tooltip: 'Synchronisieren',
-            onPressed: () => ref.invalidate(pendingOutboxCountProvider),
+            onPressed: () => ref.invalidate(syncNowProvider),
             icon: const Icon(Icons.sync),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -345,15 +346,15 @@ class _QuickActions extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => context.go(AppRoutes.workOrders),
+                onPressed: () => context.go(AppRoutes.search),
                 icon: const Icon(Icons.search),
-                label: const Text('Aufträge'),
+                label: const Text('Suche'),
               ),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () => context.go(AppRoutes.settings),
                 icon: const Icon(Icons.settings_outlined),
                 label: const Text('Einstellungen'),
               ),

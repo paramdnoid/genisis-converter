@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
+import '../application/auth_providers.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController(text: 'techniker@example.ch');
   final _passwordController = TextEditingController(text: 'offline-demo');
 
@@ -65,13 +67,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: AppSpacing.xl),
             FilledButton.icon(
-              onPressed: () => context.go(AppRoutes.dashboard),
+              onPressed: () => _login(context),
               icon: const Icon(Icons.check_circle_outline),
               label: const Text('Demo-Sitzung öffnen'),
             ),
             const SizedBox(height: AppSpacing.md),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () => _login(context),
               icon: const Icon(Icons.sync_disabled),
               label: const Text('Offline fortfahren'),
             ),
@@ -79,5 +81,19 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _login(BuildContext context) async {
+    final repository = ref.read(authRepositoryProvider);
+    final controller = ref.read(authSessionProvider);
+    await controller.login(
+      repository: repository,
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    if (context.mounted) {
+      context.go(AppRoutes.initialSync);
+    }
   }
 }

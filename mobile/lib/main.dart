@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'core/errors/global_error_handler.dart';
 
 void main() {
-  runApp(const ProviderScope(child: KaminfegerApp()));
+  GlobalErrorHandler.runAppGuarded(const ProviderScope(child: KaminfegerApp()));
 }

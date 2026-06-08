@@ -380,6 +380,8 @@ class SyncStates extends Table {
     MeasurementDao,
     DefectDao,
     PhotoDao,
+    TimeEntryDao,
+    MaterialDao,
     ReportDao,
     OutboxDao,
     SyncStateDao,
@@ -418,6 +420,58 @@ class AppDatabase extends _$AppDatabase {
         payloadJson: jsonEncode(payload),
         status: const Value('pending'),
         syncStatus: const Value('pending'),
+      ),
+    );
+  }
+
+  Future<void> setEntitySyncStatus({
+    required String entityType,
+    required String entityId,
+    required String syncStatus,
+  }) async {
+    final tableName = switch (entityType) {
+      'work_order' => 'work_orders',
+      'checklist_answer' => 'checklist_answers',
+      'measurement' => 'measurements',
+      'defect' => 'defects',
+      'photo' => 'photos',
+      'time_entry' => 'time_entries',
+      'work_order_material' => 'work_order_materials',
+      'report' => 'reports',
+      _ => null,
+    };
+
+    if (tableName == null) {
+      return;
+    }
+
+    final now = _utcNowIso();
+    await customUpdate(
+      'UPDATE $tableName '
+      'SET sync_status = ?, last_synced_at = ?, updated_at = ? '
+      'WHERE id = ?',
+      variables: [
+        Variable.withString(syncStatus),
+        Variable.withString(now),
+        Variable.withString(now),
+        Variable.withString(entityId),
+      ],
+    );
+  }
+
+  Future<void> markPhotoUploaded(String id, {String? remoteUrl}) async {
+    final existing = await photoDao.getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    await update(photos).replace(
+      existing.copyWith(
+        remoteUrl: Value(remoteUrl ?? existing.remoteUrl),
+        uploadStatus: 'uploaded',
+        updatedAt: _utcNowIso(),
+        syncStatus: 'synced',
+        lastSyncedAt: Value(_utcNowIso()),
       ),
     );
   }
@@ -786,6 +840,19 @@ class InstallationDao extends DatabaseAccessor<AppDatabase>
     with _$InstallationDaoMixin {
   InstallationDao(super.db);
 
+  Stream<List<InstallationRow>> watchActive(String tenantId) {
+    return (select(installations)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) & table.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.type),
+            (table) => OrderingTerm.asc(table.manufacturer),
+          ]))
+        .watch();
+  }
+
   Stream<List<InstallationRow>> watchForObject(
     String tenantId,
     String objectId,
@@ -967,6 +1034,36 @@ class WorkOrderDao extends DatabaseAccessor<AppDatabase>
       );
       await _closeOpenTimeEntry(existing.id, now);
     });
+  }
+
+  Future<void> attachSignatureLocal({
+    required String id,
+    required String signatureFileId,
+  }) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    await _replaceWithOutbox(
+      existing.copyWith(customerSignatureFileId: Value(signatureFileId)),
+      operation: 'update',
+    );
+  }
+
+  Future<void> attachReportLocal({
+    required String id,
+    required String reportFileId,
+  }) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    await _replaceWithOutbox(
+      existing.copyWith(reportFileId: Value(reportFileId)),
+      operation: 'update',
+    );
   }
 
   Future<void> upsertLocal(WorkOrderRow row) async {
@@ -1395,6 +1492,111 @@ class DefectDao extends DatabaseAccessor<AppDatabase> with _$DefectDaoMixin {
           ]))
         .watch();
   }
+
+  Future<DefectRow?> getById(String id) {
+    return (select(
+      defects,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> createLocal({
+    required String tenantId,
+    required String workOrderId,
+    required String severity,
+    required String title,
+    required String description,
+    String? installationId,
+    String? recommendedAction,
+    String? dueDate,
+  }) async {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+    final row = DefectsCompanion.insert(
+      id: id,
+      tenantId: tenantId,
+      workOrderId: workOrderId,
+      installationId: Value(installationId),
+      severity: severity,
+      title: title,
+      description: description,
+      recommendedAction: Value(recommendedAction),
+      dueDate: Value(dueDate),
+      createdAt: Value(now),
+      updatedAt: Value(now),
+      syncStatus: const Value('pending'),
+    );
+
+    await transaction(() async {
+      await into(defects).insert(row);
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'defect',
+        entityId: id,
+        operation: 'create',
+        payload: {
+          'id': id,
+          'tenant_id': tenantId,
+          'work_order_id': workOrderId,
+          'installation_id': installationId,
+          'severity': severity,
+          'title': title,
+          'description': description,
+          'recommended_action': recommendedAction,
+          'due_date': dueDate,
+          'resolved': false,
+        },
+      );
+    });
+  }
+
+  Future<void> updateLocal(DefectRow row) async {
+    final existing = await getById(row.id);
+    if (existing == null) {
+      return;
+    }
+
+    final next = row.copyWith(
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(defects).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'defect',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
+
+  Future<void> softDeleteLocal(String id) async {
+    final existing = await getById(id);
+    if (existing == null || existing.deletedAt != null) {
+      return;
+    }
+
+    final next = existing.copyWith(
+      deletedAt: Value(_utcNowIso()),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(defects).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'defect',
+        entityId: next.id,
+        operation: 'delete',
+        payload: next.toJson(),
+      );
+    });
+  }
 }
 
 @DriftAccessor(tables: [Photos])
@@ -1414,6 +1616,283 @@ class PhotoDao extends DatabaseAccessor<AppDatabase> with _$PhotoDaoMixin {
           )
           ..orderBy([(table) => OrderingTerm.desc(table.takenAt)]))
         .watch();
+  }
+
+  Future<PhotoRow?> getById(String id) {
+    return (select(
+      photos,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<String> createLocal({
+    required String tenantId,
+    required String localPath,
+    required String fileName,
+    required String mimeType,
+    required int sizeBytes,
+    String? workOrderId,
+    String? objectId,
+    String? installationId,
+    String? defectId,
+    String? caption,
+  }) async {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+    final row = PhotosCompanion.insert(
+      id: id,
+      tenantId: tenantId,
+      workOrderId: Value(workOrderId),
+      objectId: Value(objectId),
+      installationId: Value(installationId),
+      defectId: Value(defectId),
+      localPath: localPath,
+      fileName: fileName,
+      mimeType: mimeType,
+      sizeBytes: sizeBytes,
+      caption: Value(caption),
+      takenAt: now,
+      uploadStatus: 'pending',
+      createdAt: Value(now),
+      updatedAt: Value(now),
+      syncStatus: const Value('pending'),
+    );
+
+    await transaction(() async {
+      await into(photos).insert(row);
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'photo',
+        entityId: id,
+        operation: 'upload_file',
+        payload: {
+          'id': id,
+          'tenant_id': tenantId,
+          'work_order_id': workOrderId,
+          'object_id': objectId,
+          'installation_id': installationId,
+          'defect_id': defectId,
+          'local_path': localPath,
+          'file_name': fileName,
+          'mime_type': mimeType,
+          'size_bytes': sizeBytes,
+          'caption': caption,
+          'taken_at': now,
+          'upload_status': 'pending',
+        },
+      );
+    });
+
+    return id;
+  }
+
+  Future<void> updateCaptionLocal({
+    required String id,
+    required String? caption,
+  }) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    final next = existing.copyWith(
+      caption: Value(caption),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(photos).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'photo',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
+}
+
+@DriftAccessor(tables: [TimeEntries])
+class TimeEntryDao extends DatabaseAccessor<AppDatabase>
+    with _$TimeEntryDaoMixin {
+  TimeEntryDao(super.db);
+
+  Stream<List<TimeEntryRow>> watchForWorkOrder(
+    String tenantId,
+    String workOrderId,
+  ) {
+    return (select(timeEntries)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.workOrderId.equals(workOrderId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.startTime)]))
+        .watch();
+  }
+
+  Future<void> createLocal({
+    required String tenantId,
+    required String workOrderId,
+    required String userId,
+    required String type,
+    required String startTime,
+    String? endTime,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+    final duration = endTime == null
+        ? null
+        : _minutesBetweenIso(startTime, endTime);
+    final row = TimeEntriesCompanion.insert(
+      id: id,
+      tenantId: tenantId,
+      workOrderId: workOrderId,
+      userId: userId,
+      type: type,
+      startTime: startTime,
+      endTime: Value(endTime),
+      durationMinutes: Value(duration),
+      notes: Value(notes),
+      createdAt: Value(now),
+      updatedAt: Value(now),
+      syncStatus: const Value('pending'),
+    );
+
+    await transaction(() async {
+      await into(timeEntries).insert(row);
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'time_entry',
+        entityId: id,
+        operation: 'create',
+        payload: {
+          'id': id,
+          'tenant_id': tenantId,
+          'work_order_id': workOrderId,
+          'user_id': userId,
+          'type': type,
+          'start_time': startTime,
+          'end_time': endTime,
+          'duration_minutes': duration,
+          'notes': notes,
+        },
+      );
+    });
+  }
+
+  Future<void> updateLocal(TimeEntryRow row) async {
+    final existing = await (select(
+      timeEntries,
+    )..where((table) => table.id.equals(row.id))).getSingleOrNull();
+    if (existing == null) {
+      return;
+    }
+
+    final next = row.copyWith(
+      durationMinutes: Value(
+        row.endTime == null
+            ? row.durationMinutes
+            : _minutesBetweenIso(row.startTime, row.endTime!),
+      ),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(timeEntries).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'time_entry',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
+}
+
+@DriftAccessor(tables: [Materials, WorkOrderMaterials])
+class MaterialDao extends DatabaseAccessor<AppDatabase>
+    with _$MaterialDaoMixin {
+  MaterialDao(super.db);
+
+  Stream<List<MaterialRow>> watchActiveMaterials(String tenantId) {
+    return (select(materials)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.deletedAt.isNull() &
+                table.isActive.equals(true),
+          )
+          ..orderBy([(table) => OrderingTerm.asc(table.name)]))
+        .watch();
+  }
+
+  Stream<List<WorkOrderMaterialRow>> watchForWorkOrder(
+    String tenantId,
+    String workOrderId,
+  ) {
+    return (select(workOrderMaterials)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.workOrderId.equals(workOrderId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([(table) => OrderingTerm.asc(table.name)]))
+        .watch();
+  }
+
+  Future<void> createWorkOrderMaterialLocal({
+    required String tenantId,
+    required String workOrderId,
+    required String name,
+    required double quantity,
+    required String unit,
+    String? materialId,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+    final row = WorkOrderMaterialsCompanion.insert(
+      id: id,
+      tenantId: tenantId,
+      workOrderId: workOrderId,
+      materialId: Value(materialId),
+      name: name,
+      quantity: quantity,
+      unit: unit,
+      notes: Value(notes),
+      createdAt: Value(now),
+      updatedAt: Value(now),
+      syncStatus: const Value('pending'),
+    );
+
+    await transaction(() async {
+      await into(workOrderMaterials).insert(row);
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'work_order_material',
+        entityId: id,
+        operation: 'create',
+        payload: {
+          'id': id,
+          'tenant_id': tenantId,
+          'work_order_id': workOrderId,
+          'material_id': materialId,
+          'name': name,
+          'quantity': quantity,
+          'unit': unit,
+          'notes': notes,
+        },
+      );
+    });
   }
 }
 
@@ -1435,6 +1914,60 @@ class ReportDao extends DatabaseAccessor<AppDatabase> with _$ReportDaoMixin {
           ..orderBy([(table) => OrderingTerm.desc(table.generatedAt)]))
         .watch();
   }
+
+  Future<String> createGeneratedLocal({
+    required String tenantId,
+    required String workOrderId,
+    required String reportNumber,
+    required String pdfLocalPath,
+    String? customerNameSigned,
+    bool signed = false,
+  }) async {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+
+    await transaction(() async {
+      await into(reports).insert(
+        ReportsCompanion.insert(
+          id: id,
+          tenantId: tenantId,
+          workOrderId: workOrderId,
+          reportNumber: reportNumber,
+          status: signed ? 'signed' : 'generated',
+          pdfLocalPath: Value(pdfLocalPath),
+          generatedAt: Value(now),
+          signedAt: Value(signed ? now : null),
+          customerNameSigned: Value(customerNameSigned),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+          syncStatus: const Value('pending'),
+        ),
+      );
+      await db.workOrderDao.attachReportLocal(
+        id: workOrderId,
+        reportFileId: id,
+      );
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'report',
+        entityId: id,
+        operation: 'create',
+        payload: {
+          'id': id,
+          'tenant_id': tenantId,
+          'work_order_id': workOrderId,
+          'report_number': reportNumber,
+          'status': signed ? 'signed' : 'generated',
+          'pdf_local_path': pdfLocalPath,
+          'generated_at': now,
+          'signed_at': signed ? now : null,
+          'customer_name_signed': customerNameSigned,
+        },
+      );
+    });
+
+    return id;
+  }
 }
 
 @DriftAccessor(tables: [OutboxEntries])
@@ -1455,6 +1988,65 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
 
   Stream<int> watchPendingCount(String tenantId) {
     return watchPending(tenantId).map((entries) => entries.length);
+  }
+
+  Future<List<OutboxEntryRow>> listPending(String tenantId, {int limit = 50}) {
+    return (select(outboxEntries)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.deletedAt.isNull() &
+                table.status.isIn(['pending', 'failed']),
+          )
+          ..orderBy([(table) => OrderingTerm.asc(table.createdAt)])
+          ..limit(limit))
+        .get();
+  }
+
+  Future<void> markProcessing(String id) async {
+    await _updateStatus(id, 'processing');
+  }
+
+  Future<void> markDone(String id) async {
+    await _updateStatus(id, 'done');
+  }
+
+  Future<void> markFailed(String id, String message) async {
+    final existing = await (select(
+      outboxEntries,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+    if (existing == null) {
+      return;
+    }
+
+    await update(outboxEntries).replace(
+      existing.copyWith(
+        status: 'failed',
+        attempts: existing.attempts + 1,
+        lastAttemptAt: Value(_utcNowIso()),
+        errorMessage: Value(message),
+        updatedAt: _utcNowIso(),
+        syncStatus: 'failed',
+      ),
+    );
+  }
+
+  Future<void> _updateStatus(String id, String status) async {
+    final existing = await (select(
+      outboxEntries,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+    if (existing == null) {
+      return;
+    }
+
+    await update(outboxEntries).replace(
+      existing.copyWith(
+        status: status,
+        lastAttemptAt: Value(_utcNowIso()),
+        updatedAt: _utcNowIso(),
+        syncStatus: status == 'done' ? 'synced' : existing.syncStatus,
+      ),
+    );
   }
 }
 

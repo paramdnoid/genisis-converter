@@ -23,6 +23,12 @@ void main() {
     await tester.tap(find.text('Demo-Sitzung öffnen'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Initialer Sync'), findsOneWidget);
+    expect(find.text('Minimaldaten laden'), findsOneWidget);
+
+    await tester.tap(find.text('Minimaldaten laden'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Heute'), findsOneWidget);
     expect(find.text('Nächster Auftrag'), findsOneWidget);
     expect(find.text('Jahreskontrolle Cheminée'), findsOneWidget);
@@ -39,6 +45,8 @@ void main() {
     await tester.tap(find.text('Zur Anmeldung'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Demo-Sitzung öffnen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Minimaldaten laden'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Alle Aufträge'));
@@ -63,15 +71,25 @@ void main() {
     expect(find.text('Auftragsdetail'), findsOneWidget);
     expect(find.text('Familie Keller'), findsOneWidget);
 
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-
+    await tester.dragUntilVisible(
+      find.text('Im Ried 7, 8610 Uster'),
+      find.byType(ListView),
+      const Offset(0, -240),
+    );
     expect(find.text('Im Ried 7, 8610 Uster'), findsOneWidget);
+
+    await tester.dragUntilVisible(
+      find.text('Rueegg RIII 45'),
+      find.byType(ListView),
+      const Offset(0, -240),
+    );
     expect(find.text('Rueegg RIII 45'), findsOneWidget);
 
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-
+    await tester.dragUntilVisible(
+      find.text('Messungen'),
+      find.byType(ListView),
+      const Offset(0, -240),
+    );
     await tester.tap(find.text('Messungen'));
     await tester.pumpAndSettle();
 

@@ -9,6 +9,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../data/sync/sync_providers.dart';
 import '../../../domain/entities/work_order.dart';
 import '../../../domain/enums/work_order_status.dart';
 import '../application/work_order_providers.dart';
@@ -50,6 +51,8 @@ class _WorkOrderListScreenState extends ConsumerState<WorkOrderListScreen> {
 
             return RefreshIndicator(
               onRefresh: () async {
+                ref.invalidate(syncNowProvider);
+                await ref.read(syncNowProvider.future);
                 ref.invalidate(workOrdersProvider);
                 await ref.read(workOrdersProvider.future);
               },
@@ -237,7 +240,9 @@ class _WorkOrderCard extends ConsumerWidget {
                   IconButton.outlined(
                     tooltip: 'Abschließen',
                     onPressed: order.status.canComplete
-                        ? () => _completeOrder(ref, order.id)
+                        ? () => context.push(
+                            AppRoutes.workOrderCompletePath(order.id),
+                          )
                         : null,
                     icon: const Icon(Icons.task_alt),
                   ),
@@ -253,11 +258,6 @@ class _WorkOrderCard extends ConsumerWidget {
   Future<void> _startOrder(WidgetRef ref, String id) async {
     final startWorkOrder = await ref.read(startWorkOrderProvider.future);
     await startWorkOrder(id);
-  }
-
-  Future<void> _completeOrder(WidgetRef ref, String id) async {
-    final completeWorkOrder = await ref.read(completeWorkOrderProvider.future);
-    await completeWorkOrder(id);
   }
 }
 
