@@ -946,7 +946,7 @@ GET    /reports/:id
 - [x] Tests für erfolgreichen Sync schreiben
 - [x] Tests für Offline-Modus schreiben
 - [x] Tests für Konflikte schreiben
-- [ ] Tests für Datei-Upload-Fehler schreiben
+- [x] Tests für Datei-Upload-Fehler schreiben
 
 ---
 
