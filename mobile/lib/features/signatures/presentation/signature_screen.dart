@@ -8,6 +8,9 @@ import '../../../core/files/file_storage_service.dart';
 import '../../../data/db/database_providers.dart';
 import '../../../domain/entities/photo_attachment.dart';
 import '../../photos/application/photo_providers.dart';
+import '../../reports/application/pdf_report_generator.dart';
+import '../../reports/application/report_data_aggregator.dart';
+import '../../reports/application/report_providers.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
 class SignatureScreen extends ConsumerStatefulWidget {
@@ -166,7 +169,27 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
       id: widget.workOrderId,
       signatureFileId: photoId,
     );
-    _showMessage('Signatur lokal gespeichert.');
+    final data = await ReportDataAggregator(
+      database: database,
+      tenantId: tenantId,
+    ).load(widget.workOrderId);
+    if (data != null) {
+      final storedReport = await const PdfReportGenerator().save(
+        data: data,
+        tenantId: tenantId,
+        workOrderId: widget.workOrderId,
+      );
+      final createReport = await ref.read(createReportRecordProvider.future);
+      await createReport(
+        workOrderId: widget.workOrderId,
+        reportNumber: 'R-${data.header.workOrder.orderNumber}-signed',
+        pdfLocalPath: storedReport.path,
+        customerNameSigned: _nameController.text.trim(),
+        signed: true,
+      );
+      ref.invalidate(reportsForWorkOrderProvider(widget.workOrderId));
+    }
+    _showMessage('Signatur und finaler Rapport lokal gespeichert.');
   }
 
   void _showMessage(String message) {

@@ -17,6 +17,7 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
   var _progress = 0.0;
   String _label = 'Bereit';
   bool _running = false;
+  String? _error;
 
   @override
   Widget build(BuildContext context) {
@@ -43,13 +44,22 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(_label),
+              if (_error != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
               const SizedBox(height: AppSpacing.lg),
               LinearProgressIndicator(value: _progress),
               const Spacer(),
               FilledButton.icon(
                 onPressed: _running ? null : _run,
-                icon: const Icon(Icons.sync),
-                label: const Text('Minimaldaten laden'),
+                icon: Icon(_error == null ? Icons.sync : Icons.refresh),
+                label: Text(
+                  _error == null ? 'Minimaldaten laden' : 'Erneut versuchen',
+                ),
               ),
             ],
           ),
@@ -63,29 +73,42 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
       _running = true;
       _progress = 0.15;
       _label = 'Lokale Datenbank öffnen';
+      _error = null;
     });
-    await ref.read(databaseReadyProvider.future);
 
-    final steps = const [
-      'Benutzerprofil prüfen',
-      'Aufträge und Kunden bereitstellen',
-      'Objekte und Anlagen bereitstellen',
-      'Checklisten und Materialstamm bereitstellen',
-    ];
+    try {
+      await ref.read(databaseReadyProvider.future);
 
-    for (var i = 0; i < steps.length; i += 1) {
-      await Future<void>.delayed(const Duration(milliseconds: 180));
+      final steps = const [
+        'Benutzerprofil prüfen',
+        'Aufträge und Kunden bereitstellen',
+        'Objekte und Anlagen bereitstellen',
+        'Checklisten und Materialstamm bereitstellen',
+      ];
+
+      for (var i = 0; i < steps.length; i += 1) {
+        await Future<void>.delayed(const Duration(milliseconds: 180));
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _label = steps[i];
+          _progress = (i + 2) / (steps.length + 2);
+        });
+      }
+
+      if (mounted) {
+        context.go(AppRoutes.dashboard);
+      }
+    } catch (error) {
       if (!mounted) {
         return;
       }
       setState(() {
-        _label = steps[i];
-        _progress = (i + 2) / (steps.length + 2);
+        _label = 'Initialer Sync fehlgeschlagen';
+        _error = error.toString();
+        _running = false;
       });
-    }
-
-    if (mounted) {
-      context.go(AppRoutes.dashboard);
     }
   }
 }

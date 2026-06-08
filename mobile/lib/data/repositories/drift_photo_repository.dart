@@ -16,6 +16,26 @@ final class DriftPhotoRepository implements PhotoRepository {
   }
 
   @override
+  Stream<List<PhotoAttachment>> watchForDefect(String defectId) {
+    return database.photoDao
+        .watchForDefect(tenantId, defectId)
+        .map((rows) => rows.map(_mapRow).toList(growable: false));
+  }
+
+  @override
+  Stream<List<PhotoAttachment>> watchForInstallation(String installationId) {
+    return database.photoDao
+        .watchForInstallation(tenantId, installationId)
+        .map((rows) => rows.map(_mapRow).toList(growable: false));
+  }
+
+  @override
+  Future<PhotoAttachment?> getById(String id) async {
+    final row = await database.photoDao.getById(id);
+    return row == null ? null : _mapRow(row);
+  }
+
+  @override
   Future<String> create(PhotoDraft draft) {
     return database.photoDao.createLocal(
       tenantId: tenantId,
@@ -34,6 +54,11 @@ final class DriftPhotoRepository implements PhotoRepository {
   @override
   Future<void> updateCaption({required String id, required String? caption}) {
     return database.photoDao.updateCaptionLocal(id: id, caption: caption);
+  }
+
+  @override
+  Future<void> attachToDefect({required String id, required String? defectId}) {
+    return database.photoDao.attachToDefectLocal(id: id, defectId: defectId);
   }
 }
 

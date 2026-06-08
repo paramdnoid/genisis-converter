@@ -18,9 +18,41 @@ final photosForWorkOrderProvider = StreamProvider.autoDispose
       yield* repository.watchForWorkOrder(workOrderId);
     });
 
+final photosForDefectProvider = StreamProvider.autoDispose
+    .family<List<PhotoAttachment>, String>((ref, defectId) async* {
+      final repository = await ref.watch(photoRepositoryProvider.future);
+      yield* repository.watchForDefect(defectId);
+    });
+
+final photosForInstallationProvider = StreamProvider.autoDispose
+    .family<List<PhotoAttachment>, String>((ref, installationId) async* {
+      final repository = await ref.watch(photoRepositoryProvider.future);
+      yield* repository.watchForInstallation(installationId);
+    });
+
+final photoDetailProvider = FutureProvider.autoDispose
+    .family<PhotoAttachment?, String>((ref, photoId) async {
+      final repository = await ref.watch(photoRepositoryProvider.future);
+      return repository.getById(photoId);
+    });
+
 final createPhotoProvider = FutureProvider<CreatePhoto>((ref) async {
   final repository = await ref.watch(photoRepositoryProvider.future);
   return CreatePhoto(repository);
+});
+
+final updatePhotoCaptionProvider = FutureProvider<UpdatePhotoCaption>((
+  ref,
+) async {
+  final repository = await ref.watch(photoRepositoryProvider.future);
+  return UpdatePhotoCaption(repository);
+});
+
+final attachPhotoToDefectProvider = FutureProvider<AttachPhotoToDefect>((
+  ref,
+) async {
+  final repository = await ref.watch(photoRepositoryProvider.future);
+  return AttachPhotoToDefect(repository);
 });
 
 final class CreatePhoto {
@@ -30,5 +62,25 @@ final class CreatePhoto {
 
   Future<String> call(PhotoDraft draft) {
     return _repository.create(draft);
+  }
+}
+
+final class UpdatePhotoCaption {
+  const UpdatePhotoCaption(this._repository);
+
+  final PhotoRepository _repository;
+
+  Future<void> call({required String id, required String? caption}) {
+    return _repository.updateCaption(id: id, caption: caption);
+  }
+}
+
+final class AttachPhotoToDefect {
+  const AttachPhotoToDefect(this._repository);
+
+  final PhotoRepository _repository;
+
+  Future<void> call({required String id, required String? defectId}) {
+    return _repository.attachToDefect(id: id, defectId: defectId);
   }
 }

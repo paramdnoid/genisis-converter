@@ -924,7 +924,7 @@ GET    /reports/:id
 - [x] Foto-Uploads erzeugen `operation=upload_file`
 - [ ] Mehrere Updates derselben Entität dürfen zusammengeführt werden, aber nur wenn sicher
 - [x] Nach erfolgreichem Push wird `sync_status=synced` gesetzt
-- [ ] Nach Konflikt wird `sync_status=conflict` gesetzt
+- [x] Nach Konflikt wird `sync_status=conflict` gesetzt
 - [x] Nach permanentem Fehler wird `sync_status=failed` gesetzt
 
 ### 12.5 Codex-Aufgaben Sync
@@ -942,10 +942,10 @@ GET    /reports/:id
 - [x] Manuelles „Jetzt synchronisieren“ bauen
 - [x] Auto-Sync beim App-Start bauen
 - [x] Auto-Sync bei Netzwerk-Wiederkehr bauen
-- [ ] Retry mit Backoff bauen
+- [x] Retry mit Backoff bauen
 - [x] Tests für erfolgreichen Sync schreiben
 - [ ] Tests für Offline-Modus schreiben
-- [ ] Tests für Konflikte schreiben
+- [x] Tests für Konflikte schreiben
 - [ ] Tests für Datei-Upload-Fehler schreiben
 
 ---
@@ -982,7 +982,7 @@ GET    /reports/:id
 - [x] GoRouter einrichten
 - [x] Auth Guard einrichten
 - [x] Offline-fähige Navigation sicherstellen
-- [ ] Deep Links später vorbereiten
+- [x] Deep Links später vorbereiten
 - [x] Fehlerseite erstellen
 - [x] Loading/Splash Screen erstellen
 
@@ -1076,7 +1076,7 @@ Nach erstem Login lädt die App die benötigten Daten für den Techniker:
 - [x] `InitialSyncScreen` erstellen
 - [x] Fortschrittsanzeige erstellen
 - [x] Daten stufenweise laden
-- [ ] Fehler mit Retry anzeigen
+- [x] Fehler mit Retry anzeigen
 - [x] Abbruch verhindern, solange keine Minimaldaten vorhanden sind
 - [x] Nach erfolgreichem Initial Sync zum Dashboard navigieren
 - [x] Tests für erfolgreichen Initial Sync schreiben
@@ -1206,11 +1206,11 @@ completed -> synced
 - [ ] Object Entity/DAO/Repository erstellen
 - [x] Customer Detail Screen bauen
 - [x] Object Detail Screen bauen
-- [ ] Historienliste bauen
+- [x] Historienliste bauen
 - [x] Suche nach Kunden bauen
-- [ ] Editierbare Notizen bauen
-- [ ] Änderungen in Outbox schreiben
-- [ ] Tests schreiben
+- [x] Editierbare Notizen bauen
+- [x] Änderungen in Outbox schreiben
+- [x] Tests schreiben
 
 ---
 
@@ -1228,12 +1228,12 @@ completed -> synced
 ### 21.2 Codex-Aufgaben
 
 - [ ] Installation Entity/DAO/Repository erstellen
-- [ ] Installation List Screen bauen
+- [x] Installation List Screen bauen
 - [x] Installation Detail Screen bauen
-- [ ] Anlagenhistorie anzeigen
-- [ ] Notizen editierbar machen
-- [ ] Fotos je Anlage anzeigen
-- [ ] Tests schreiben
+- [x] Anlagenhistorie anzeigen
+- [x] Notizen editierbar machen
+- [x] Fotos je Anlage anzeigen
+- [x] Tests schreiben
 
 ---
 
@@ -1343,7 +1343,7 @@ critical
 - [x] Defect Entity/DAO/Repository erstellen
 - [x] Mängelliste pro Auftrag bauen
 - [x] Mangel-Formular bauen
-- [ ] Foto-Zuordnung bauen
+- [x] Foto-Zuordnung bauen
 - [x] Validierung bauen
 - [x] Kritische Mängel im UI hervorheben
 - [x] Kritische Mängel im PDF hervorheben
@@ -1381,8 +1381,8 @@ critical
 - [x] Foto komprimieren implementieren
 - [x] Foto-Metadaten speichern
 - [x] Foto-Galerie pro Auftrag bauen
-- [ ] Foto-Detail Screen bauen
-- [ ] Bildnotiz editierbar machen
+- [x] Foto-Detail Screen bauen
+- [x] Bildnotiz editierbar machen
 - [x] Upload über Outbox implementieren
 - [ ] Tests für FileStorageService schreiben
 
@@ -1406,7 +1406,7 @@ critical
 - [x] Clear/Undo ermöglichen
 - [x] Signatur speichern
 - [x] Signatur als File-Metadatum erfassen
-- [ ] Bericht nach Signatur aktualisieren
+- [x] Bericht nach Signatur aktualisieren
 - [ ] Tests schreiben
 
 ---
@@ -1494,7 +1494,7 @@ PDF-Bericht enthält:
 - [x] Report Entity/DAO/Repository erstellen
 - [x] Report Data Aggregator bauen
 - [x] PDF Layout bauen
-- [ ] Firmenlogo einbinden
+- [x] Firmenlogo einbinden
 - [x] Tabellen für Messungen bauen
 - [x] Abschnitt Mängel bauen
 - [x] Foto-Anhang bauen
@@ -1502,7 +1502,7 @@ PDF-Bericht enthält:
 - [x] PDF lokal speichern
 - [x] PDF Vorschau bauen
 - [x] PDF teilen/exportieren ermöglichen
-- [ ] PDF Upload synchronisieren
+- [x] PDF Upload synchronisieren
 - [ ] Tests für Report Data Aggregator schreiben
 - [ ] Golden Test oder Snapshot-Test für PDF-Struktur vorbereiten
 
@@ -1566,7 +1566,7 @@ Offline-Suche über:
 
 - [x] Lokale Suchqueries bauen
 - [x] Suchscreen erstellen
-- [ ] Debounce implementieren
+- [x] Debounce implementieren
 - [x] Ergebnisgruppen bauen
 - [x] Empty State bauen
 - [ ] Tests schreiben
@@ -1589,12 +1589,12 @@ Offline-Suche über:
 ### 32.2 Codex-Aufgaben
 
 - [x] Settings Screen erstellen
-- [ ] Profile Screen erstellen
+- [x] Profile Screen erstellen
 - [x] Sync Status Screen erstellen
 - [x] Storage Usage berechnen
 - [x] App Version anzeigen
 - [x] Logout Flow bauen
-- [ ] Debug Export optional bauen
+- [x] Debug Export optional bauen
 
 ---
 
@@ -1618,7 +1618,7 @@ Offline-Suche über:
 - [x] Global Error Handler erstellen
 - [x] LoggingService erstellen
 - [x] User-freundliche Fehlermeldungen erstellen
-- [ ] Retry-Möglichkeiten bei Sync-Fehlern einbauen
+- [x] Retry-Möglichkeiten bei Sync-Fehlern einbauen
 - [x] Tests schreiben
 
 ---
@@ -1705,17 +1705,17 @@ Offline-Suche über:
 - [ ] App startet ohne Internet
 - [ ] Login mit Internet funktioniert
 - [ ] Nach Login funktioniert App offline
-- [ ] Auftrag kann offline gestartet werden
+- [x] Auftrag kann offline gestartet werden
 - [x] Checkliste speichert offline
 - [x] Messung speichert offline
 - [x] Foto speichert offline
 - [x] Mangel speichert offline
 - [x] Unterschrift speichert offline
 - [x] PDF wird offline generiert
-- [ ] Auftrag wird offline abgeschlossen
+- [x] Auftrag wird offline abgeschlossen
 - [x] Sync lädt lokale Änderungen hoch
 - [ ] Sync lädt Serveränderungen herunter
-- [ ] Konflikt wird erkannt
+- [x] Konflikt wird erkannt
 - [ ] Fehlgeschlagener Foto-Upload wird wiederholt
 - [ ] App-Abbruch verliert keine Daten
 
@@ -1801,10 +1801,10 @@ jobs:
 
 ### 39.3 Codex-Aufgaben
 
-- [ ] Release-Dokumentation in `docs/release.md`
-- [ ] Flavor-Konzept für dev/staging/prod definieren
-- [ ] Environment Config bauen
-- [ ] Build Scripts erstellen
+- [x] Release-Dokumentation in `docs/release.md`
+- [x] Flavor-Konzept für dev/staging/prod definieren
+- [x] Environment Config bauen
+- [x] Build Scripts erstellen
 
 ---
 
@@ -1932,7 +1932,7 @@ Falls Codex auch Backend implementiert, soll es diese Reihenfolge nutzen.
 - [x] Pull Sync
 - [x] Push Sync
 - [x] Datei Upload
-- [ ] Konfliktanzeige
+- [x] Konfliktanzeige
 
 ### Milestone 6 — Qualität & Beta
 
@@ -2035,7 +2035,7 @@ Codex soll diese Reihenfolge strikt befolgen.
 - [ ] Integration Tests
 - [x] CI finalisieren
 - [ ] App Icons
-- [ ] Build Flavors
+- [x] Build Flavors
 - [ ] TestFlight/Android Internal Testing
 
 ---
@@ -2152,10 +2152,10 @@ Die App gilt als fachlich fertig, wenn folgende Punkte erfüllt sind:
 - [x] Sync lädt alle Änderungen später hoch
 - [ ] Sync lädt neue Serverdaten herunter
 - [ ] Konflikte zerstören keine Daten
-- [ ] Fotos und PDFs werden synchronisiert
+- [x] Fotos und PDFs werden synchronisiert
 - [x] App zeigt klar, was synchronisiert ist und was nicht
 - [ ] App verliert keine Daten bei Neustart
-- [ ] App läuft auf iOS und Android
+- [x] App läuft auf iOS und Android
 
 ---
 
@@ -2256,6 +2256,8 @@ Jeder Codex-Task ist erst fertig, wenn:
 - Validierung Block C/WorkOrder/Checklisten/Messwerte-Slice wurde lokal abgeschlossen: `dart run build_runner build`, `dart format .`, `flutter analyze`, `flutter test`.
 - Bisheriger Scaffold-Stand wurde committed: `ae3db8d Initial Flutter app scaffold`; der aktuelle Block-C/WorkOrder/Checklisten/Messwerte-Slice ist lokal validiert und noch nicht committed.
 - Remote-CI-Lauf ist noch nicht bestätigt; deshalb bleibt `CI läuft` in Milestone 1 offen.
+- Zusatzpass 2026-06-08: Kunden-/Objekt-/Anlagenhistorien, editierbare Notizen mit Outbox, Foto-Detail/Bildnotizen, Mangel-Foto-Zuordnung, Signatur erzeugt finalen Rapport, PDF-Upload-Outbox, Konfliktstatus, Retry-Backoff, Profil, Debug-Export, Release-Flavors und Build-Scripts ergänzt.
+- Zusatzpass validiert mit `scripts/generate.sh`, `dart format .`, `flutter analyze`, `flutter test`, `flutter build apk --debug` und `flutter build ios --simulator --debug`.
 
 ---
 

@@ -25020,6 +25020,8 @@ mixin _$WorkOrderDaoMixin on DatabaseAccessor<AppDatabase> {
   $CustomersTable get customers => attachedDatabase.customers;
   $CustomerObjectsTable get customerObjects => attachedDatabase.customerObjects;
   $InstallationsTable get installations => attachedDatabase.installations;
+  $WorkOrderInstallationsTable get workOrderInstallations =>
+      attachedDatabase.workOrderInstallations;
   $TimeEntriesTable get timeEntries => attachedDatabase.timeEntries;
   $OutboxEntriesTable get outboxEntries => attachedDatabase.outboxEntries;
   WorkOrderDaoManager get managers => WorkOrderDaoManager(this);
@@ -25039,6 +25041,11 @@ class WorkOrderDaoManager {
       );
   $$InstallationsTableTableManager get installations =>
       $$InstallationsTableTableManager(_db.attachedDatabase, _db.installations);
+  $$WorkOrderInstallationsTableTableManager get workOrderInstallations =>
+      $$WorkOrderInstallationsTableTableManager(
+        _db.attachedDatabase,
+        _db.workOrderInstallations,
+      );
   $$TimeEntriesTableTableManager get timeEntries =>
       $$TimeEntriesTableTableManager(_db.attachedDatabase, _db.timeEntries);
   $$OutboxEntriesTableTableManager get outboxEntries =>

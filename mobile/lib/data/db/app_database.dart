@@ -430,6 +430,9 @@ class AppDatabase extends _$AppDatabase {
     required String syncStatus,
   }) async {
     final tableName = switch (entityType) {
+      'customer' => 'customers',
+      'object' => 'objects',
+      'installation' => 'installations',
       'work_order' => 'work_orders',
       'checklist_answer' => 'checklist_answers',
       'measurement' => 'measurements',
@@ -456,6 +459,24 @@ class AppDatabase extends _$AppDatabase {
         Variable.withString(now),
         Variable.withString(entityId),
       ],
+    );
+  }
+
+  Future<void> markReportUploaded(String id, {String? remoteUrl}) async {
+    final existing = await (select(
+      reports,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+    if (existing == null) {
+      return;
+    }
+
+    await update(reports).replace(
+      existing.copyWith(
+        pdfRemoteUrl: Value(remoteUrl ?? existing.pdfRemoteUrl),
+        updatedAt: _utcNowIso(),
+        syncStatus: 'synced',
+        lastSyncedAt: Value(_utcNowIso()),
+      ),
     );
   }
 
@@ -806,6 +827,12 @@ class CustomerDao extends DatabaseAccessor<AppDatabase>
     with _$CustomerDaoMixin {
   CustomerDao(super.db);
 
+  Future<CustomerRow?> getById(String id) {
+    return (select(
+      customers,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
   Stream<List<CustomerRow>> watchActive(String tenantId) {
     return (select(customers)
           ..where(
@@ -815,11 +842,42 @@ class CustomerDao extends DatabaseAccessor<AppDatabase>
           ..orderBy([(table) => OrderingTerm.asc(table.displayName)]))
         .watch();
   }
+
+  Future<void> updateNotesLocal({required String id, String? notes}) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    final next = existing.copyWith(
+      notes: Value(notes),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(customers).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'customer',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
 }
 
 @DriftAccessor(tables: [CustomerObjects])
 class ObjectDao extends DatabaseAccessor<AppDatabase> with _$ObjectDaoMixin {
   ObjectDao(super.db);
+
+  Future<CustomerObjectRow?> getById(String id) {
+    return (select(
+      customerObjects,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
 
   Stream<List<CustomerObjectRow>> watchActive(String tenantId) {
     return (select(customerObjects)
@@ -833,12 +891,61 @@ class ObjectDao extends DatabaseAccessor<AppDatabase> with _$ObjectDaoMixin {
           ]))
         .watch();
   }
+
+  Stream<List<CustomerObjectRow>> watchForCustomer(
+    String tenantId,
+    String customerId,
+  ) {
+    return (select(customerObjects)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.customerId.equals(customerId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.city),
+            (table) => OrderingTerm.asc(table.street),
+          ]))
+        .watch();
+  }
+
+  Future<void> updateNotesLocal({required String id, String? notes}) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    final next = existing.copyWith(
+      objectNotes: Value(notes),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(customerObjects).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'object',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
 }
 
 @DriftAccessor(tables: [Installations])
 class InstallationDao extends DatabaseAccessor<AppDatabase>
     with _$InstallationDaoMixin {
   InstallationDao(super.db);
+
+  Future<InstallationRow?> getById(String id) {
+    return (select(
+      installations,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
 
   Stream<List<InstallationRow>> watchActive(String tenantId) {
     return (select(installations)
@@ -867,6 +974,31 @@ class InstallationDao extends DatabaseAccessor<AppDatabase>
           ..orderBy([(table) => OrderingTerm.asc(table.locationDescription)]))
         .watch();
   }
+
+  Future<void> updateNotesLocal({required String id, String? notes}) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    final next = existing.copyWith(
+      notes: Value(notes),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(installations).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'installation',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
 }
 
 final class WorkOrderDetailHeaderRow {
@@ -887,6 +1019,7 @@ final class WorkOrderDetailHeaderRow {
     Customers,
     CustomerObjects,
     Installations,
+    WorkOrderInstallations,
     TimeEntries,
     OutboxEntries,
   ],
@@ -913,6 +1046,61 @@ class WorkOrderDao extends DatabaseAccessor<AppDatabase>
       (rows) => rows
           .where((row) => _isSameLocalDate(row.scheduledStart, day))
           .toList(growable: false),
+    );
+  }
+
+  Stream<List<WorkOrderRow>> watchForCustomer(
+    String tenantId,
+    String customerId,
+  ) {
+    return (select(workOrders)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.customerId.equals(customerId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.desc(table.scheduledStart),
+            (table) => OrderingTerm.asc(table.orderNumber),
+          ]))
+        .watch();
+  }
+
+  Stream<List<WorkOrderRow>> watchForObject(String tenantId, String objectId) {
+    return (select(workOrders)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.objectId.equals(objectId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.desc(table.scheduledStart),
+            (table) => OrderingTerm.asc(table.orderNumber),
+          ]))
+        .watch();
+  }
+
+  Stream<List<WorkOrderRow>> watchForInstallation(
+    String tenantId,
+    String installationId,
+  ) {
+    final query =
+        select(workOrders).join([
+          innerJoin(
+            workOrderInstallations,
+            workOrderInstallations.workOrderId.equalsExp(workOrders.id),
+          ),
+        ])..where(
+          workOrders.tenantId.equals(tenantId) &
+              workOrders.deletedAt.isNull() &
+              workOrderInstallations.deletedAt.isNull() &
+              workOrderInstallations.installationId.equals(installationId),
+        );
+
+    return query.watch().map(
+      (rows) => rows.map((row) => row.readTable(workOrders)).toList(),
     );
   }
 
@@ -1618,6 +1806,33 @@ class PhotoDao extends DatabaseAccessor<AppDatabase> with _$PhotoDaoMixin {
         .watch();
   }
 
+  Stream<List<PhotoRow>> watchForDefect(String tenantId, String defectId) {
+    return (select(photos)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.defectId.equals(defectId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.takenAt)]))
+        .watch();
+  }
+
+  Stream<List<PhotoRow>> watchForInstallation(
+    String tenantId,
+    String installationId,
+  ) {
+    return (select(photos)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.installationId.equals(installationId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.takenAt)]))
+        .watch();
+  }
+
   Future<PhotoRow?> getById(String id) {
     return (select(
       photos,
@@ -1696,6 +1911,34 @@ class PhotoDao extends DatabaseAccessor<AppDatabase> with _$PhotoDaoMixin {
 
     final next = existing.copyWith(
       caption: Value(caption),
+      updatedAt: _utcNowIso(),
+      version: existing.version + 1,
+      syncStatus: 'pending',
+    );
+
+    await transaction(() async {
+      await update(photos).replace(next);
+      await db.enqueueOutbox(
+        tenantId: next.tenantId,
+        entityType: 'photo',
+        entityId: next.id,
+        operation: 'update',
+        payload: next.toJson(),
+      );
+    });
+  }
+
+  Future<void> attachToDefectLocal({
+    required String id,
+    required String? defectId,
+  }) async {
+    final existing = await getById(id);
+    if (existing == null) {
+      return;
+    }
+
+    final next = existing.copyWith(
+      defectId: Value(defectId),
       updatedAt: _utcNowIso(),
       version: existing.version + 1,
       syncStatus: 'pending',
@@ -1964,6 +2207,19 @@ class ReportDao extends DatabaseAccessor<AppDatabase> with _$ReportDaoMixin {
           'customer_name_signed': customerNameSigned,
         },
       );
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'report',
+        entityId: id,
+        operation: 'upload_file',
+        payload: {
+          'id': id,
+          'tenant_id': tenantId,
+          'work_order_id': workOrderId,
+          'pdf_local_path': pdfLocalPath,
+          'mime_type': 'application/pdf',
+        },
+      );
     });
 
     return id;
@@ -1980,7 +2236,12 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
             (table) =>
                 table.tenantId.equals(tenantId) &
                 table.deletedAt.isNull() &
-                table.status.isIn(['pending', 'processing', 'failed']),
+                table.status.isIn([
+                  'pending',
+                  'processing',
+                  'failed',
+                  'conflict',
+                ]),
           )
           ..orderBy([(table) => OrderingTerm.asc(table.createdAt)]))
         .watch();
@@ -2027,6 +2288,26 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
         errorMessage: Value(message),
         updatedAt: _utcNowIso(),
         syncStatus: 'failed',
+      ),
+    );
+  }
+
+  Future<void> markConflict(String id, String message) async {
+    final existing = await (select(
+      outboxEntries,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+    if (existing == null) {
+      return;
+    }
+
+    await update(outboxEntries).replace(
+      existing.copyWith(
+        status: 'conflict',
+        attempts: existing.attempts + 1,
+        lastAttemptAt: Value(_utcNowIso()),
+        errorMessage: Value(message),
+        updatedAt: _utcNowIso(),
+        syncStatus: 'conflict',
       ),
     );
   }

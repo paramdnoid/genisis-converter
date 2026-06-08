@@ -104,8 +104,10 @@ class _OutboxCard extends StatelessWidget {
             ),
             StatusBadge(
               label: entry.status,
-              icon: Icons.cloud_upload_outlined,
-              tone: entry.status == 'failed'
+              icon: entry.status == 'conflict'
+                  ? Icons.warning_amber_outlined
+                  : Icons.cloud_upload_outlined,
+              tone: entry.status == 'failed' || entry.status == 'conflict'
                   ? StatusBadgeTone.error
                   : StatusBadgeTone.warning,
             ),

@@ -11,6 +11,14 @@ final class FileUploadSyncService {
         entry.entityId,
         remoteUrl: 'pending-server-url/${entry.entityId}',
       );
+      return;
+    }
+
+    if (entry.entityType == 'report') {
+      await database.markReportUploaded(
+        entry.entityId,
+        remoteUrl: 'pending-server-report-url/${entry.entityId}',
+      );
     }
   }
 }

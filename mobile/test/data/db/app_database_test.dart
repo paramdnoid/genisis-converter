@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kaminfeger_mobile/data/db/app_database.dart';
@@ -366,6 +367,99 @@ void main() {
     expect(afterSync?.syncStatus, 'synced');
   });
 
+  test(
+    'updates customer, object and installation notes through outbox',
+    () async {
+      await database.seedDevelopmentData();
+
+      await database.customerDao.updateNotesLocal(
+        id: DevelopmentSeed.customerId,
+        notes: 'Neue Kundennotiz',
+      );
+      await database.objectDao.updateNotesLocal(
+        id: DevelopmentSeed.objectId,
+        notes: 'Neue Objektnotiz',
+      );
+      await database.installationDao.updateNotesLocal(
+        id: DevelopmentSeed.installationId,
+        notes: 'Neue Anlagennotiz',
+      );
+
+      final customer = await database.customerDao.getById(
+        DevelopmentSeed.customerId,
+      );
+      final object = await database.objectDao.getById(DevelopmentSeed.objectId);
+      final installation = await database.installationDao.getById(
+        DevelopmentSeed.installationId,
+      );
+      final outbox = await database.outboxDao
+          .watchPending(DevelopmentSeed.tenantId)
+          .first;
+
+      expect(customer?.notes, 'Neue Kundennotiz');
+      expect(object?.objectNotes, 'Neue Objektnotiz');
+      expect(installation?.notes, 'Neue Anlagennotiz');
+      expect(
+        outbox.map((entry) => '${entry.entityType}:${entry.operation}'),
+        containsAll([
+          'customer:update',
+          'object:update',
+          'installation:update',
+        ]),
+      );
+    },
+  );
+
+  test('updates photo caption and associates photo with defect', () async {
+    await database.seedDevelopmentData();
+    final photoRepository = DriftPhotoRepository(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    );
+    final defectRepository = DriftDefectRepository(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    );
+
+    await defectRepository.create(
+      const DefectDraft(
+        workOrderId: DevelopmentSeed.workOrderInspectionId,
+        severity: DefectSeverity.minor,
+        title: 'Russablagerung',
+        description: 'Fotodokumentation erforderlich.',
+      ),
+    );
+    final defect =
+        (await defectRepository
+                .watchForWorkOrder(DevelopmentSeed.workOrderInspectionId)
+                .first)
+            .single;
+    final photoId = await photoRepository.create(
+      const PhotoDraft(
+        workOrderId: DevelopmentSeed.workOrderInspectionId,
+        installationId: DevelopmentSeed.installationId,
+        localPath: '/tmp/defect-photo.jpg',
+        fileName: 'defect-photo.jpg',
+        mimeType: 'image/jpeg',
+        sizeBytes: 2048,
+      ),
+    );
+
+    await photoRepository.updateCaption(id: photoId, caption: 'Riss links');
+    await photoRepository.attachToDefect(id: photoId, defectId: defect.id);
+
+    final photo = await photoRepository.getById(photoId);
+    final defectPhotos = await photoRepository.watchForDefect(defect.id).first;
+    final installationPhotos = await photoRepository
+        .watchForInstallation(DevelopmentSeed.installationId)
+        .first;
+
+    expect(photo?.caption, 'Riss links');
+    expect(photo?.defectId, defect.id);
+    expect(defectPhotos.single.id, photoId);
+    expect(installationPhotos.single.id, photoId);
+  });
+
   test('creates generated report record and links it to work order', () async {
     await database.seedDevelopmentData();
     final repository = DriftReportRepository(
@@ -394,8 +488,131 @@ void main() {
     expect(order?.reportFileId, id);
     expect(
       outbox.map((entry) => '${entry.entityType}:${entry.operation}'),
-      containsAll(['report:create', 'work_order:update']),
+      containsAll(['report:create', 'report:upload_file', 'work_order:update']),
     );
+  });
+
+  test('processes report upload outbox entries', () async {
+    await database.seedDevelopmentData();
+    final repository = DriftReportRepository(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    );
+
+    final id = await repository.createGenerated(
+      workOrderId: DevelopmentSeed.workOrderInspectionId,
+      reportNumber: 'R-WO-2026-0001',
+      pdfLocalPath: '/tmp/rapport.pdf',
+      signed: true,
+    );
+    final processor = OutboxProcessor(
+      database: database,
+      pushSyncService: const PushSyncService(),
+      fileUploadSyncService: FileUploadSyncService(database: database),
+    );
+
+    await processor.process(tenantId: DevelopmentSeed.tenantId);
+
+    final report =
+        (await repository
+                .watchForWorkOrder(DevelopmentSeed.workOrderInspectionId)
+                .first)
+            .single;
+    expect(report.id, id);
+    expect(report.pdfRemoteUrl, 'pending-server-report-url/$id');
+    expect(report.syncStatus, 'synced');
+  });
+
+  test('marks conflicts and leaves them visible in sync status', () async {
+    await database.seedDevelopmentData();
+    await database.workOrderDao.startLocal(
+      id: DevelopmentSeed.workOrderInspectionId,
+      userId: DevelopmentSeed.technicianUserId,
+    );
+    final processor = OutboxProcessor(
+      database: database,
+      pushSyncService: PushSyncService(
+        handler: (_) async => const PushSyncResult.conflict('Version mismatch'),
+      ),
+      fileUploadSyncService: FileUploadSyncService(database: database),
+    );
+
+    final processed = await processor.process(
+      tenantId: DevelopmentSeed.tenantId,
+    );
+    final order = await database.workOrderDao.getById(
+      DevelopmentSeed.workOrderInspectionId,
+    );
+    final pending = await database.outboxDao
+        .watchPending(DevelopmentSeed.tenantId)
+        .first;
+
+    expect(processed, 0);
+    expect(order?.syncStatus, 'conflict');
+    expect(pending.any((entry) => entry.status == 'conflict'), isTrue);
+  });
+
+  test('failed outbox entries wait for retry backoff', () async {
+    await database.seedDevelopmentData();
+    await database.workOrderDao.startLocal(
+      id: DevelopmentSeed.workOrderInspectionId,
+      userId: DevelopmentSeed.technicianUserId,
+    );
+
+    final failingProcessor = OutboxProcessor(
+      database: database,
+      pushSyncService: PushSyncService(
+        handler: (_) async => throw StateError('offline'),
+      ),
+      fileUploadSyncService: FileUploadSyncService(database: database),
+      retryBackoffPolicy: const RetryBackoffPolicy(
+        baseDelay: Duration(minutes: 1),
+      ),
+      clock: () => DateTime.utc(2026),
+    );
+    await failingProcessor.process(tenantId: DevelopmentSeed.tenantId);
+    final failedEntries = await database.outboxDao
+        .watchPending(DevelopmentSeed.tenantId)
+        .first;
+    for (final entry in failedEntries) {
+      await database
+          .update(database.outboxEntries)
+          .replace(
+            entry.copyWith(
+              status: 'failed',
+              lastAttemptAt: Value(DateTime.utc(2026).toIso8601String()),
+            ),
+          );
+    }
+
+    final waitingProcessor = OutboxProcessor(
+      database: database,
+      pushSyncService: const PushSyncService(),
+      fileUploadSyncService: FileUploadSyncService(database: database),
+      retryBackoffPolicy: const RetryBackoffPolicy(
+        baseDelay: Duration(minutes: 1),
+      ),
+      clock: () => DateTime.utc(2026, 1, 1, 0, 1),
+    );
+    final processedEarly = await waitingProcessor.process(
+      tenantId: DevelopmentSeed.tenantId,
+    );
+
+    final readyProcessor = OutboxProcessor(
+      database: database,
+      pushSyncService: const PushSyncService(),
+      fileUploadSyncService: FileUploadSyncService(database: database),
+      retryBackoffPolicy: const RetryBackoffPolicy(
+        baseDelay: Duration(minutes: 1),
+      ),
+      clock: () => DateTime.utc(2026, 1, 1, 0, 3),
+    );
+    final processedLater = await readyProcessor.process(
+      tenantId: DevelopmentSeed.tenantId,
+    );
+
+    expect(processedEarly, 0);
+    expect(processedLater, 2);
   });
 
   test(

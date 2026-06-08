@@ -9,12 +9,15 @@ import '../../features/customers/presentation/customer_list_screen.dart';
 import '../../features/customers/presentation/customer_detail_screen.dart';
 import '../../features/defects/presentation/defect_screen.dart';
 import '../../features/installations/presentation/installation_detail_screen.dart';
+import '../../features/installations/presentation/installation_list_screen.dart';
 import '../../features/measurements/presentation/measurement_screen.dart';
 import '../../features/materials/presentation/material_screen.dart';
 import '../../features/objects/presentation/object_detail_screen.dart';
+import '../../features/photos/presentation/photo_detail_screen.dart';
 import '../../features/photos/presentation/photo_screen.dart';
 import '../../features/reports/presentation/report_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
+import '../../features/settings/presentation/profile_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/signatures/presentation/signature_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
@@ -36,6 +39,8 @@ abstract final class AppRoutes {
   static const workOrderMeasurements = '/work-orders/:workOrderId/measurements';
   static const workOrderDefects = '/work-orders/:workOrderId/defects';
   static const workOrderPhotos = '/work-orders/:workOrderId/photos';
+  static const workOrderPhotoDetail =
+      '/work-orders/:workOrderId/photos/:photoId';
   static const workOrderTime = '/work-orders/:workOrderId/time';
   static const workOrderMaterials = '/work-orders/:workOrderId/materials';
   static const workOrderReport = '/work-orders/:workOrderId/report';
@@ -44,9 +49,11 @@ abstract final class AppRoutes {
   static const customers = '/customers';
   static const customerDetail = '/customers/:customerId';
   static const objectDetail = '/objects/:objectId';
+  static const installations = '/installations';
   static const installationDetail = '/installations/:installationId';
   static const settings = '/settings';
   static const syncStatus = '/settings/sync';
+  static const settingsProfile = '/settings/profile';
   static const search = '/search';
 
   static String workOrderDetailPath(String workOrderId) {
@@ -67,6 +74,10 @@ abstract final class AppRoutes {
 
   static String workOrderPhotosPath(String workOrderId) {
     return '/work-orders/$workOrderId/photos';
+  }
+
+  static String workOrderPhotoDetailPath(String workOrderId, String photoId) {
+    return '/work-orders/$workOrderId/photos/$photoId';
   }
 
   static String workOrderTimePath(String workOrderId) {
@@ -99,6 +110,10 @@ abstract final class AppRoutes {
 
   static String installationDetailPath(String installationId) {
     return '/installations/$installationId';
+  }
+
+  static Uri deepLinkUri(String path) {
+    return Uri(scheme: 'kaminfeger', host: 'app', path: path);
   }
 }
 
@@ -206,6 +221,17 @@ GoRouter createAppRouter() {
         },
       ),
       GoRoute(
+        path: AppRoutes.workOrderPhotoDetail,
+        name: 'work-order-photo-detail',
+        pageBuilder: (context, state) {
+          final photoId = state.pathParameters['photoId'] ?? '';
+          return _fadePage(
+            key: state.pageKey,
+            child: PhotoDetailScreen(photoId: photoId),
+          );
+        },
+      ),
+      GoRoute(
         path: AppRoutes.workOrderTime,
         name: 'work-order-time',
         pageBuilder: (context, state) {
@@ -289,6 +315,14 @@ GoRouter createAppRouter() {
         },
       ),
       GoRoute(
+        path: AppRoutes.installations,
+        name: 'installations',
+        pageBuilder: (context, state) => _fadePage(
+          key: state.pageKey,
+          child: const InstallationListScreen(),
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.installationDetail,
         name: 'installation-detail',
         pageBuilder: (context, state) {
@@ -316,6 +350,12 @@ GoRouter createAppRouter() {
         name: 'sync-status',
         pageBuilder: (context, state) =>
             _fadePage(key: state.pageKey, child: const SyncStatusScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsProfile,
+        name: 'settings-profile',
+        pageBuilder: (context, state) =>
+            _fadePage(key: state.pageKey, child: const ProfileScreen()),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

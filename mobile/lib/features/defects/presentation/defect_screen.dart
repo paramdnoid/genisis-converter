@@ -8,6 +8,8 @@ import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/defect.dart';
 import '../../../domain/entities/installation.dart';
+import '../../../domain/entities/photo_attachment.dart';
+import '../../photos/application/photo_providers.dart';
 import '../../work_orders/application/work_order_providers.dart';
 import '../application/defect_providers.dart';
 
@@ -268,6 +270,14 @@ class _DefectCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final linkedPhotos = ref.watch(photosForDefectProvider(defect.id));
+    final workOrderPhotos = ref.watch(
+      photosForWorkOrderProvider(defect.workOrderId),
+    );
+    final availablePhotos = workOrderPhotos.maybeWhen(
+      data: (photos) => photos,
+      orElse: () => const <PhotoAttachment>[],
+    );
     final colorScheme = Theme.of(context).colorScheme;
     final borderColor = defect.isCritical
         ? colorScheme.error
@@ -311,6 +321,12 @@ class _DefectCard extends ConsumerWidget {
               Text('Massnahme: ${defect.recommendedAction!}'),
             ],
             const SizedBox(height: AppSpacing.md),
+            linkedPhotos.when(
+              loading: () => const LinearProgressIndicator(),
+              error: (error, stackTrace) => Text(error.toString()),
+              data: (photos) => _LinkedDefectPhotos(photos: photos),
+            ),
+            const SizedBox(height: AppSpacing.md),
             Row(
               children: [
                 if (defect.isDirty)
@@ -320,6 +336,12 @@ class _DefectCard extends ConsumerWidget {
                     tone: StatusBadgeTone.warning,
                   ),
                 const Spacer(),
+                TextButton.icon(
+                  onPressed: () =>
+                      _showPhotoAssignment(context, ref, availablePhotos),
+                  icon: const Icon(Icons.add_photo_alternate_outlined),
+                  label: const Text('Foto zuordnen'),
+                ),
                 TextButton.icon(
                   onPressed: defect.resolved
                       ? null
@@ -337,6 +359,103 @@ class _DefectCard extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showPhotoAssignment(
+    BuildContext context,
+    WidgetRef ref,
+    List<PhotoAttachment> photos,
+  ) async {
+    if (photos.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Noch keine Fotos im Auftrag.')),
+      );
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.xl,
+            ),
+            children: [
+              Text(
+                'Foto zuordnen',
+                style: Theme.of(
+                  sheetContext,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              ...photos.map(
+                (photo) => Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.photo_outlined),
+                    title: Text(photo.caption ?? photo.fileName),
+                    subtitle: Text(
+                      photo.defectId == null
+                          ? 'Nicht zugeordnet'
+                          : 'Bereits einem Mangel zugeordnet',
+                    ),
+                    trailing: photo.defectId == defect.id
+                        ? const Icon(Icons.check)
+                        : null,
+                    onTap: () async {
+                      final attach = await ref.read(
+                        attachPhotoToDefectProvider.future,
+                      );
+                      await attach(id: photo.id, defectId: defect.id);
+                      ref.invalidate(photosForDefectProvider(defect.id));
+                      ref.invalidate(
+                        photosForWorkOrderProvider(defect.workOrderId),
+                      );
+                      if (sheetContext.mounted) {
+                        Navigator.of(sheetContext).pop();
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LinkedDefectPhotos extends StatelessWidget {
+  const _LinkedDefectPhotos({required this.photos});
+
+  final List<PhotoAttachment> photos;
+
+  @override
+  Widget build(BuildContext context) {
+    if (photos.isEmpty) {
+      return Text(
+        'Keine Fotos zugeordnet.',
+        style: Theme.of(context).textTheme.bodySmall,
+      );
+    }
+
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
+      children: photos
+          .map(
+            (photo) => Chip(
+              avatar: const Icon(Icons.photo_outlined, size: 18),
+              label: Text(photo.caption ?? photo.fileName),
+            ),
+          )
+          .toList(growable: false),
     );
   }
 }

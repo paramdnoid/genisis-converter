@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -16,6 +17,8 @@ final class PdfReportGenerator {
     final order = data.header.workOrder;
     final customer = data.header.customer;
     final object = data.header.object;
+    final logo = _loadLocalImage(data.logoPhoto?.localPath);
+    final signature = _loadLocalImage(data.signaturePhoto?.localPath);
 
     document.addPage(
       pw.MultiPage(
@@ -24,17 +27,32 @@ final class PdfReportGenerator {
         build: (context) => [
           pw.Header(
             level: 0,
-            child: pw.Column(
+            child: pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'Rapport ${order.orderNumber}',
-                  style: pw.TextStyle(
-                    fontSize: 24,
-                    fontWeight: pw.FontWeight.bold,
+                _logoBlock(data, logo),
+                pw.SizedBox(width: 16),
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text(
+                        'Rapport ${order.orderNumber}',
+                        style: pw.TextStyle(
+                          fontSize: 24,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                      pw.Text(order.title),
+                      pw.SizedBox(height: 8),
+                      pw.Text(data.tenant.name),
+                      pw.Text(
+                        '${data.tenant.address}, ${data.tenant.postalCode} ${data.tenant.city}',
+                      ),
+                      pw.Text('${data.tenant.phone} · ${data.tenant.email}'),
+                    ],
                   ),
                 ),
-                pw.Text(order.title),
               ],
             ),
           ),
@@ -125,6 +143,12 @@ final class PdfReportGenerator {
                       .toList(),
           ),
           _section('Abschlussnotiz', [order.completionNotes ?? '-']),
+          _signatureSection(
+            customerName: order.customerSignatureFileId == null
+                ? null
+                : data.signaturePhoto?.caption?.replaceFirst('Signatur ', ''),
+            signature: signature,
+          ),
         ],
       ),
     );
@@ -163,6 +187,81 @@ final class PdfReportGenerator {
         ],
       ),
     );
+  }
+
+  pw.Widget _logoBlock(ReportData data, pw.MemoryImage? logo) {
+    if (logo != null) {
+      return pw.Container(
+        width: 76,
+        height: 76,
+        alignment: pw.Alignment.center,
+        child: pw.Image(logo, fit: pw.BoxFit.contain),
+      );
+    }
+
+    final parts = data.tenant.name
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .take(2)
+        .map((part) => part[0].toUpperCase())
+        .join();
+
+    return pw.Container(
+      width: 76,
+      height: 76,
+      alignment: pw.Alignment.center,
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: PdfColors.grey600),
+        borderRadius: pw.BorderRadius.circular(6),
+      ),
+      child: pw.Text(
+        parts.isEmpty ? 'KF' : parts,
+        style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
+      ),
+    );
+  }
+
+  pw.Widget _signatureSection({
+    required String? customerName,
+    required pw.MemoryImage? signature,
+  }) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(top: 8),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            'Kundensignatur',
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 6),
+          pw.Text('Unterzeichner: ${customerName ?? '-'}'),
+          pw.SizedBox(height: 8),
+          if (signature == null)
+            pw.Text('Keine Signatur gespeichert.')
+          else
+            pw.Container(
+              width: 220,
+              height: 90,
+              alignment: pw.Alignment.centerLeft,
+              child: pw.Image(signature, fit: pw.BoxFit.contain),
+            ),
+        ],
+      ),
+    );
+  }
+
+  pw.MemoryImage? _loadLocalImage(String? imagePath) {
+    if (imagePath == null || imagePath.trim().isEmpty) {
+      return null;
+    }
+
+    final file = File(imagePath);
+    if (!file.existsSync()) {
+      return null;
+    }
+
+    return pw.MemoryImage(file.readAsBytesSync());
   }
 
   pw.Widget _table(

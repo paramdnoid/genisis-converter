@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/files/file_storage_service.dart';
 import '../../../core/permissions/permission_service.dart';
+import '../../../core/routing/app_router.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
@@ -191,50 +193,63 @@ class _PhotoCard extends StatelessWidget {
     final exists = File(photo.localPath).existsSync();
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox.square(
-                dimension: 88,
-                child: exists
-                    ? Image.file(File(photo.localPath), fit: BoxFit.cover)
-                    : ColoredBox(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                        child: const Icon(Icons.broken_image_outlined),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: photo.workOrderId == null
+            ? null
+            : () => context.push(
+                AppRoutes.workOrderPhotoDetailPath(
+                  photo.workOrderId!,
+                  photo.id,
+                ),
+              ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox.square(
+                  dimension: 88,
+                  child: exists
+                      ? Image.file(File(photo.localPath), fit: BoxFit.cover)
+                      : ColoredBox(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          child: const Icon(Icons.broken_image_outlined),
+                        ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      photo.caption ?? photo.fileName,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
                       ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    photo.caption ?? photo.fileName,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text('${(photo.sizeBytes / 1024).toStringAsFixed(0)} KB'),
-                  const SizedBox(height: AppSpacing.sm),
-                  StatusBadge(
-                    label: photo.isPendingUpload ? 'Upload offen' : 'Uploaded',
-                    icon: photo.isPendingUpload
-                        ? Icons.cloud_upload_outlined
-                        : Icons.cloud_done_outlined,
-                    tone: photo.isPendingUpload
-                        ? StatusBadgeTone.warning
-                        : StatusBadgeTone.success,
-                  ),
-                ],
+                    const SizedBox(height: AppSpacing.xs),
+                    Text('${(photo.sizeBytes / 1024).toStringAsFixed(0)} KB'),
+                    const SizedBox(height: AppSpacing.sm),
+                    StatusBadge(
+                      label: photo.isPendingUpload
+                          ? 'Upload offen'
+                          : 'Uploaded',
+                      icon: photo.isPendingUpload
+                          ? Icons.cloud_upload_outlined
+                          : Icons.cloud_done_outlined,
+                      tone: photo.isPendingUpload
+                          ? StatusBadgeTone.warning
+                          : StatusBadgeTone.success,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

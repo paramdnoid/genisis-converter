@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -133,6 +135,13 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   String _query = '';
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +160,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           children: [
             TextField(
               autofocus: true,
-              onChanged: (value) => setState(() => _query = value),
+              onChanged: _scheduleSearch,
               decoration: const InputDecoration(
                 labelText: 'Auftrag, Kunde, Adresse oder Anlage suchen',
                 prefixIcon: Icon(Icons.search),
@@ -194,5 +203,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
     );
+  }
+
+  void _scheduleSearch(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        setState(() => _query = value);
+      }
+    });
   }
 }
