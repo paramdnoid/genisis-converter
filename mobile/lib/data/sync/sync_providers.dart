@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/config/environment_providers.dart';
+import '../../features/auth/application/auth_providers.dart';
+import '../../features/work_orders/application/work_order_notification_service.dart';
+import '../../features/work_orders/application/work_order_providers.dart';
 import '../api/api_client.dart';
 import '../db/database_providers.dart';
-import '../../features/work_orders/application/work_order_providers.dart';
 import 'file_upload_sync_service.dart';
 import 'network_monitor.dart';
 import 'outbox_processor.dart';
@@ -13,22 +15,36 @@ import 'pull_sync_service.dart';
 import 'push_sync_service.dart';
 import 'sync_orchestrator.dart';
 import 'sync_service.dart';
+import 'work_order_notification_sink.dart';
 
 final networkMonitorProvider = Provider<NetworkMonitor>((ref) {
   return NetworkMonitor();
+});
+
+final workOrderNotificationSinkProvider = Provider<WorkOrderNotificationSink>((
+  ref,
+) {
+  return LocalWorkOrderNotificationService();
 });
 
 final syncOrchestratorProvider = FutureProvider<SyncOrchestrator>((ref) async {
   final database = await ref.watch(databaseReadyProvider.future);
   final tenantId = ref.watch(activeTenantIdProvider);
   final environment = ref.watch(appEnvironmentProvider);
+  final authController = ref.watch(authSessionProvider);
   final orchestrator = SyncOrchestrator(
     database: database,
     tenantId: tenantId,
     networkMonitor: ref.watch(networkMonitorProvider),
     pullSyncService: PullSyncService(
       database: database,
-      client: DioPullSyncClient(ApiClient(environment: environment)),
+      client: DioPullSyncClient(
+        ApiClient(
+          environment: environment,
+          accessTokenProvider: () => authController.session?.accessToken,
+        ),
+      ),
+      notificationSink: ref.watch(workOrderNotificationSinkProvider),
     ),
     outboxProcessor: OutboxProcessor(
       database: database,

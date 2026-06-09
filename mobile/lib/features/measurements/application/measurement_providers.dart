@@ -7,6 +7,8 @@ import '../../../domain/repositories/measurement_repository.dart';
 import '../../../domain/use_cases/save_measurement.dart';
 import '../../../domain/use_cases/validate_measurement.dart';
 import '../../work_orders/application/work_order_providers.dart';
+import 'bluetooth_measurement.dart';
+import 'flutter_blue_plus_measurement_client.dart';
 
 final measurementRepositoryProvider = FutureProvider<MeasurementRepository>((
   ref,
@@ -29,4 +31,23 @@ final validateMeasurementProvider = Provider<ValidateMeasurement>((ref) {
 final saveMeasurementProvider = FutureProvider<SaveMeasurement>((ref) async {
   final repository = await ref.watch(measurementRepositoryProvider.future);
   return SaveMeasurement(repository);
+});
+
+final bluetoothMeasurementClientProvider = Provider<BluetoothMeasurementClient>(
+  (ref) {
+    return FlutterBluePlusMeasurementClient();
+  },
+);
+
+final bluetoothMeasurementDevicesProvider =
+    StreamProvider.autoDispose<List<BluetoothMeasurementDevice>>((ref) {
+      final client = ref.watch(bluetoothMeasurementClientProvider);
+      return client.watchDevices();
+    });
+
+final bluetoothMeasurementScanningProvider = StreamProvider.autoDispose<bool>((
+  ref,
+) {
+  final client = ref.watch(bluetoothMeasurementClientProvider);
+  return client.watchScanning();
 });

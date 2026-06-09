@@ -7,6 +7,8 @@ final class MaterialItem {
     required this.isActive,
     this.sku,
     this.defaultPrice,
+    this.stockQuantity,
+    this.minStockQuantity,
   });
 
   final String id;
@@ -16,6 +18,16 @@ final class MaterialItem {
   final bool isActive;
   final String? sku;
   final double? defaultPrice;
+  final double? stockQuantity;
+  final double? minStockQuantity;
+
+  bool get isStockTracked => stockQuantity != null;
+
+  bool get isLowStock {
+    final stock = stockQuantity;
+    final minimum = minStockQuantity;
+    return stock != null && minimum != null && stock <= minimum;
+  }
 }
 
 final class WorkOrderMaterial {

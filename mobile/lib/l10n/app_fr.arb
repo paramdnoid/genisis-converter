@@ -20,12 +20,76 @@
   "openSyncsMetricLabel": "Syncs ouvertes",
   "urgentMetricLabel": "Urgent",
   "nextOrderTitle": "Prochain ordre",
+  "routeOptimizationTitle": "Tournee du jour",
+  "routeOptimizationReadyMessage": "{count} arret(s) du jour pret(s) pour la route.",
+  "@routeOptimizationReadyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "routeOptimizationCoordinateMode": "Optimise par coordonnees",
+  "routeOptimizationScheduleMode": "Ordre des rendez-vous",
+  "routeOptimizationNoStopsMessage": "Aucun arret du jour avec adresse disponible.",
+  "routeOptimizationOpenAction": "Ouvrir la route optimisee",
+  "routeOptimizationOpenError": "La route optimisee n'a pas pu etre ouverte.",
+  "offlineRouteMapTitle": "Carte hors ligne",
+  "offlineRouteMapAction": "Carte hors ligne",
+  "offlineRouteMapSubtitle": "{count} arret(s) dessine(s) localement a partir des coordonnees.",
+  "@offlineRouteMapSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineRouteMapEmptyTitle": "Aucune route hors ligne",
+  "offlineRouteMapNoCoordinatesTitle": "Aucune coordonnee",
+  "offlineRouteMapNoCoordinatesMessage": "La carte locale necessite au moins un arret du jour avec des coordonnees enregistrees.",
+  "offlineRouteMapStopsTitle": "Arrets",
+  "offlineRouteMapUnmappedTitle": "Sans coordonnees",
+  "recurringWorkOrdersTitle": "Ordres recurrents",
+  "recurringWorkOrdersDueCount": "{count} echu(s)",
+  "@recurringWorkOrdersDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringWorkOrdersReadyMessage": "{count} installation(s) sont echues pour un nouvel ordre.",
+  "@recurringWorkOrdersReadyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringWorkOrdersEmptyMessage": "Aucun ordre recurrent echu.",
+  "recurringWorkOrdersCreateAction": "Creer les ordres echus",
+  "recurringWorkOrdersCreatedMessage": "{count} ordre(s) recurrent(s) cree(s) localement.",
+  "@recurringWorkOrdersCreatedMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringWorkOrdersErrorMessage": "Les ordres recurrents n'ont pas pu etre crees: {error}",
+  "@recurringWorkOrdersErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "startOrderAction": "Demarrer",
-  "pauseOrderAction": "Pausieren",
-  "resumeOrderAction": "Fortsetzen",
+  "pauseOrderAction": "Pause",
+  "resumeOrderAction": "Reprendre",
   "allOrdersTooltip": "Tous les ordres",
   "syncStatusTitle": "Statut de sync",
-  "syncNowTooltip": "Jetzt synchronisieren",
+  "syncNowTooltip": "Synchroniser maintenant",
   "syncStatusCleanMessage": "Aucune modification locale dans l'outbox.",
   "syncStatusWaitingMessage": "L'outbox attend la prochaine connexion.",
   "syncStatusSynchronized": "Synchronise",
@@ -40,6 +104,11 @@
   "quickActionsTitle": "Actions rapides",
   "searchAction": "Recherche",
   "settingsTitle": "Parametres",
+  "languageTitle": "Langue",
+  "languageSystemOption": "Systeme",
+  "languageGermanOption": "Deutsch",
+  "languageFrenchOption": "Français",
+  "languageItalianOption": "Italiano",
   "noAppointment": "sans rendez-vous",
   "noDate": "sans date",
   "searchTitle": "Recherche",
@@ -53,25 +122,36 @@
   "retryAction": "Reessayer",
   "notFoundTitle": "Page introuvable",
   "backToDashboardAction": "Retour au tableau de bord",
-  "localRecordMissingMessage": "Der lokale Datensatz ist nicht vorhanden.",
-  "localWorkOrderMissingMessage": "Der lokale Auftrag ist nicht vorhanden.",
-  "workOrdersTitle": "Aufträge",
-  "workOrdersLoadErrorTitle": "Aufträge konnten nicht geladen werden",
-  "workOrdersSearchLabel": "Aufträge suchen",
-  "workOrdersEmptyFilteredTitle": "Keine passenden Aufträge",
-  "workOrdersEmptyFilteredMessage": "Passe Suche oder Statusfilter an.",
-  "resetFilterAction": "Filter zurücksetzen",
-  "allFilterLabel": "Alle",
-  "locallyChangedStatus": "Lokal geändert",
-  "completeOrderTooltip": "Abschließen",
-  "workOrderDetailTitle": "Auftragsdetail",
-  "workOrderLoadErrorTitle": "Auftrag konnte nicht geladen werden",
-  "workOrderNotFoundTitle": "Auftrag nicht gefunden",
+  "localRecordMissingMessage": "L'enregistrement local est introuvable.",
+  "localWorkOrderMissingMessage": "L'ordre local est introuvable.",
+  "workOrdersTitle": "Ordres",
+  "workOrdersLoadErrorTitle": "Les ordres n'ont pas pu etre charges",
+  "workOrdersSearchLabel": "Rechercher des ordres",
+  "workOrdersEmptyFilteredTitle": "Aucun ordre correspondant",
+  "workOrdersEmptyFilteredMessage": "Adapte la recherche ou le filtre de statut.",
+  "resetFilterAction": "Reinitialiser le filtre",
+  "allFilterLabel": "Tous",
+  "locallyChangedStatus": "Modifie localement",
+  "completeOrderTooltip": "Cloturer",
+  "workOrderDetailTitle": "Detail de l'ordre",
+  "workOrderLoadErrorTitle": "L'ordre n'a pas pu etre charge",
+  "workOrderNotFoundTitle": "Ordre introuvable",
   "actualTimeLabel": "Ist-Zeit",
   "navigationOpenError": "Navigation konnte nicht geöffnet werden.",
   "callOpenError": "Anruf konnte nicht gestartet werden.",
   "navigationAction": "Navigation",
   "callAction": "Anrufen",
+  "calendarShareAction": "Calendrier",
+  "calendarShareSuccessMessage": "L'evenement de calendrier a ete transmis au partage.",
+  "calendarShareCancelledMessage": "Le partage du calendrier a ete annule.",
+  "calendarShareErrorMessage": "L'evenement de calendrier n'a pas pu etre partage: {error}",
+  "@calendarShareErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "phoneLabel": "Telefon",
   "addressLabel": "Adresse",
   "customerTypeLabel": "Typ",
@@ -80,14 +160,14 @@
   "customerOpenAction": "Kunde öffnen",
   "objectTitle": "Objekt",
   "objectOpenAction": "Objekt öffnen",
-  "installationsTitle": "Anlagen",
-  "noLinkedInstallations": "Keine Anlagen verknüpft.",
+  "installationsTitle": "Installations",
+  "noLinkedInstallations": "Aucune installation liee.",
   "processingSectionTitle": "Bearbeitung",
   "checklistTitle": "Checkliste",
   "measurementsTitle": "Messungen",
-  "defectsTitle": "Mängel",
+  "defectsTitle": "Defauts",
   "photosTitle": "Fotos",
-  "noPhotosTitle": "Keine Fotos",
+  "noPhotosTitle": "Aucune photo",
   "timeEntriesTitle": "Zeiten",
   "materialTitle": "Material",
   "reportTitle": "Rapport",
@@ -104,31 +184,84 @@
   "pdfReportTitle": "PDF-Bericht",
   "pdfReportSourceMessage": "Rapportdaten werden aus der lokalen Datenbank geladen.",
   "pdfSignerLabel": "Unterzeichner",
-  "pdfNoSignatureMessage": "Keine Signatur gespeichert.",
-  "pdfNoEntriesMessage": "Keine Einträge.",
+  "pdfNoSignatureMessage": "Aucune signature enregistree.",
+  "pdfNoEntriesMessage": "Aucune entree.",
   "reportNoPdfTitle": "Noch kein PDF erzeugt",
   "reportNoPdfMessage": "Der Rapport kann offline generiert werden.",
   "reportSavePdfAction": "PDF lokal speichern",
   "reportPdfSavedMessage": "PDF lokal gespeichert.",
-  "reportPreviewErrorTitle": "Vorschau konnte nicht erstellt werden",
-  "reportNoPreviewTitle": "Keine Vorschau",
-  "reportNoPreviewMessage": "Der Auftrag ist lokal nicht vorhanden.",
-  "measurementsUnavailableTitle": "Keine Messungen möglich",
-  "measurementsLoadErrorTitle": "Messungen konnten nicht geladen werden",
-  "measurementsEmptyTitle": "Keine Messwerte erfasst",
-  "measurementsEmptyMessage": "Neue Messwerte werden lokal gespeichert.",
-  "recordedMeasurementsTitle": "Erfasste Messungen",
+  "reportEmailShareAction": "Envoyer le rapport par e-mail",
+  "reportEmailShareSuccessMessage": "Le rapport a ete transmis au partage.",
+  "reportEmailShareCancelledMessage": "Le partage a ete annule.",
+  "reportEmailShareErrorMessage": "Le rapport n'a pas pu etre partage: {error}",
+  "@reportEmailShareErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceExportAction": "Rechnungsentwurf exportieren",
+  "invoiceExportSuccessMessage": "Rechnungsentwurf wurde an die Freigabe übergeben.",
+  "invoiceExportCancelledMessage": "Rechnungsexport wurde abgebrochen.",
+  "invoiceExportErrorMessage": "Rechnungsentwurf konnte nicht exportiert werden: {error}",
+  "@invoiceExportErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportEmailSubject": "Rapport {orderNumber} - {customerName}",
+  "@reportEmailSubject": {
+    "placeholders": {
+      "orderNumber": {
+        "type": "String"
+      },
+      "customerName": {
+        "type": "String"
+      }
+    }
+  },
+  "reportEmailBody": "Bonjour\n\nVous trouverez en piece jointe le rapport {orderNumber} pour {customerName}.\n\nMeilleures salutations",
+  "@reportEmailBody": {
+    "placeholders": {
+      "customerName": {
+        "type": "String"
+      },
+      "orderNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "reportPreviewErrorTitle": "L'apercu n'a pas pu etre cree",
+  "reportNoPreviewTitle": "Aucun apercu",
+  "reportNoPreviewMessage": "L'ordre n'existe pas localement.",
+  "measurementsUnavailableTitle": "Mesures impossibles",
+  "measurementsLoadErrorTitle": "Les mesures n'ont pas pu etre chargees",
+  "measurementsEmptyTitle": "Aucune mesure saisie",
+  "measurementsEmptyMessage": "Les nouvelles mesures sont enregistrees localement.",
+  "recordedMeasurementsTitle": "Mesures saisies",
   "measurementTypeLabel": "Messart",
-  "noInstallationOption": "Keine Anlage",
+  "noInstallationOption": "Aucune installation",
   "installationFieldLabel": "Anlage",
   "valueFieldLabel": "Wert",
   "unitFieldLabel": "Einheit",
   "notesFieldLabel": "Notizen",
   "notesSectionTitle": "Notizen",
   "saveMeasurementAction": "Messwert speichern",
-  "photosLoadErrorTitle": "Fotos konnten nicht geladen werden",
-  "photosEmptyTitle": "Keine Fotos gespeichert",
-  "photosEmptyMessage": "Fotos werden lokal im App-Verzeichnis abgelegt.",
+  "bluetoothMeasurementTitle": "Bluetooth-Messgerät",
+  "bluetoothMeasurementSubtitle": "BLE-Messgeräte scannen, verbinden und Messwerte direkt lokal übernehmen.",
+  "startBluetoothScanAction": "Scan starten",
+  "stopBluetoothScanAction": "Scan stoppen",
+  "bluetoothDevicesEmptyMessage": "Noch kein Messgerät gefunden.",
+  "bluetoothDeviceConnectingStatus": "Verbinden...",
+  "bluetoothReadingSaveAction": "Messwert übernehmen",
+  "bluetoothReadingSavedMessage": "Bluetooth-Messwert lokal gespeichert.",
+  "measurementDeviceLabel": "Gerät",
+  "photosLoadErrorTitle": "Les photos n'ont pas pu etre chargees",
+  "photosEmptyTitle": "Aucune photo enregistree",
+  "photosEmptyMessage": "Les photos sont stockees localement dans le dossier de l'app.",
   "photoAddTitle": "Foto hinzufügen",
   "cameraAction": "Kamera",
   "galleryAction": "Galerie",
@@ -136,15 +269,15 @@
   "photoTitle": "Foto",
   "photoLoadErrorTitle": "Foto konnte nicht geladen werden",
   "photoNotFoundTitle": "Foto nicht gefunden",
-  "photoMetadataMissingMessage": "Die lokale Fotometadatei ist nicht vorhanden.",
+  "photoMetadataMissingMessage": "Les metadonnees locales de la photo sont introuvables.",
   "photoCaptionLabel": "Bildnotiz",
   "savePhotoCaptionAction": "Bildnotiz speichern",
   "photoCaptionSavedMessage": "Bildnotiz lokal gespeichert.",
   "uploadPendingStatus": "Upload offen",
   "uploadedStatus": "Uploaded",
-  "defectAssignedStatus": "Mangel zugeordnet",
-  "objectLoadErrorTitle": "Objekt konnte nicht geladen werden",
-  "objectNotFoundTitle": "Objekt nicht gefunden",
+  "defectAssignedStatus": "Defaut lie",
+  "objectLoadErrorTitle": "L'objet n'a pas pu etre charge",
+  "objectNotFoundTitle": "Objet introuvable",
   "accessNotesLabel": "Zugang",
   "safetyNotesLabel": "Sicherheit",
   "objectNotesLabel": "Notizen zum Objekt",
@@ -153,12 +286,25 @@
   "objectHistoryTitle": "Objekthistorie",
   "objectNotesTitle": "Objektnotizen",
   "installationListSearchLabel": "Anlage suchen",
-  "installationsLoadErrorTitle": "Anlagen konnten nicht geladen werden",
-  "installationsEmptyTitle": "Keine Anlagen",
-  "installationsEmptyMessage": "Die Anlagen werden aus der lokalen DB geladen.",
-  "installationTitle": "Anlage",
-  "installationLoadErrorTitle": "Anlage konnte nicht geladen werden",
-  "installationNotFoundTitle": "Anlage nicht gefunden",
+  "installationScanTooltip": "Scanner QR/code-barres",
+  "installationScanTitle": "Scanner l'installation",
+  "installationScanManualLabel": "ID installation ou numero de serie",
+  "installationScanManualAction": "Rechercher le code",
+  "installationScanNoMatchMessage": "Aucune installation locale trouvee pour \"{code}\".",
+  "@installationScanNoMatchMessage": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "installationScanCameraError": "La camera n'a pas pu demarrer. Saisis l'ID de l'installation ou le numero de serie manuellement.",
+  "installationsLoadErrorTitle": "Les installations n'ont pas pu etre chargees",
+  "installationsEmptyTitle": "Aucune installation",
+  "installationsEmptyMessage": "Les installations sont chargees depuis la base locale.",
+  "installationTitle": "Installation",
+  "installationLoadErrorTitle": "L'installation n'a pas pu etre chargee",
+  "installationNotFoundTitle": "Installation introuvable",
   "typeLabel": "Typ",
   "fuelTypeLabel": "Brennstoff",
   "locationLabel": "Standort",
@@ -215,6 +361,23 @@
   "materialAddTitle": "Material erfassen",
   "freeTextOption": "Freitext",
   "materialCatalogFieldLabel": "Materialstamm",
+  "materialStockSectionTitle": "Lagerbestand",
+  "materialStockAvailable": "Bestand: {quantity} {unit}",
+  "@materialStockAvailable": {
+    "placeholders": {
+      "quantity": {},
+      "unit": {}
+    }
+  },
+  "materialStockMinimum": "Minimum: {quantity} {unit}",
+  "@materialStockMinimum": {
+    "placeholders": {
+      "quantity": {},
+      "unit": {}
+    }
+  },
+  "materialLowStockLabel": "Knapp",
+  "materialSufficientStockLabel": "OK",
   "nameFieldLabel": "Bezeichnung",
   "quantityFieldLabel": "Menge",
   "saveMaterialAction": "Material speichern",
@@ -251,6 +414,15 @@
   "objectsTitle": "Objekte",
   "objectsEmptyTitle": "Keine Objekte",
   "orderHistoryTitle": "Auftragshistorie",
+  "historyTotalMetricLabel": "Total",
+  "historyCompletedMetricLabel": "Termines",
+  "historyOpenMetricLabel": "Ouverts",
+  "historyOverdueMetricLabel": "En retard",
+  "historyLocalMetricLabel": "Local",
+  "historyLastCompletedLabel": "Derniere cloture",
+  "historyNextScheduledLabel": "Prochain rendez-vous",
+  "historyNoCompletedOrders": "aucune cloture",
+  "historyNoUpcomingOrders": "aucun rendez-vous ouvert",
   "previousOrdersEmptyTitle": "Keine früheren Aufträge",
   "ordersEmptyTitle": "Keine Aufträge",
   "checklistLoadErrorTitle": "Checkliste konnte nicht geladen werden",

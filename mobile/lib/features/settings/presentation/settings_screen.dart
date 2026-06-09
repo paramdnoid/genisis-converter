@@ -11,6 +11,7 @@ import '../../../core/files/file_storage_service.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../data/db/database_providers.dart';
 import '../../../features/auth/application/auth_providers.dart';
+import '../../../l10n/app_locale_controller.dart';
 import '../../../l10n/app_localizations_x.dart';
 import '../../work_orders/application/work_order_providers.dart';
 
@@ -43,6 +44,7 @@ class SettingsScreen extends ConsumerWidget {
               value: session?.email ?? context.l10n.demoTechnician,
               onTap: () => context.push(AppRoutes.settingsProfile),
             ),
+            const _LanguageSelector(),
             _SettingsTile(
               icon: Icons.storage_outlined,
               title: context.l10n.storageTitle,
@@ -122,6 +124,60 @@ class SettingsScreen extends ConsumerWidget {
         SnackBar(content: Text(context.l10n.debugExportMessage(file.path))),
       );
     }
+  }
+}
+
+class _LanguageSelector extends ConsumerWidget {
+  const _LanguageSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(appLocaleProvider);
+    final selectedCode = controller.localeCode ?? 'system';
+    final options = [
+      ('system', context.l10n.languageSystemOption),
+      ('de', context.l10n.languageGermanOption),
+      ('fr', context.l10n.languageFrenchOption),
+      ('it', context.l10n.languageItalianOption),
+    ];
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.language_outlined),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  context.l10n.languageTitle,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (final option in options)
+                  ChoiceChip(
+                    label: Text(option.$2),
+                    selected: selectedCode == option.$1,
+                    onSelected: (_) => ref
+                        .read(appLocaleProvider)
+                        .setLocaleCode(
+                          option.$1 == 'system' ? null : option.$1,
+                        ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

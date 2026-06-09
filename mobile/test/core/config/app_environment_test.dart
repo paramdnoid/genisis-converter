@@ -28,11 +28,13 @@ void main() {
       final environment = AppEnvironment.fromFlavor(
         AppFlavor.prod,
         apiBaseUrl: Uri.parse('http://localhost:8080'),
+        tenantSlug: 'demo-kaminfeger',
       );
 
       expect(environment.enforceHttps, isTrue);
       expect(environment.isHttpsEndpoint, isFalse);
       expect(environment.allowsConfiguredEndpoint, isFalse);
+      expect(environment.tenantSlug, 'demo-kaminfeger');
     });
 
     test('parses flavor aliases and falls back to development', () {

@@ -11,6 +11,10 @@ export interface BackendEnvironment {
   JWT_REFRESH_TTL: string;
   UPLOAD_BASE_URL: string;
   LOCAL_UPLOAD_DIR: string;
+  PUSH_NOTIFICATIONS_ENABLED?: string;
+  FIREBASE_PROJECT_ID?: string;
+  FIREBASE_CLIENT_EMAIL?: string;
+  FIREBASE_PRIVATE_KEY?: string;
 }
 
 export function envValidation(env: RawEnv): BackendEnvironment {
@@ -33,5 +37,9 @@ export function envValidation(env: RawEnv): BackendEnvironment {
     UPLOAD_BASE_URL:
       env.UPLOAD_BASE_URL ?? "http://localhost:3000/files/upload",
     LOCAL_UPLOAD_DIR: env.LOCAL_UPLOAD_DIR ?? "./uploads",
+    PUSH_NOTIFICATIONS_ENABLED: env.PUSH_NOTIFICATIONS_ENABLED,
+    FIREBASE_PROJECT_ID: env.FIREBASE_PROJECT_ID,
+    FIREBASE_CLIENT_EMAIL: env.FIREBASE_CLIENT_EMAIL,
+    FIREBASE_PRIVATE_KEY: env.FIREBASE_PRIVATE_KEY,
   };
 }

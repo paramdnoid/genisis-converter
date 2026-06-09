@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kaminfeger_mobile/data/db/app_database.dart';
@@ -49,5 +50,55 @@ void main() {
       'pageObjectCount': greaterThanOrEqualTo(1),
       'minimumBytes': true,
     });
+  });
+
+  test('loads the active tenant report template for PDF generation', () async {
+    final data = await ReportDataAggregator(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    ).load(DevelopmentSeed.workOrderInspectionId);
+
+    expect(data?.reportTemplate?.id, DevelopmentSeed.reportTemplateId);
+    expect(data?.reportTemplate?.isDefault, isTrue);
+    expect(data?.reportTemplate?.includeMeasurements, isTrue);
+  });
+
+  test('applies tenant report template options to generated PDFs', () async {
+    final defaultData = await ReportDataAggregator(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    ).load(DevelopmentSeed.workOrderInspectionId);
+    final defaultBytes = await const PdfReportGenerator().generateBytes(
+      defaultData!,
+    );
+
+    final template = defaultData.reportTemplate!;
+    await database
+        .update(database.reportTemplates)
+        .replace(
+          template.copyWith(
+            titlePrefix: 'Serviceprotokoll',
+            primaryColor: '#0f766e',
+            footerText: const Value('Mandantenspezifische Vorlage'),
+            includeMeasurements: false,
+            includeDefects: false,
+            includePhotos: false,
+          ),
+        );
+
+    final customData = await ReportDataAggregator(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    ).load(DevelopmentSeed.workOrderInspectionId);
+    final customBytes = await const PdfReportGenerator().generateBytes(
+      customData!,
+    );
+    final customBody = latin1.decode(customBytes, allowInvalid: true);
+
+    expect(customData.reportTemplate?.titlePrefix, 'Serviceprotokoll');
+    expect(customData.reportTemplate?.includeMeasurements, isFalse);
+    expect(customData.reportTemplate?.includeDefects, isFalse);
+    expect(customBody.startsWith('%PDF-'), isTrue);
+    expect(customBytes.length, isNot(defaultBytes.length));
   });
 }

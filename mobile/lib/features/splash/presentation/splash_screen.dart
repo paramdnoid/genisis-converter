@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../l10n/app_localizations_x.dart';
+import '../../auth/application/auth_providers.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(_restoreSession);
+  }
+
+  Future<void> _restoreSession() async {
+    final repository = ref.read(authRepositoryProvider);
+    final controller = ref.read(authSessionProvider);
+    await controller.restore(repository);
+    if (!mounted || controller.session == null) {
+      return;
+    }
+    context.go(AppRoutes.dashboard);
+  }
 
   @override
   Widget build(BuildContext context) {

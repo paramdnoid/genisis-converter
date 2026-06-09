@@ -10,9 +10,11 @@ import '../../features/customers/presentation/customer_detail_screen.dart';
 import '../../features/defects/presentation/defect_screen.dart';
 import '../../features/installations/presentation/installation_detail_screen.dart';
 import '../../features/installations/presentation/installation_list_screen.dart';
+import '../../features/installations/presentation/installation_scan_screen.dart';
 import '../../features/measurements/presentation/measurement_screen.dart';
 import '../../features/materials/presentation/material_screen.dart';
 import '../../features/objects/presentation/object_detail_screen.dart';
+import '../../features/objects/presentation/object_list_screen.dart';
 import '../../features/photos/presentation/photo_detail_screen.dart';
 import '../../features/photos/presentation/photo_screen.dart';
 import '../../features/reports/presentation/report_screen.dart';
@@ -24,6 +26,7 @@ import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/sync_status/presentation/initial_sync_screen.dart';
 import '../../features/sync_status/presentation/sync_status_screen.dart';
 import '../../features/time_entries/presentation/time_entry_screen.dart';
+import '../../features/work_orders/presentation/offline_route_map_screen.dart';
 import '../../features/work_orders/presentation/work_order_completion_screen.dart';
 import '../../features/work_orders/presentation/work_order_detail_screen.dart';
 import '../../features/work_orders/presentation/work_order_list_screen.dart';
@@ -34,6 +37,7 @@ abstract final class AppRoutes {
   static const login = '/login';
   static const initialSync = '/sync-initial';
   static const dashboard = '/dashboard';
+  static const offlineRouteMap = '/routes/offline-map';
   static const workOrders = '/work-orders';
   static const workOrderDetail = '/work-orders/:workOrderId';
   static const workOrderChecklist = '/work-orders/:workOrderId/checklist';
@@ -49,8 +53,10 @@ abstract final class AppRoutes {
   static const workOrderComplete = '/work-orders/:workOrderId/complete';
   static const customers = '/customers';
   static const customerDetail = '/customers/:customerId';
+  static const objects = '/objects';
   static const objectDetail = '/objects/:objectId';
   static const installations = '/installations';
+  static const installationScan = '/installations/scan';
   static const installationDetail = '/installations/:installationId';
   static const settings = '/settings';
   static const syncStatus = '/settings/sync';
@@ -159,6 +165,12 @@ GoRouter createAppRouter() {
         name: 'dashboard',
         pageBuilder: (context, state) =>
             _fadePage(key: state.pageKey, child: const DashboardScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.offlineRouteMap,
+        name: 'offline-route-map',
+        pageBuilder: (context, state) =>
+            _fadePage(key: state.pageKey, child: const OfflineRouteMapScreen()),
       ),
       GoRoute(
         path: AppRoutes.workOrders,
@@ -305,6 +317,12 @@ GoRouter createAppRouter() {
         },
       ),
       GoRoute(
+        path: AppRoutes.objects,
+        name: 'objects',
+        pageBuilder: (context, state) =>
+            _fadePage(key: state.pageKey, child: const ObjectListScreen()),
+      ),
+      GoRoute(
         path: AppRoutes.objectDetail,
         name: 'object-detail',
         pageBuilder: (context, state) {
@@ -321,6 +339,14 @@ GoRouter createAppRouter() {
         pageBuilder: (context, state) => _fadePage(
           key: state.pageKey,
           child: const InstallationListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.installationScan,
+        name: 'installation-scan',
+        pageBuilder: (context, state) => _fadePage(
+          key: state.pageKey,
+          child: const InstallationScanScreen(),
         ),
       ),
       GoRoute(

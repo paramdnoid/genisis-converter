@@ -32,18 +32,20 @@ describe("AuthService", () => {
     const passwordHash = await hash("secret-password", 4);
     const prisma = {
       user: {
-        findFirst: jest.fn().mockResolvedValue({
-          id: "user-1",
-          tenantId: "tenant-1",
-          firstName: "Ada",
-          lastName: "Admin",
-          email: "ada@example.invalid",
-          phone: null,
-          role: "admin",
-          passwordHash,
-          isActive: true,
-          tenant: { id: "tenant-1", name: "Tenant" },
-        }),
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: "user-1",
+            tenantId: "tenant-1",
+            firstName: "Ada",
+            lastName: "Admin",
+            email: "ada@example.invalid",
+            phone: null,
+            role: "admin",
+            passwordHash,
+            isActive: true,
+            tenant: { id: "tenant-1", slug: "tenant", name: "Tenant" },
+          },
+        ]),
       },
     } as unknown as PrismaService;
 
@@ -55,6 +57,7 @@ describe("AuthService", () => {
     const result = await service.login({
       email: "ADA@example.invalid",
       password: "secret-password",
+      tenantSlug: "tenant",
     });
 
     expect(result.user).toMatchObject({
@@ -65,12 +68,73 @@ describe("AuthService", () => {
     });
     expect(result.tokens.accessToken).toEqual(expect.any(String));
     expect(result.tokens.refreshToken).toEqual(expect.any(String));
+    expect(prisma.user.findMany).toHaveBeenCalledWith({
+      where: {
+        email: "ada@example.invalid",
+        isActive: true,
+        deletedAt: null,
+        tenant: {
+          deletedAt: null,
+          status: "active",
+          slug: "tenant",
+        },
+      },
+      include: { tenant: true },
+      take: 2,
+    });
+  });
+
+  it("requires tenant slug when the email exists in multiple active tenants", async () => {
+    const passwordHash = await hash("secret-password", 4);
+    const prisma = {
+      user: {
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: "user-1",
+            tenantId: "tenant-1",
+            firstName: "Ada",
+            lastName: "Admin",
+            email: "ada@example.invalid",
+            phone: null,
+            role: "admin",
+            passwordHash,
+            isActive: true,
+            tenant: { id: "tenant-1", slug: "tenant-1" },
+          },
+          {
+            id: "user-2",
+            tenantId: "tenant-2",
+            firstName: "Ada",
+            lastName: "Admin",
+            email: "ada@example.invalid",
+            phone: null,
+            role: "admin",
+            passwordHash,
+            isActive: true,
+            tenant: { id: "tenant-2", slug: "tenant-2" },
+          },
+        ]),
+      },
+    } as unknown as PrismaService;
+
+    const service = new AuthService(
+      prisma,
+      new JwtService(),
+      config() as never,
+    );
+
+    await expect(
+      service.login({
+        email: "ada@example.invalid",
+        password: "secret-password",
+      }),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
   it("rejects invalid credentials without issuing tokens", async () => {
     const prisma = {
       user: {
-        findFirst: jest.fn().mockResolvedValue(null),
+        findMany: jest.fn().mockResolvedValue([]),
       },
     } as unknown as PrismaService;
 

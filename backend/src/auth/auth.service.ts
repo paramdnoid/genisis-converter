@@ -9,6 +9,8 @@ import { PrismaService } from "../prisma/prisma.service";
 export interface LoginRequest {
   email?: string;
   password?: string;
+  tenantId?: string;
+  tenantSlug?: string;
 }
 
 export interface RefreshRequest {
@@ -38,14 +40,27 @@ export class AuthService {
       throw new UnauthorizedException("Email and password are required.");
     }
 
-    const user = await this.prisma.user.findFirst({
+    const tenantFilter = this.tenantLoginFilter(request);
+    const candidates = await this.prisma.user.findMany({
       where: {
         email,
         isActive: true,
         deletedAt: null,
+        tenant: {
+          deletedAt: null,
+          status: "active",
+          ...tenantFilter,
+        },
       },
       include: { tenant: true },
+      take: 2,
     });
+    if (candidates.length > 1) {
+      throw new UnauthorizedException(
+        "Tenant slug is required for this account.",
+      );
+    }
+    const user = candidates[0];
     if (!user || !(await compare(password, user.passwordHash))) {
       throw new UnauthorizedException("Invalid credentials.");
     }
@@ -87,6 +102,10 @@ export class AuthService {
         tenantId: payload.tenantId,
         isActive: true,
         deletedAt: null,
+        tenant: {
+          deletedAt: null,
+          status: "active",
+        },
       },
     });
     if (!user) {
@@ -112,6 +131,10 @@ export class AuthService {
         tenantId: user.tenantId,
         isActive: true,
         deletedAt: null,
+        tenant: {
+          deletedAt: null,
+          status: "active",
+        },
       },
       include: { tenant: true },
     });
@@ -149,6 +172,39 @@ export class AuthService {
       refreshToken,
       tokenType: "Bearer",
     };
+  }
+
+  async createSessionForUser(user: {
+    id: string;
+    tenantId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string | null;
+    role: string;
+    isActive: boolean;
+  }) {
+    return {
+      user: this.toPublicUser(user),
+      tokens: await this.issueTokens({
+        sub: user.id,
+        tenantId: user.tenantId,
+        email: user.email,
+        role: user.role,
+      }),
+    };
+  }
+
+  private tenantLoginFilter(request: LoginRequest) {
+    const tenantId = request.tenantId?.trim();
+    const tenantSlug = request.tenantSlug?.trim().toLowerCase();
+    if (tenantId) {
+      return { id: tenantId };
+    }
+    if (tenantSlug) {
+      return { slug: tenantSlug };
+    }
+    return {};
   }
 
   private toPublicUser(user: {

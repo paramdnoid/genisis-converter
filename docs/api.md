@@ -9,7 +9,30 @@ The backend API is implemented in `backend/` with NestJS, Prisma, JWT auth, and 
 - `POST /auth/logout`
 - `GET /me`
 
-All routes except `/health`, `/auth/login`, and `/auth/refresh` require a bearer access token. The token contains `sub`, `tenantId`, `email`, and `role`. The optional `x-tenant-id` header must match the token tenant.
+`POST /auth/login` accepts `email`, `password`, and optional `tenantSlug` or
+`tenantId`. The tenant selector is required when the same email exists in more
+than one active tenant.
+
+All routes except `/health`, `/auth/login`, `/auth/refresh`, and
+`/tenancy/signup` require a bearer access token. The token contains `sub`,
+`tenantId`, `email`, and `role`. The optional `x-tenant-id` header must match
+the token tenant.
+
+After authentication, route-level permissions are enforced by role. Admins have
+full access. Dispatchers can use planning, report, material, and read-heavy
+office flows. Technicians can sync, upload, register push tokens, generate
+reports, and mutate field-work entities such as work orders, checklist answers,
+measurements, defects, photos, time entries, material usage, and service lines.
+
+## Tenancy
+
+- `POST /tenancy/signup`
+- `GET /tenancy/current`
+- `PATCH /tenancy/current`
+
+Signup creates a new active tenant with a unique `slug`, starter plan, and an
+initial admin user in one transaction. Current-tenant updates are limited to
+tenant admins and update profile fields only.
 
 ## Health
 
@@ -56,6 +79,7 @@ Whole-tenant pulls return the roadmap collection shape:
     "installations": [],
     "work_orders": [],
     "checklist_templates": [],
+    "report_templates": [],
     "materials": []
   }
 }
@@ -91,6 +115,7 @@ Tenant-scoped REST CRUD routes are available for:
 - `/time-entries`
 - `/materials`
 - `/work-order-materials`
+- `/report-templates`
 - `/reports`
 
 Each route supports `GET`, `POST`, `GET /:id`, `PATCH /:id`, and `DELETE /:id`. Deletes are soft deletes. Updates increment `version`.
@@ -101,3 +126,11 @@ Each route supports `GET`, `POST`, `GET /:id`, `PATCH /:id`, and `DELETE /:id`. 
 - `GET /reports/:id`
 
 Report generation creates server-side report metadata and links it to a work order. PDF bytes remain in the mobile/local file flow until uploaded through `/files/upload/*`.
+
+Tenant-specific report templates are managed through `/report-templates` and
+sync through `report_templates`. A template can define the report title prefix,
+locale marker, primary color, footer text, default status, and section switches
+for customer/object data, installations, measurements, defects, materials, time
+entries, photos, and signature blocks. Mobile PDF generation uses the active
+default template for the current tenant and falls back to the standard report
+layout when no template is available.

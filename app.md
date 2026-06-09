@@ -1784,6 +1784,11 @@ Offline-Suche über:
 - [x] Kern-Use-Cases testen
 - [x] CI Pipeline mit Tests vorbereiten
 
+**Status 2026-06-08**
+
+- `mobile/integration_test/offline_smoke_test.dart` prüft den echten App-Router mit Offline-Login, Initial-Sync und lokaler Auftragsliste.
+- `scripts/test.sh` und `.github/workflows/mobile-ci.yml` führen die Integration Tests zusätzlich zu Analyze, Unit-/Widgettests und Builds aus.
+
 ---
 
 ## 38. CI/CD
@@ -1831,6 +1836,11 @@ jobs:
 - [x] Android Build optional einrichten
 - [x] README Badge optional einrichten
 
+**Status 2026-06-08**
+
+- Die CI prüft Mobile mit Format, Analyze, Unit-/Widgettests, Integration Test und Android Debug Build.
+- Die CI prüft Backend mit `npm ci`, Prisma Generate/Validate, Prettier Check, Nest Build und Jest Tests.
+
 ---
 
 ## 39. Release Vorbereitung
@@ -1861,6 +1871,14 @@ jobs:
 - [x] Flavor-Konzept für dev/staging/prod definieren
 - [x] Environment Config bauen
 - [x] Build Scripts erstellen
+
+**Status 2026-06-08**
+
+- Android APK Smoke-Build ist mit `scripts/build_android.sh dev` validiert.
+- Android App Bundle Script prüft Release-Signing früh und bricht ohne `mobile/android/key.properties` kontrolliert ab.
+- iOS Simulator Smoke-Build ist mit `scripts/build_ios_simulator.sh dev` validiert.
+- iOS Archive Script prüft `IOS_DEVELOPMENT_TEAM` früh und bricht ohne lokale Apple-Team-ID kontrolliert ab.
+- Echte Google Play Internal Testing und TestFlight Uploads bleiben offen, weil dafür externe Store-Accounts und reale Signing-Werte nötig sind.
 
 ---
 
@@ -2097,7 +2115,7 @@ Codex soll diese Reihenfolge strikt befolgen.
 
 - [x] Permissions finalisieren
 - [x] Offline Tests
-- [ ] Integration Tests
+- [x] Integration Tests
 - [x] CI finalisieren
 - [x] App Icons
 - [x] Build Flavors
@@ -2228,30 +2246,86 @@ Die App gilt als fachlich fertig, wenn folgende Punkte erfüllt sind:
 
 ### 46.1 Version 1.1
 
-- [ ] Push Notifications für neue Aufträge
-- [ ] Kalenderintegration
-- [ ] Routenoptimierung
-- [ ] Wiederkehrende Aufträge
-- [ ] Erweiterte Auftragshistorie
-- [ ] Bericht per E-Mail senden
+- [x] Push Notifications für neue Aufträge
+- [x] Kalenderintegration
+- [x] Routenoptimierung
+- [x] Wiederkehrende Aufträge
+- [x] Erweiterte Auftragshistorie
+- [x] Bericht per E-Mail senden
+
+**Status 2026-06-08**
+
+- Rapporte können aus dem lokalen PDF-Datensatz per Plattform-Freigabe mit E-Mail-Betreff, Text und vorhandener Kunden-E-Mail geteilt werden.
+- `ReportShareService` kapselt PDF-Erzeugung und `Printing.sharePdf`, damit der Flow testbar bleibt.
+- Auftragsdetails können terminierte Aufträge als `.ics`-Kalenderdatei mit Titel, Ort, Beschreibung und UTC-Zeitfenster über die native Freigabe an Kalender-Apps übergeben.
+- `WorkOrderCalendarShareService` kapselt ICS-Erzeugung und `share_plus`, inklusive Unit-Test gegen echte Seed-Auftragsdaten.
+- Das Dashboard zeigt eine Tagesroute, lädt lokale Auftragsstopps mit Objektadresse/Koordinaten und öffnet eine optimierte Google-Maps-Mehrstopp-Route.
+- `WorkOrderRouteOptimizer` sortiert koordinatenbasierte Stopps per Nearest-Neighbor und fällt bei unvollständigen Koordinaten deterministisch auf Terminreihenfolge zurück.
+- Wiederkehrende Aufträge werden aus fälligen Anlagen mit `intervalMonths` und `nextServiceDate` lokal erzeugt, mit Anlage verknüpft und über Outbox für Auftrag, Verknüpfung und fortgeschriebene Anlage synchronisiert.
+- Das Dashboard zeigt fällige Intervallaufträge und kann sie duplikatsicher lokal erzeugen; vorhandene Aufträge am Fälligkeitsdatum sperren erneute Erzeugung.
+- Kunden-, Objekt- und Anlagen-Details nutzen eine gemeinsame erweiterte Auftragshistorie mit Kennzahlen für Gesamt/offen/erledigt/überfällig/lokal geändert, letztem Abschluss, nächstem Termin und monatlich gruppierter Timeline.
+- `WorkOrderHistorySummary` kapselt Sortierung, Gruppierung und Kennzahlen der lokalen Historie und ist durch einen dedizierten Unit-Test abgedeckt.
+- Pull-Sync erkennt nach einem erfolgreichen Vor-Sync neu vom Server gelieferte Aufträge und leitet sie an eine austauschbare Notification-Schicht weiter; initiale Bootstrap-Pulls lösen keine Benachrichtigungen aus.
+- `LocalWorkOrderNotificationService` zeigt diese neuen Aufträge über `flutter_local_notifications` als lokale Systembenachrichtigung an und fragt Android-13-Notification-Rechte an.
+- Das Backend speichert mobile Push-Gerätetokens mandanten- und benutzerbezogen unter `/push/device-tokens`, widerruft Tokens, bereinigt ungültige FCM-Tokens nach Versand und auditiert Remote-Push-Zustellungen.
+- Neue oder neu zugewiesene Aufträge stoßen über CRUD, Sync und Disposition den gemeinsamen `PushService` an; der zuständige Techniker erhält eine FCM-Nachricht mit WorkOrder-ID, Auftragsnummer, Titel, Kunde, Objekt und Termin.
+- Die Flutter-App registriert FCM-Tokens nach echter Online-Session und meldet Token-Refreshes nach; ohne Firebase-Dart-Defines bleibt der Pfad deaktiviert und offline-/testfähig. Für produktive APNs/FCM-Zustellung sind Firebase-Projektwerte, Server-Credentials und iOS-Push-Entitlements bereitzustellen.
+- Android- und iOS-Build-Skripte reichen optionale Firebase-Dart-Defines durch; Release-Dokumentation beschreibt die nötigen FCM/APNs-Werte für Store-Artefakte.
 
 ### 46.2 Version 1.2
 
-- [ ] Bluetooth-Messgeräte
-- [ ] QR-/Barcode Scan für Anlagen
-- [ ] Offline-Karten
-- [ ] Lagerbestand
-- [ ] Rechnungsintegration
-- [ ] Web-Portal für Disposition
+- [x] Bluetooth-Messgeräte
+- [x] QR-/Barcode Scan für Anlagen
+- [x] Offline-Karten
+- [x] Lagerbestand
+- [x] Rechnungsintegration
+- [x] Web-Portal für Disposition
+
+**Status 2026-06-08**
+
+- Anlagenliste öffnet einen QR-/Barcode-Scanner mit `mobile_scanner` sowie manueller Eingabe als Fallback.
+- `InstallationScanMatcher` erkennt lokale Anlagen anhand ID oder Seriennummer aus Rohcode, URL-/Query-Payloads und JSON-Payloads.
+- Erkannte Anlagen navigieren direkt zur lokalen Anlagen-Detailseite; Matcher, Listenaktion und Routing sind durch Flutter-Tests abgedeckt.
+- Materialstamm führt optionale Bestands- und Mindestbestandsmengen in Drift und Prisma; Drift-Migration 4 und Prisma-Migration `20260608190000_material_inventory` ergänzen die Spalten.
+- Lokaler Materialverbrauch bucht bei ausgewähltem Katalogmaterial den Bestand atomar ab, verhindert Überverbrauch und legt zusätzlich ein `material:update` in der Outbox ab.
+- Die Materialansicht zeigt Lagerbestand, Mindestbestand und Knapp-/OK-Status; Datenbank- und Widgettests decken Anzeige, Abbuchung, Low-Stock und Überverbrauch ab.
+- Der Rapportbereich kann aus lokalen Auftragsdaten einen Rechnungsentwurf als JSON exportieren und über die native Freigabe an Büro-/ERP-Prozesse übergeben.
+- `WorkOrderInvoiceExportService` baut Rechnungsnummer, Empfänger, Rechnungsadresse, Fälligkeit, Service-/Materialpositionen, Zwischensumme, Tax-Points und CHF-Währung aus `ReportData`.
+- Der Rechnungsexport ist durch einen Test mit echten lokalen Service-Lines, Materialverbrauch, Share-Datei und JSON-Payload abgedeckt.
+- Das Dashboard öffnet eine lokale Offline-Routenkarte für die Tagesroute, ohne externe Kartentiles oder Netzwerkzugriff.
+- `OfflineRouteMapBuilder` normalisiert optimierte Stopps mit lokalen Koordinaten, trennt Stopps ohne Koordinaten und lehnt Karten ohne Koordinaten deterministisch ab.
+- `OfflineRouteMapScreen` rendert die schematische Route per `CustomPaint`, zeigt Stoppliste und Koordinaten und ist zusammen mit dem Builder durch Unit- und Widgettests abgedeckt.
+- Messwerte können direkt aus BLE-Messgeräten übernommen werden; der `flutter_blue_plus`-Client scannt, verbindet, liest Notify-/Read-Characteristics und speichert erkannte Readings über den bestehenden lokalen Messwert-/Outbox-Pfad.
+- `BluetoothMeasurementParser` verarbeitet generische Text- und JSON-Payloads mit Gerät, Seriennummer, Messart, Wert und Einheit für CO, O2, CO2, Temperatur, Zug, Russzahl, Wirkungsgrad, Druck und Sonstige.
+- Der Messwertscreen zeigt einen Bluetooth-Import unterhalb der manuellen Erfassung, übernimmt Messwerte optional an eine Anlage und zeigt Geräte-Metadaten an gespeicherten Messwerten; Parser, Permission-Mapping und UI-Import sind durch Flutter-Tests abgedeckt.
+- Das Backend liefert unter `/disposition` ein schlankes Dispositions-Web-Portal mit Login, Kennzahlen, Status-/Techniker-/Suchfiltern und Auftragskarten aus.
+- Die geschützte API `/disposition/api/snapshot` bündelt Aufträge, Kunden, Objekte und Techniker pro Mandant; `/disposition/api/work-orders/:id` aktualisiert Zuweisung, Status, Priorität und Termine nur für Admin-/Disponentenrollen.
+- Portal-Assets, Rollenprüfung, Snapshot-Metriken und Dispositionsupdates sind durch Backend-Tests abgedeckt; HTTP-Smoke bestätigte HTML/CSS/JS-Auslieferung und `401` für unautorisierte Snapshot-Zugriffe.
 
 ### 46.3 Version 2.0
 
-- [ ] Mehrmandanten-SaaS
-- [ ] Rollen-/Rechte-System fein granular
-- [ ] Mandantenspezifische Berichtsvorlagen
+- [x] Mehrmandanten-SaaS
+- [x] Rollen-/Rechte-System fein granular
+- [x] Mandantenspezifische Berichtsvorlagen
 - [ ] Mehrsprachigkeit Deutsch/Französisch/Italienisch
 - [ ] Analytics und Auswertungen
 - [ ] KI-gestützte Mangeltexte optional
+
+**Status 2026-06-08**
+
+- Tenants besitzen einen eindeutigen SaaS-`slug`, `plan` und `status`; Prisma-Migration `20260608210000_tenant_saas` migriert bestehende Mandanten und erzwingt eindeutige Slugs.
+- `POST /tenancy/signup` erstellt Mandant und ersten Admin atomar, normalisiert den Tenant-Slug, validiert Mindestpasswortlänge und gibt direkt eine Auth-Session zurück.
+- `GET/PATCH /tenancy/current` liefern und aktualisieren das aktuelle Mandantenprofil tenant-scoped; Profiländerungen sind auf Admins beschränkt.
+- Login ist mandantenbewusst: `tenantSlug` oder `tenantId` kann mitgesendet werden; bei gleicher E-Mail in mehreren aktiven Mandanten wird ohne Tenant-Auswahl keine Session ausgestellt.
+- Mobile Auth unterstützt `tenantSlug` im Login-Payload und kann ihn über den `TENANT_SLUG` Dart-Define aus Release-/Smoke-Builds übernehmen.
+- API-, Security-, Architektur- und Release-Dokumentation beschreiben den SaaS-Tenant-Vertrag; Backend- und Mobile-Tests decken Signup, Tenant-Profil, Admin-Gate und Tenant-Slug-Login ab.
+- Ein globaler `PermissionGuard` erzwingt nach JWT-Auth explizite Route-Permissions; Admins haben Vollzugriff, Disponenten Planungs-/Office-Rechte und Techniker Feldarbeits-, Sync-, Upload-, Push-Token- und Report-Rechte.
+- Generierte CRUD-Controller verwenden pro Entity getrennte `read`/`write`/`delete`-Permissions; Reports, Files, Sync, Disposition, Push und Tenancy sind zusätzlich mit fachlichen Permissions annotiert.
+- Die RBAC-Matrix und der Guard sind durch Unit-Tests abgedeckt, inklusive Techniker-Write-Rechten für WorkOrders, fehlenden User-/Tenant-Admin-Rechten und Dispatcher-Grenzen.
+- `report_templates` ist als tenant-scoped Prisma-/Drift-/Sync-Entität umgesetzt und über `/report-templates` per generiertem CRUD erreichbar.
+- Mandantenvorlagen steuern Titelpräfix, Akzentfarbe, Footer und Abschnitte für Kunde/Objekt, Anlagen, Messwerte, Mängel, Material, Zeiten, Fotos und Signatur.
+- Mobile PDF-Erzeugung lädt die aktive Standardvorlage aus Drift, bleibt ohne Vorlage fallbackfähig und ist zusammen mit Pull-Sync der Vorlage durch Flutter-Tests abgedeckt.
+- Disponenten und Techniker haben Leserechte auf Berichtsvorlagen; Schreibrechte bleiben admin-only über die RBAC-Matrix.
 
 ---
 

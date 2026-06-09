@@ -10,6 +10,7 @@ import {
   Type,
 } from "@nestjs/common";
 
+import { RequirePermissions } from "../common/decorators/require-permissions.decorator";
 import { TenantId } from "../common/decorators/tenant-id.decorator";
 import { EntityCrudService } from "./entity-crud.service";
 import { ENTITY_DEFINITIONS, EntityKey } from "./entity-map";
@@ -26,11 +27,13 @@ function createCrudController(route: string, entity: EntityKey): Type<unknown> {
   class GeneratedCrudController {
     constructor(private readonly service: EntityCrudService) {}
 
+    @RequirePermissions(`entity:${entity}:read`)
     @Get()
     list(@TenantId() tenantId: string, @Query() query: Record<string, string>) {
       return this.service.list(entity, tenantId, query);
     }
 
+    @RequirePermissions(`entity:${entity}:write`)
     @Post()
     create(
       @TenantId() tenantId: string,
@@ -39,11 +42,13 @@ function createCrudController(route: string, entity: EntityKey): Type<unknown> {
       return this.service.create(entity, tenantId, body);
     }
 
+    @RequirePermissions(`entity:${entity}:read`)
     @Get(":id")
     get(@TenantId() tenantId: string, @Param("id") id: string) {
       return this.service.get(entity, tenantId, id);
     }
 
+    @RequirePermissions(`entity:${entity}:write`)
     @Patch(":id")
     update(
       @TenantId() tenantId: string,
@@ -53,6 +58,7 @@ function createCrudController(route: string, entity: EntityKey): Type<unknown> {
       return this.service.update(entity, tenantId, id, body);
     }
 
+    @RequirePermissions(`entity:${entity}:delete`)
     @Delete(":id")
     delete(@TenantId() tenantId: string, @Param("id") id: string) {
       return this.service.softDelete(entity, tenantId, id);

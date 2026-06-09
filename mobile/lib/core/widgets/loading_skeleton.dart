@@ -11,6 +11,8 @@ class LoadingSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.lg),
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       itemCount: itemCount,
       separatorBuilder: (context, index) =>
           const SizedBox(height: AppSpacing.md),

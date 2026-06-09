@@ -6,6 +6,7 @@ import '../../../domain/entities/installation.dart';
 import '../../../domain/entities/installation_detail.dart';
 import '../../../domain/repositories/installation_repository.dart';
 import '../../work_orders/application/work_order_providers.dart';
+import 'installation_scan_matcher.dart';
 
 final installationRepositoryProvider = FutureProvider<InstallationRepository>((
   ref,
@@ -46,4 +47,14 @@ final installationDetailProvider = FutureProvider.autoDispose
     .family<InstallationDetail?, String>((ref, installationId) async {
       final repository = await ref.watch(installationRepositoryProvider.future);
       return repository.getDetail(installationId);
+    });
+
+final installationScanMatchProvider = FutureProvider.autoDispose
+    .family<InstallationScanMatch?, String>((ref, rawCode) async {
+      final repository = await ref.watch(installationRepositoryProvider.future);
+      final installations = await repository.watchAll().first;
+      return const InstallationScanMatcher().match(
+        rawCode: rawCode,
+        installations: installations,
+      );
     });

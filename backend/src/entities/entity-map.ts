@@ -15,7 +15,12 @@ export type EntityKey =
   | "time_entries"
   | "materials"
   | "work_order_materials"
-  | "reports";
+  | "tariff_catalog_items"
+  | "object_tariff_assignments"
+  | "work_order_service_lines"
+  | "report_templates"
+  | "reports"
+  | "legacy_import_records";
 
 export interface EntityDefinition {
   key: EntityKey;
@@ -155,12 +160,52 @@ export const ENTITY_DEFINITIONS: Record<EntityKey, EntityDefinition> = {
     collection: "work_order_materials",
     scope: "tenantColumn",
   },
+  tariff_catalog_items: {
+    key: "tariff_catalog_items",
+    route: "tariff-catalog-items",
+    delegate: "tariffCatalogItem",
+    singular: "tariff_catalog_item",
+    collection: "tariff_catalog_items",
+    scope: "tenantColumn",
+  },
+  object_tariff_assignments: {
+    key: "object_tariff_assignments",
+    route: "object-tariff-assignments",
+    delegate: "objectTariffAssignment",
+    singular: "object_tariff_assignment",
+    collection: "object_tariff_assignments",
+    scope: "tenantColumn",
+  },
+  work_order_service_lines: {
+    key: "work_order_service_lines",
+    route: "work-order-service-lines",
+    delegate: "workOrderServiceLine",
+    singular: "work_order_service_line",
+    collection: "work_order_service_lines",
+    scope: "tenantColumn",
+  },
+  report_templates: {
+    key: "report_templates",
+    route: "report-templates",
+    delegate: "reportTemplate",
+    singular: "report_template",
+    collection: "report_templates",
+    scope: "tenantColumn",
+  },
   reports: {
     key: "reports",
     route: "reports",
     delegate: "report",
     singular: "report",
     collection: "reports",
+    scope: "tenantColumn",
+  },
+  legacy_import_records: {
+    key: "legacy_import_records",
+    route: "legacy-import-records",
+    delegate: "legacyImportRecord",
+    singular: "legacy_import_record",
+    collection: "legacy_import_records",
     scope: "tenantColumn",
   },
 };
@@ -188,6 +233,16 @@ aliases.set("timeEntries", "time_entries");
 aliases.set("timeEntry", "time_entries");
 aliases.set("workOrderMaterials", "work_order_materials");
 aliases.set("workOrderMaterial", "work_order_materials");
+aliases.set("tariffCatalogItems", "tariff_catalog_items");
+aliases.set("tariffCatalogItem", "tariff_catalog_items");
+aliases.set("objectTariffAssignments", "object_tariff_assignments");
+aliases.set("objectTariffAssignment", "object_tariff_assignments");
+aliases.set("workOrderServiceLines", "work_order_service_lines");
+aliases.set("workOrderServiceLine", "work_order_service_lines");
+aliases.set("reportTemplates", "report_templates");
+aliases.set("reportTemplate", "report_templates");
+aliases.set("legacyImportRecords", "legacy_import_records");
+aliases.set("legacyImportRecord", "legacy_import_records");
 
 export function normalizeEntityKey(value: string): EntityKey | undefined {
   return aliases.get(value.trim());
@@ -210,5 +265,10 @@ export const SYNC_ENTITY_KEYS: EntityKey[] = [
   "time_entries",
   "materials",
   "work_order_materials",
+  "tariff_catalog_items",
+  "object_tariff_assignments",
+  "work_order_service_lines",
+  "report_templates",
   "reports",
+  "legacy_import_records",
 ];

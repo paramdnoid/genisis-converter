@@ -178,6 +178,138 @@ abstract class AppLocalizations {
   /// **'Nächster Auftrag'**
   String get nextOrderTitle;
 
+  /// No description provided for @routeOptimizationTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Tagesroute'**
+  String get routeOptimizationTitle;
+
+  /// No description provided for @routeOptimizationReadyMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} Tagesstopp(s) für die Route bereit.'**
+  String routeOptimizationReadyMessage(int count);
+
+  /// No description provided for @routeOptimizationCoordinateMode.
+  ///
+  /// In de, this message translates to:
+  /// **'Koordinatenoptimiert'**
+  String get routeOptimizationCoordinateMode;
+
+  /// No description provided for @routeOptimizationScheduleMode.
+  ///
+  /// In de, this message translates to:
+  /// **'Terminreihenfolge'**
+  String get routeOptimizationScheduleMode;
+
+  /// No description provided for @routeOptimizationNoStopsMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Tagesstopps mit Adresse vorhanden.'**
+  String get routeOptimizationNoStopsMessage;
+
+  /// No description provided for @routeOptimizationOpenAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Optimierte Route öffnen'**
+  String get routeOptimizationOpenAction;
+
+  /// No description provided for @routeOptimizationOpenError.
+  ///
+  /// In de, this message translates to:
+  /// **'Optimierte Route konnte nicht geöffnet werden.'**
+  String get routeOptimizationOpenError;
+
+  /// No description provided for @offlineRouteMapTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Offline-Karte'**
+  String get offlineRouteMapTitle;
+
+  /// No description provided for @offlineRouteMapAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Offline-Karte'**
+  String get offlineRouteMapAction;
+
+  /// No description provided for @offlineRouteMapSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} Stopp(s) lokal aus Koordinaten gezeichnet.'**
+  String offlineRouteMapSubtitle(int count);
+
+  /// No description provided for @offlineRouteMapEmptyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Offline-Route'**
+  String get offlineRouteMapEmptyTitle;
+
+  /// No description provided for @offlineRouteMapNoCoordinatesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Koordinaten'**
+  String get offlineRouteMapNoCoordinatesTitle;
+
+  /// No description provided for @offlineRouteMapNoCoordinatesMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Für die lokale Karte braucht mindestens ein Tagesstopp gespeicherte Koordinaten.'**
+  String get offlineRouteMapNoCoordinatesMessage;
+
+  /// No description provided for @offlineRouteMapStopsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Stopps'**
+  String get offlineRouteMapStopsTitle;
+
+  /// No description provided for @offlineRouteMapUnmappedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Koordinaten'**
+  String get offlineRouteMapUnmappedTitle;
+
+  /// No description provided for @recurringWorkOrdersTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederkehrende Aufträge'**
+  String get recurringWorkOrdersTitle;
+
+  /// No description provided for @recurringWorkOrdersDueCount.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} fällig'**
+  String recurringWorkOrdersDueCount(int count);
+
+  /// No description provided for @recurringWorkOrdersReadyMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} Anlage(n) sind für einen neuen Auftrag fällig.'**
+  String recurringWorkOrdersReadyMessage(int count);
+
+  /// No description provided for @recurringWorkOrdersEmptyMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine fälligen Intervallaufträge.'**
+  String get recurringWorkOrdersEmptyMessage;
+
+  /// No description provided for @recurringWorkOrdersCreateAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Fällige Aufträge erstellen'**
+  String get recurringWorkOrdersCreateAction;
+
+  /// No description provided for @recurringWorkOrdersCreatedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} wiederkehrende Auftrag/Aufträge lokal erstellt.'**
+  String recurringWorkOrdersCreatedMessage(int count);
+
+  /// No description provided for @recurringWorkOrdersErrorMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederkehrende Aufträge konnten nicht erstellt werden: {error}'**
+  String recurringWorkOrdersErrorMessage(String error);
+
   /// No description provided for @startOrderAction.
   ///
   /// In de, this message translates to:
@@ -448,6 +580,30 @@ abstract class AppLocalizations {
   /// **'Anrufen'**
   String get callAction;
 
+  /// No description provided for @calendarShareAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender'**
+  String get calendarShareAction;
+
+  /// No description provided for @calendarShareSuccessMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalendereintrag wurde an die Freigabe übergeben.'**
+  String get calendarShareSuccessMessage;
+
+  /// No description provided for @calendarShareCancelledMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalenderfreigabe wurde abgebrochen.'**
+  String get calendarShareCancelledMessage;
+
+  /// No description provided for @calendarShareErrorMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalendereintrag konnte nicht geteilt werden: {error}'**
+  String calendarShareErrorMessage(String error);
+
   /// No description provided for @phoneLabel.
   ///
   /// In de, this message translates to:
@@ -676,6 +832,66 @@ abstract class AppLocalizations {
   /// **'PDF lokal gespeichert.'**
   String get reportPdfSavedMessage;
 
+  /// No description provided for @reportEmailShareAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Rapport per E-Mail senden'**
+  String get reportEmailShareAction;
+
+  /// No description provided for @reportEmailShareSuccessMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Rapport wurde an die Freigabe übergeben.'**
+  String get reportEmailShareSuccessMessage;
+
+  /// No description provided for @reportEmailShareCancelledMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Freigabe wurde abgebrochen.'**
+  String get reportEmailShareCancelledMessage;
+
+  /// No description provided for @reportEmailShareErrorMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Rapport konnte nicht geteilt werden: {error}'**
+  String reportEmailShareErrorMessage(String error);
+
+  /// No description provided for @invoiceExportAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Rechnungsentwurf exportieren'**
+  String get invoiceExportAction;
+
+  /// No description provided for @invoiceExportSuccessMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Rechnungsentwurf wurde an die Freigabe übergeben.'**
+  String get invoiceExportSuccessMessage;
+
+  /// No description provided for @invoiceExportCancelledMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Rechnungsexport wurde abgebrochen.'**
+  String get invoiceExportCancelledMessage;
+
+  /// No description provided for @invoiceExportErrorMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Rechnungsentwurf konnte nicht exportiert werden: {error}'**
+  String invoiceExportErrorMessage(String error);
+
+  /// No description provided for @reportEmailSubject.
+  ///
+  /// In de, this message translates to:
+  /// **'Rapport {orderNumber} - {customerName}'**
+  String reportEmailSubject(String orderNumber, String customerName);
+
+  /// No description provided for @reportEmailBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Guten Tag\n\nIm Anhang finden Sie den Rapport {orderNumber} für {customerName}.\n\nFreundliche Grüsse'**
+  String reportEmailBody(String customerName, String orderNumber);
+
   /// No description provided for @reportPreviewErrorTitle.
   ///
   /// In de, this message translates to:
@@ -771,6 +987,60 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Messwert speichern'**
   String get saveMeasurementAction;
+
+  /// No description provided for @bluetoothMeasurementTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Bluetooth-Messgerät'**
+  String get bluetoothMeasurementTitle;
+
+  /// No description provided for @bluetoothMeasurementSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'BLE-Messgeräte scannen, verbinden und Messwerte direkt lokal übernehmen.'**
+  String get bluetoothMeasurementSubtitle;
+
+  /// No description provided for @startBluetoothScanAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Scan starten'**
+  String get startBluetoothScanAction;
+
+  /// No description provided for @stopBluetoothScanAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Scan stoppen'**
+  String get stopBluetoothScanAction;
+
+  /// No description provided for @bluetoothDevicesEmptyMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch kein Messgerät gefunden.'**
+  String get bluetoothDevicesEmptyMessage;
+
+  /// No description provided for @bluetoothDeviceConnectingStatus.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbinden...'**
+  String get bluetoothDeviceConnectingStatus;
+
+  /// No description provided for @bluetoothReadingSaveAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Messwert übernehmen'**
+  String get bluetoothReadingSaveAction;
+
+  /// No description provided for @bluetoothReadingSavedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Bluetooth-Messwert lokal gespeichert.'**
+  String get bluetoothReadingSavedMessage;
+
+  /// No description provided for @measurementDeviceLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Gerät'**
+  String get measurementDeviceLabel;
 
   /// No description provided for @photosLoadErrorTitle.
   ///
@@ -933,6 +1203,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Anlage suchen'**
   String get installationListSearchLabel;
+
+  /// No description provided for @installationScanTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'QR-/Barcode scannen'**
+  String get installationScanTooltip;
+
+  /// No description provided for @installationScanTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Anlage scannen'**
+  String get installationScanTitle;
+
+  /// No description provided for @installationScanManualLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Anlagen-ID oder Seriennummer'**
+  String get installationScanManualLabel;
+
+  /// No description provided for @installationScanManualAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Code suchen'**
+  String get installationScanManualAction;
+
+  /// No description provided for @installationScanNoMatchMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine lokale Anlage für \"{code}\" gefunden.'**
+  String installationScanNoMatchMessage(String code);
+
+  /// No description provided for @installationScanCameraError.
+  ///
+  /// In de, this message translates to:
+  /// **'Kamera konnte nicht gestartet werden. Gib die Anlagen-ID oder Seriennummer manuell ein.'**
+  String get installationScanCameraError;
 
   /// No description provided for @installationsLoadErrorTitle.
   ///
@@ -1306,6 +1612,36 @@ abstract class AppLocalizations {
   /// **'Materialstamm'**
   String get materialCatalogFieldLabel;
 
+  /// No description provided for @materialStockSectionTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Lagerbestand'**
+  String get materialStockSectionTitle;
+
+  /// No description provided for @materialStockAvailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Bestand: {quantity} {unit}'**
+  String materialStockAvailable(Object quantity, Object unit);
+
+  /// No description provided for @materialStockMinimum.
+  ///
+  /// In de, this message translates to:
+  /// **'Minimum: {quantity} {unit}'**
+  String materialStockMinimum(Object quantity, Object unit);
+
+  /// No description provided for @materialLowStockLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Knapp'**
+  String get materialLowStockLabel;
+
+  /// No description provided for @materialSufficientStockLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'OK'**
+  String get materialSufficientStockLabel;
+
   /// No description provided for @nameFieldLabel.
   ///
   /// In de, this message translates to:
@@ -1479,6 +1815,60 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Auftragshistorie'**
   String get orderHistoryTitle;
+
+  /// No description provided for @historyTotalMetricLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Gesamt'**
+  String get historyTotalMetricLabel;
+
+  /// No description provided for @historyCompletedMetricLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigt'**
+  String get historyCompletedMetricLabel;
+
+  /// No description provided for @historyOpenMetricLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Offen'**
+  String get historyOpenMetricLabel;
+
+  /// No description provided for @historyOverdueMetricLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Überfällig'**
+  String get historyOverdueMetricLabel;
+
+  /// No description provided for @historyLocalMetricLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Lokal'**
+  String get historyLocalMetricLabel;
+
+  /// No description provided for @historyLastCompletedLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Letzter Abschluss'**
+  String get historyLastCompletedLabel;
+
+  /// No description provided for @historyNextScheduledLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Nächster Termin'**
+  String get historyNextScheduledLabel;
+
+  /// No description provided for @historyNoCompletedOrders.
+  ///
+  /// In de, this message translates to:
+  /// **'kein Abschluss'**
+  String get historyNoCompletedOrders;
+
+  /// No description provided for @historyNoUpcomingOrders.
+  ///
+  /// In de, this message translates to:
+  /// **'kein offener Termin'**
+  String get historyNoUpcomingOrders;
 
   /// No description provided for @previousOrdersEmptyTitle.
   ///

@@ -53,6 +53,87 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nextOrderTitle => 'Prochain ordre';
 
   @override
+  String get routeOptimizationTitle => 'Tournee du jour';
+
+  @override
+  String routeOptimizationReadyMessage(int count) {
+    return '$count arret(s) du jour pret(s) pour la route.';
+  }
+
+  @override
+  String get routeOptimizationCoordinateMode => 'Optimise par coordonnees';
+
+  @override
+  String get routeOptimizationScheduleMode => 'Ordre des rendez-vous';
+
+  @override
+  String get routeOptimizationNoStopsMessage =>
+      'Aucun arret du jour avec adresse disponible.';
+
+  @override
+  String get routeOptimizationOpenAction => 'Ouvrir la route optimisee';
+
+  @override
+  String get routeOptimizationOpenError =>
+      'La route optimisee n\'a pas pu etre ouverte.';
+
+  @override
+  String get offlineRouteMapTitle => 'Carte hors ligne';
+
+  @override
+  String get offlineRouteMapAction => 'Carte hors ligne';
+
+  @override
+  String offlineRouteMapSubtitle(int count) {
+    return '$count arret(s) dessine(s) localement a partir des coordonnees.';
+  }
+
+  @override
+  String get offlineRouteMapEmptyTitle => 'Aucune route hors ligne';
+
+  @override
+  String get offlineRouteMapNoCoordinatesTitle => 'Aucune coordonnee';
+
+  @override
+  String get offlineRouteMapNoCoordinatesMessage =>
+      'La carte locale necessite au moins un arret du jour avec des coordonnees enregistrees.';
+
+  @override
+  String get offlineRouteMapStopsTitle => 'Arrets';
+
+  @override
+  String get offlineRouteMapUnmappedTitle => 'Sans coordonnees';
+
+  @override
+  String get recurringWorkOrdersTitle => 'Ordres recurrents';
+
+  @override
+  String recurringWorkOrdersDueCount(int count) {
+    return '$count echu(s)';
+  }
+
+  @override
+  String recurringWorkOrdersReadyMessage(int count) {
+    return '$count installation(s) sont echues pour un nouvel ordre.';
+  }
+
+  @override
+  String get recurringWorkOrdersEmptyMessage => 'Aucun ordre recurrent echu.';
+
+  @override
+  String get recurringWorkOrdersCreateAction => 'Creer les ordres echus';
+
+  @override
+  String recurringWorkOrdersCreatedMessage(int count) {
+    return '$count ordre(s) recurrent(s) cree(s) localement.';
+  }
+
+  @override
+  String recurringWorkOrdersErrorMessage(String error) {
+    return 'Les ordres recurrents n\'ont pas pu etre crees: $error';
+  }
+
+  @override
   String get startOrderAction => 'Demarrer';
 
   @override
@@ -197,6 +278,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get callAction => 'Anrufen';
 
   @override
+  String get calendarShareAction => 'Calendrier';
+
+  @override
+  String get calendarShareSuccessMessage =>
+      'L\'evenement de calendrier a ete transmis au partage.';
+
+  @override
+  String get calendarShareCancelledMessage =>
+      'Le partage du calendrier a ete annule.';
+
+  @override
+  String calendarShareErrorMessage(String error) {
+    return 'L\'evenement de calendrier n\'a pas pu etre partage: $error';
+  }
+
+  @override
   String get phoneLabel => 'Telefon';
 
   @override
@@ -314,6 +411,47 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportPdfSavedMessage => 'PDF lokal gespeichert.';
 
   @override
+  String get reportEmailShareAction => 'Envoyer le rapport par e-mail';
+
+  @override
+  String get reportEmailShareSuccessMessage =>
+      'Le rapport a ete transmis au partage.';
+
+  @override
+  String get reportEmailShareCancelledMessage => 'Le partage a ete annule.';
+
+  @override
+  String reportEmailShareErrorMessage(String error) {
+    return 'Le rapport n\'a pas pu etre partage: $error';
+  }
+
+  @override
+  String get invoiceExportAction => 'Rechnungsentwurf exportieren';
+
+  @override
+  String get invoiceExportSuccessMessage =>
+      'Rechnungsentwurf wurde an die Freigabe übergeben.';
+
+  @override
+  String get invoiceExportCancelledMessage =>
+      'Rechnungsexport wurde abgebrochen.';
+
+  @override
+  String invoiceExportErrorMessage(String error) {
+    return 'Rechnungsentwurf konnte nicht exportiert werden: $error';
+  }
+
+  @override
+  String reportEmailSubject(String orderNumber, String customerName) {
+    return 'Rapport $orderNumber - $customerName';
+  }
+
+  @override
+  String reportEmailBody(String customerName, String orderNumber) {
+    return 'Bonjour\n\nVous trouverez en piece jointe le rapport $orderNumber pour $customerName.\n\nMeilleures salutations';
+  }
+
+  @override
   String get reportPreviewErrorTitle => 'Vorschau konnte nicht erstellt werden';
 
   @override
@@ -362,6 +500,35 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get saveMeasurementAction => 'Messwert speichern';
+
+  @override
+  String get bluetoothMeasurementTitle => 'Bluetooth-Messgerät';
+
+  @override
+  String get bluetoothMeasurementSubtitle =>
+      'BLE-Messgeräte scannen, verbinden und Messwerte direkt lokal übernehmen.';
+
+  @override
+  String get startBluetoothScanAction => 'Scan starten';
+
+  @override
+  String get stopBluetoothScanAction => 'Scan stoppen';
+
+  @override
+  String get bluetoothDevicesEmptyMessage => 'Noch kein Messgerät gefunden.';
+
+  @override
+  String get bluetoothDeviceConnectingStatus => 'Verbinden...';
+
+  @override
+  String get bluetoothReadingSaveAction => 'Messwert übernehmen';
+
+  @override
+  String get bluetoothReadingSavedMessage =>
+      'Bluetooth-Messwert lokal gespeichert.';
+
+  @override
+  String get measurementDeviceLabel => 'Gerät';
 
   @override
   String get photosLoadErrorTitle => 'Fotos konnten nicht geladen werden';
@@ -445,6 +612,28 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get installationListSearchLabel => 'Anlage suchen';
+
+  @override
+  String get installationScanTooltip => 'Scanner QR/code-barres';
+
+  @override
+  String get installationScanTitle => 'Scanner l\'installation';
+
+  @override
+  String get installationScanManualLabel =>
+      'ID installation ou numero de serie';
+
+  @override
+  String get installationScanManualAction => 'Rechercher le code';
+
+  @override
+  String installationScanNoMatchMessage(String code) {
+    return 'Aucune installation locale trouvee pour \"$code\".';
+  }
+
+  @override
+  String get installationScanCameraError =>
+      'La camera n\'a pas pu demarrer. Saisis l\'ID de l\'installation ou le numero de serie manuellement.';
 
   @override
   String get installationsLoadErrorTitle =>
@@ -641,6 +830,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get materialCatalogFieldLabel => 'Materialstamm';
 
   @override
+  String get materialStockSectionTitle => 'Lagerbestand';
+
+  @override
+  String materialStockAvailable(Object quantity, Object unit) {
+    return 'Bestand: $quantity $unit';
+  }
+
+  @override
+  String materialStockMinimum(Object quantity, Object unit) {
+    return 'Minimum: $quantity $unit';
+  }
+
+  @override
+  String get materialLowStockLabel => 'Knapp';
+
+  @override
+  String get materialSufficientStockLabel => 'OK';
+
+  @override
   String get nameFieldLabel => 'Bezeichnung';
 
   @override
@@ -729,6 +937,33 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get orderHistoryTitle => 'Auftragshistorie';
+
+  @override
+  String get historyTotalMetricLabel => 'Total';
+
+  @override
+  String get historyCompletedMetricLabel => 'Termines';
+
+  @override
+  String get historyOpenMetricLabel => 'Ouverts';
+
+  @override
+  String get historyOverdueMetricLabel => 'En retard';
+
+  @override
+  String get historyLocalMetricLabel => 'Local';
+
+  @override
+  String get historyLastCompletedLabel => 'Derniere cloture';
+
+  @override
+  String get historyNextScheduledLabel => 'Prochain rendez-vous';
+
+  @override
+  String get historyNoCompletedOrders => 'aucune cloture';
+
+  @override
+  String get historyNoUpcomingOrders => 'aucun rendez-vous ouvert';
 
   @override
   String get previousOrdersEmptyTitle => 'Keine früheren Aufträge';

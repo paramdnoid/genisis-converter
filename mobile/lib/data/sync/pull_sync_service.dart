@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import '../../core/errors/app_error.dart';
 import '../api/api_client.dart';
 import '../db/app_database.dart';
+import 'work_order_notification_sink.dart';
 
 abstract interface class PullSyncClient {
   Future<PullSyncPage> pull({
@@ -116,6 +117,7 @@ final class PullSyncService {
   const PullSyncService({
     required this.database,
     this.client = const EmptyPullSyncClient(),
+    this.notificationSink = const NoopWorkOrderNotificationSink(),
     this.clock,
   });
 
@@ -136,11 +138,17 @@ final class PullSyncService {
     'time_entries',
     'materials',
     'work_order_materials',
+    'tariff_catalog_items',
+    'object_tariff_assignments',
+    'work_order_service_lines',
+    'report_templates',
     'reports',
+    'legacy_import_records',
   ];
 
   final AppDatabase database;
   final PullSyncClient client;
+  final WorkOrderNotificationSink notificationSink;
   final DateTime Function()? clock;
 
   Future<void> pull({required String tenantId}) async {
@@ -154,14 +162,23 @@ final class PullSyncService {
         entityType: state.entityType,
         cursor: state.cursor,
       );
+      final notifications = <NewWorkOrderNotification>[];
+      final canNotifyNewOrders =
+          state.entityType == 'work_orders' &&
+          state.lastSuccessfulSyncAt != null &&
+          state.lastSuccessfulSyncAt!.trim().isNotEmpty;
 
       await database.transaction(() async {
         for (final change in page.changes) {
-          await _applyChange(
+          final notification = await _applyChange(
             tenantId: tenantId,
             change: change,
             pulledAt: pulledAt,
+            notifyNewWorkOrders: canNotifyNewOrders,
           );
+          if (notification != null) {
+            notifications.add(notification);
+          }
         }
 
         await database
@@ -174,6 +191,14 @@ final class PullSyncService {
               ),
             );
       });
+
+      for (final notification in notifications) {
+        try {
+          await notificationSink.notifyNewWorkOrder(notification);
+        } catch (_) {
+          // Notification delivery must never make an otherwise valid pull fail.
+        }
+      }
     }
   }
 
@@ -201,10 +226,11 @@ final class PullSyncService {
     }
   }
 
-  Future<void> _applyChange({
+  Future<NewWorkOrderNotification?> _applyChange({
     required String tenantId,
     required ServerEntityChange change,
     required String pulledAt,
+    required bool notifyNewWorkOrders,
   }) async {
     final entityType = _normalizeEntityType(change.entityType);
     final id = change.data['id']?.toString();
@@ -218,7 +244,7 @@ final class PullSyncService {
     );
     if (hasUnsyncedLocalChange) {
       await _markConflict(entityType: entityType, id: id, pulledAt: pulledAt);
-      return;
+      return null;
     }
 
     final operation = change.operation?.trim().toLowerCase();
@@ -232,8 +258,12 @@ final class PullSyncService {
         version: _intValue(change.data['version']) ?? 1,
         pulledAt: pulledAt,
       );
-      return;
+      return null;
     }
+    final isNewRemoteWorkOrder =
+        notifyNewWorkOrders &&
+        entityType == 'work_order' &&
+        await database.workOrderDao.getById(id) == null;
 
     final data = _withSyncedMetadata(
       tenantId: tenantId,
@@ -241,6 +271,10 @@ final class PullSyncService {
       pulledAt: pulledAt,
     );
     await _upsertEntity(entityType, data);
+    if (isNewRemoteWorkOrder) {
+      return NewWorkOrderNotification.fromData(data);
+    }
+    return null;
   }
 
   Map<String, Object?> _withSyncedMetadata({
@@ -329,10 +363,30 @@ final class PullSyncService {
         database
             .into(database.workOrderMaterials)
             .insertOnConflictUpdate(WorkOrderMaterialRow.fromJson(data)),
+      'tariff_catalog_item' =>
+        database
+            .into(database.tariffCatalogItems)
+            .insertOnConflictUpdate(TariffCatalogItemRow.fromJson(data)),
+      'object_tariff_assignment' =>
+        database
+            .into(database.objectTariffAssignments)
+            .insertOnConflictUpdate(ObjectTariffAssignmentRow.fromJson(data)),
+      'work_order_service_line' =>
+        database
+            .into(database.workOrderServiceLines)
+            .insertOnConflictUpdate(WorkOrderServiceLineRow.fromJson(data)),
+      'report_template' =>
+        database
+            .into(database.reportTemplates)
+            .insertOnConflictUpdate(ReportTemplateRow.fromJson(data)),
       'report' =>
         database
             .into(database.reports)
             .insertOnConflictUpdate(ReportRow.fromJson(data)),
+      'legacy_import_record' =>
+        database
+            .into(database.legacyImportRecords)
+            .insertOnConflictUpdate(LegacyImportRecordRow.fromJson(data)),
       _ => throw UnsupportedError('Unsupported sync entity type: $entityType'),
     };
   }
@@ -410,7 +464,12 @@ final class PullSyncService {
       'time_entries' => 'time_entry',
       'materials' => 'material',
       'work_order_materials' => 'work_order_material',
+      'tariff_catalog_items' => 'tariff_catalog_item',
+      'object_tariff_assignments' => 'object_tariff_assignment',
+      'work_order_service_lines' => 'work_order_service_line',
+      'report_templates' => 'report_template',
       'reports' => 'report',
+      'legacy_import_records' => 'legacy_import_record',
       final normalized => normalized,
     };
   }
@@ -433,7 +492,12 @@ final class PullSyncService {
       'time_entry' => 'time_entries',
       'material' => 'materials',
       'work_order_material' => 'work_order_materials',
+      'tariff_catalog_item' => 'tariff_catalog_items',
+      'object_tariff_assignment' => 'object_tariff_assignments',
+      'work_order_service_line' => 'work_order_service_lines',
+      'report_template' => 'report_templates',
       'report' => 'reports',
+      'legacy_import_record' => 'legacy_import_records',
       _ => throw UnsupportedError('Unsupported sync entity type: $entityType'),
     };
   }

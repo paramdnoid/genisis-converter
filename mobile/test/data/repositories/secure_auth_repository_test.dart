@@ -60,6 +60,87 @@ void main() {
       expect(await repository.restore(), isNotNull);
     });
 
+    test('successful login accepts backend nested token responses', () async {
+      final storage = <String, String>{};
+      FlutterSecureStorage.setMockInitialValues(storage);
+      final adapter = FakeHttpClientAdapter(
+        (options) => ResponseBody.fromString(
+          '{"user":{"id":"user-1","tenantId":"tenant-1"},"tokens":{"accessToken":"nested-access","refreshToken":"nested-refresh"}}',
+          200,
+          headers: jsonHeaders,
+        ),
+      );
+      final repository = SecureAuthRepository(api: _authApi(adapter));
+
+      final session = await repository.login(
+        email: 'admin@example.invalid',
+        password: 'admin1234',
+      );
+
+      expect(adapter.requests.single.path, '/auth/login');
+      expect(session.accessToken, 'nested-access');
+      expect(session.refreshToken, 'nested-refresh');
+      expect(session.tenantId, 'tenant-1');
+      expect(session.userId, 'user-1');
+      expect(storage['auth.accessToken'], 'nested-access');
+      expect(storage['auth.refreshToken'], 'nested-refresh');
+      expect(storage['auth.tenantId'], 'tenant-1');
+      expect(storage['auth.userId'], 'user-1');
+    });
+
+    test('login forwards the tenant slug for SaaS tenant selection', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final adapter = FakeHttpClientAdapter(
+        (options) => ResponseBody.fromString(
+          '{"accessToken":"online-access","refreshToken":"online-refresh"}',
+          200,
+          headers: jsonHeaders,
+        ),
+      );
+      final repository = SecureAuthRepository(api: _authApi(adapter));
+
+      await repository.login(
+        email: 'tech@example.ch',
+        password: 'correct-password',
+        tenantSlug: 'demo-kaminfeger',
+      );
+
+      expect(adapter.requests.single.data, {
+        'email': 'tech@example.ch',
+        'password': 'correct-password',
+        'tenantSlug': 'demo-kaminfeger',
+      });
+    });
+
+    test(
+      'login uses configured default tenant slug when none is supplied',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final adapter = FakeHttpClientAdapter(
+          (options) => ResponseBody.fromString(
+            '{"accessToken":"online-access","refreshToken":"online-refresh"}',
+            200,
+            headers: jsonHeaders,
+          ),
+        );
+        final repository = SecureAuthRepository(
+          api: _authApi(adapter),
+          defaultTenantSlug: 'configured-tenant',
+        );
+
+        await repository.login(
+          email: 'tech@example.ch',
+          password: 'correct-password',
+        );
+
+        expect(adapter.requests.single.data, {
+          'email': 'tech@example.ch',
+          'password': 'correct-password',
+          'tenantSlug': 'configured-tenant',
+        });
+      },
+    );
+
     test(
       'refresh without a stored session reports an expired session',
       () async {

@@ -28,6 +28,20 @@ case "$FLAVOR" in
     ;;
 esac
 
+firebase_defines=()
+for key in \
+  FIREBASE_API_KEY \
+  FIREBASE_APP_ID \
+  FIREBASE_MESSAGING_SENDER_ID \
+  FIREBASE_PROJECT_ID \
+  FIREBASE_IOS_BUNDLE_ID \
+  APP_VERSION \
+  TENANT_SLUG; do
+  if [[ -n "${!key:-}" ]]; then
+    firebase_defines+=(--dart-define="$key=${!key}")
+  fi
+done
+
 cd "$(dirname "$0")/../mobile"
 SIGNING_FILE="ios/Flutter/Signing.local.xcconfig"
 if [[ ! -f "$SIGNING_FILE" ]] || ! grep -Eq '^[[:space:]]*IOS_DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*[A-Z0-9]+' "$SIGNING_FILE"; then
@@ -39,4 +53,5 @@ flutter build ipa --release --export-method app-store \
   --dart-define=APP_ENV="$APP_ENV" \
   --dart-define=API_BASE_URL="$API_BASE_URL" \
   --dart-define=LOG_LEVEL="$LOG_LEVEL" \
-  --dart-define=ENFORCE_HTTPS="$ENFORCE_HTTPS"
+  --dart-define=ENFORCE_HTTPS="$ENFORCE_HTTPS" \
+  "${firebase_defines[@]}"

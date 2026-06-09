@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -16,6 +17,8 @@ import '../../work_orders/application/work_order_providers.dart';
 import '../application/pdf_report_generator.dart';
 import '../application/report_data_aggregator.dart';
 import '../application/report_providers.dart';
+import '../application/report_share_service.dart';
+import '../application/work_order_invoice_export_service.dart';
 
 final reportPreviewBytesProvider = FutureProvider.autoDispose
     .family<Uint8List?, String>((ref, workOrderId) async {
@@ -119,6 +122,18 @@ class _ReportActions extends ConsumerWidget {
               icon: const Icon(Icons.picture_as_pdf_outlined),
               label: Text(context.l10n.reportSavePdfAction),
             ),
+            const SizedBox(height: AppSpacing.sm),
+            OutlinedButton.icon(
+              onPressed: () => _shareByEmail(context, ref),
+              icon: const Icon(Icons.mail_outline),
+              label: Text(context.l10n.reportEmailShareAction),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            OutlinedButton.icon(
+              onPressed: () => _exportInvoice(context, ref),
+              icon: const Icon(Icons.receipt_long_outlined),
+              label: Text(context.l10n.invoiceExportAction),
+            ),
           ],
         ),
       ),
@@ -151,6 +166,88 @@ class _ReportActions extends ConsumerWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.reportPdfSavedMessage)),
+      );
+    }
+  }
+
+  Future<void> _shareByEmail(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+    final database = await ref.read(databaseReadyProvider.future);
+    final tenantId = ref.read(activeTenantIdProvider);
+    final data = await ReportDataAggregator(
+      database: database,
+      tenantId: tenantId,
+    ).load(workOrderId);
+    if (data == null) {
+      return;
+    }
+
+    try {
+      final shared = await const ReportShareService().shareByEmail(
+        data: data,
+        subject: l10n.reportEmailSubject(
+          data.header.workOrder.orderNumber,
+          data.header.customer.displayName,
+        ),
+        body: l10n.reportEmailBody(
+          data.header.customer.displayName,
+          data.header.workOrder.orderNumber,
+        ),
+      );
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            shared
+                ? l10n.reportEmailShareSuccessMessage
+                : l10n.reportEmailShareCancelledMessage,
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.reportEmailShareErrorMessage('$error'))),
+      );
+    }
+  }
+
+  Future<void> _exportInvoice(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+    final database = await ref.read(databaseReadyProvider.future);
+    final tenantId = ref.read(activeTenantIdProvider);
+    final data = await ReportDataAggregator(
+      database: database,
+      tenantId: tenantId,
+    ).load(workOrderId);
+    if (data == null) {
+      return;
+    }
+
+    try {
+      final result = await WorkOrderInvoiceExportService().share(data);
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.status == ShareResultStatus.success
+                ? l10n.invoiceExportSuccessMessage
+                : l10n.invoiceExportCancelledMessage,
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.invoiceExportErrorMessage('$error'))),
       );
     }
   }

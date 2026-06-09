@@ -10,6 +10,9 @@ final class ReportData {
     required this.photos,
     required this.timeEntries,
     required this.materials,
+    required this.serviceLines,
+    required this.materialCatalog,
+    this.reportTemplate,
     this.logoPhoto,
     this.signaturePhoto,
   });
@@ -22,6 +25,9 @@ final class ReportData {
   final List<PhotoRow> photos;
   final List<TimeEntryRow> timeEntries;
   final List<WorkOrderMaterialRow> materials;
+  final List<WorkOrderServiceLineRow> serviceLines;
+  final List<MaterialRow> materialCatalog;
+  final ReportTemplateRow? reportTemplate;
   final PhotoRow? logoPhoto;
   final PhotoRow? signaturePhoto;
 }
@@ -65,6 +71,15 @@ final class ReportDataAggregator {
     final materials = await database.materialDao
         .watchForWorkOrder(tenantId, workOrderId)
         .first;
+    final serviceLines = await database.workOrderDao
+        .watchServiceLines(tenantId, workOrderId)
+        .first;
+    final materialCatalog = await database.materialDao
+        .watchActiveMaterials(tenantId)
+        .first;
+    final reportTemplate = await database.reportTemplateDao.getDefault(
+      tenantId,
+    );
     final logoPhoto = tenant.logoFileId == null
         ? null
         : await database.photoDao.getById(tenant.logoFileId!);
@@ -83,6 +98,9 @@ final class ReportDataAggregator {
       photos: photos,
       timeEntries: timeEntries,
       materials: materials,
+      serviceLines: serviceLines,
+      materialCatalog: materialCatalog,
+      reportTemplate: reportTemplate,
       logoPhoto: logoPhoto,
       signaturePhoto: signaturePhoto,
     );

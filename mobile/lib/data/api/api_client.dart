@@ -4,10 +4,26 @@ import '../../core/config/app_environment.dart';
 import '../../core/errors/app_error.dart';
 
 final class ApiClient {
-  ApiClient({required AppEnvironment environment, Dio? dio})
-    : _dio =
-          dio ?? Dio(BaseOptions(baseUrl: environment.apiBaseUrl.toString())) {
+  ApiClient({
+    required AppEnvironment environment,
+    Dio? dio,
+    String? Function()? accessTokenProvider,
+  }) : _dio =
+           dio ?? Dio(BaseOptions(baseUrl: environment.apiBaseUrl.toString())) {
     _enforceHttps(environment);
+    if (accessTokenProvider != null) {
+      _dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            final accessToken = accessTokenProvider();
+            if (accessToken != null && accessToken.trim().isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $accessToken';
+            }
+            handler.next(options);
+          },
+        ),
+      );
+    }
   }
 
   final Dio _dio;

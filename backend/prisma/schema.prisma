@@ -9,7 +9,10 @@ datasource db {
 
 model Tenant {
   id           String    @id @default(uuid())
+  slug         String    @unique
   name         String
+  plan         String    @default("starter")
+  status       String    @default("active")
   address      String
   postalCode   String    @map("postal_code")
   city         String
@@ -24,25 +27,32 @@ model Tenant {
   syncStatus   String    @default("synced") @map("sync_status")
   lastSyncedAt DateTime? @map("last_synced_at")
 
-  users                  User[]
-  customers              Customer[]
-  objects                CustomerObject[]
-  installations          Installation[]
-  workOrders             WorkOrder[]
-  workOrderInstallations WorkOrderInstallation[]
-  checklistTemplates     ChecklistTemplate[]
-  checklistTemplateItems ChecklistTemplateItem[]
-  checklistAnswers       ChecklistAnswer[]
-  measurements           Measurement[]
-  defects                Defect[]
-  photos                 Photo[]
-  timeEntries            TimeEntry[]
-  materials              Material[]
-  workOrderMaterials     WorkOrderMaterial[]
-  reports                Report[]
-  fileUploads            FileUpload[]
-  syncOutboxEntries      SyncOutboxEntry[]
-  auditLogs              AuditLog[]
+  users                   User[]
+  pushDeviceTokens        PushDeviceToken[]
+  customers               Customer[]
+  objects                 CustomerObject[]
+  installations           Installation[]
+  workOrders              WorkOrder[]
+  workOrderInstallations  WorkOrderInstallation[]
+  checklistTemplates      ChecklistTemplate[]
+  checklistTemplateItems  ChecklistTemplateItem[]
+  checklistAnswers        ChecklistAnswer[]
+  measurements            Measurement[]
+  defects                 Defect[]
+  photos                  Photo[]
+  timeEntries             TimeEntry[]
+  materials               Material[]
+  workOrderMaterials      WorkOrderMaterial[]
+  tariffCatalogItems      TariffCatalogItem[]
+  objectTariffAssignments ObjectTariffAssignment[]
+  workOrderServiceLines   WorkOrderServiceLine[]
+  reportTemplates         ReportTemplate[]
+  reports                 Report[]
+  fileUploads             FileUpload[]
+  syncOutboxEntries       SyncOutboxEntry[]
+  auditLogs               AuditLog[]
+  legacyImportBatches     LegacyImportBatch[]
+  legacyImportRecords     LegacyImportRecord[]
 
   @@map("tenants")
 }
@@ -63,12 +73,39 @@ model User {
   version      Int       @default(1)
   syncStatus   String    @default("synced") @map("sync_status")
   lastSyncedAt DateTime? @map("last_synced_at")
+  sourceSystem String?   @map("source_system")
+  sourceFile   String?   @map("source_file")
+  sourceTable  String?   @map("source_table")
+  sourceKey    String?   @map("source_key")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant           Tenant            @relation(fields: [tenantId], references: [id])
+  pushDeviceTokens PushDeviceToken[]
 
   @@unique([tenantId, email])
+  @@unique([tenantId, sourceSystem, sourceKey], map: "users_tenant_source_key")
   @@index([tenantId, updatedAt])
   @@map("users")
+}
+
+model PushDeviceToken {
+  id         String    @id @default(uuid())
+  tenantId   String    @map("tenant_id")
+  userId     String    @map("user_id")
+  token      String
+  platform   String
+  deviceId   String?   @map("device_id")
+  appVersion String?   @map("app_version")
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at")
+  revokedAt  DateTime? @map("revoked_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([tenantId, token], map: "push_tokens_tenant_token_key")
+  @@index([tenantId, userId, revokedAt], map: "push_tokens_tenant_user_active_idx")
+  @@map("push_device_tokens")
 }
 
 model Customer {
@@ -90,11 +127,16 @@ model Customer {
   version        Int       @default(1)
   syncStatus     String    @default("synced") @map("sync_status")
   lastSyncedAt   DateTime? @map("last_synced_at")
+  sourceSystem   String?   @map("source_system")
+  sourceFile     String?   @map("source_file")
+  sourceTable    String?   @map("source_table")
+  sourceKey      String?   @map("source_key")
 
   tenant     Tenant           @relation(fields: [tenantId], references: [id])
   objects    CustomerObject[]
   workOrders WorkOrder[]
 
+  @@unique([tenantId, sourceSystem, sourceKey], map: "customers_tenant_source_key")
   @@index([tenantId, updatedAt])
   @@map("customers")
 }
@@ -120,13 +162,19 @@ model CustomerObject {
   version      Int       @default(1)
   syncStatus   String    @default("synced") @map("sync_status")
   lastSyncedAt DateTime? @map("last_synced_at")
+  sourceSystem String?   @map("source_system")
+  sourceFile   String?   @map("source_file")
+  sourceTable  String?   @map("source_table")
+  sourceKey    String?   @map("source_key")
 
-  tenant        Tenant         @relation(fields: [tenantId], references: [id])
-  customer      Customer       @relation(fields: [customerId], references: [id])
-  installations Installation[]
-  workOrders    WorkOrder[]
-  photos        Photo[]
+  tenant            Tenant                   @relation(fields: [tenantId], references: [id])
+  customer          Customer                 @relation(fields: [customerId], references: [id])
+  installations     Installation[]
+  workOrders        WorkOrder[]
+  photos            Photo[]
+  tariffAssignments ObjectTariffAssignment[]
 
+  @@unique([tenantId, sourceSystem, sourceKey], map: "objects_tenant_source_key")
   @@index([tenantId, updatedAt])
   @@map("objects")
 }
@@ -152,6 +200,10 @@ model Installation {
   version             Int       @default(1)
   syncStatus          String    @default("synced") @map("sync_status")
   lastSyncedAt        DateTime? @map("last_synced_at")
+  sourceSystem        String?   @map("source_system")
+  sourceFile          String?   @map("source_file")
+  sourceTable         String?   @map("source_table")
+  sourceKey           String?   @map("source_key")
 
   tenant                 Tenant                  @relation(fields: [tenantId], references: [id])
   object                 CustomerObject          @relation(fields: [objectId], references: [id])
@@ -159,7 +211,9 @@ model Installation {
   measurements           Measurement[]
   defects                Defect[]
   photos                 Photo[]
+  serviceLines           WorkOrderServiceLine[]
 
+  @@unique([tenantId, sourceSystem, sourceKey], map: "installations_tenant_source_key")
   @@index([tenantId, updatedAt])
   @@map("installations")
 }
@@ -200,6 +254,7 @@ model WorkOrder {
   photos        Photo[]
   timeEntries   TimeEntry[]
   materials     WorkOrderMaterial[]
+  serviceLines  WorkOrderServiceLine[]
   reports       Report[]
 
   @@unique([tenantId, orderNumber])
@@ -408,19 +463,21 @@ model TimeEntry {
 }
 
 model Material {
-  id           String    @id @default(uuid())
-  tenantId     String    @map("tenant_id")
-  sku          String?
-  name         String
-  unit         String
-  defaultPrice Float?    @map("default_price")
-  isActive     Boolean   @default(true) @map("is_active")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
-  version      Int       @default(1)
-  syncStatus   String    @default("synced") @map("sync_status")
-  lastSyncedAt DateTime? @map("last_synced_at")
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  sku              String?
+  name             String
+  unit             String
+  defaultPrice     Float?    @map("default_price")
+  stockQuantity    Float?    @map("stock_quantity")
+  minStockQuantity Float?    @map("min_stock_quantity")
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+  version          Int       @default(1)
+  syncStatus       String    @default("synced") @map("sync_status")
+  lastSyncedAt     DateTime? @map("last_synced_at")
 
   tenant Tenant              @relation(fields: [tenantId], references: [id])
   usages WorkOrderMaterial[]
@@ -453,6 +510,114 @@ model WorkOrderMaterial {
   @@map("work_order_materials")
 }
 
+model TariffCatalogItem {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  tariffSystem String    @map("tariff_system")
+  code         String
+  description  String
+  defaultPrice Float?    @map("default_price")
+  taxCategory  String?   @map("tax_category")
+  taxPoints    Float?    @map("tax_points")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  version      Int       @default(1)
+  syncStatus   String    @default("synced") @map("sync_status")
+  lastSyncedAt DateTime? @map("last_synced_at")
+  sourceSystem String?   @map("source_system")
+  sourceFile   String?   @map("source_file")
+  sourceTable  String?   @map("source_table")
+  sourceKey    String?   @map("source_key")
+
+  tenant            Tenant                   @relation(fields: [tenantId], references: [id])
+  objectAssignments ObjectTariffAssignment[]
+  serviceLines      WorkOrderServiceLine[]
+
+  @@unique([tenantId, sourceSystem, sourceKey], map: "tariff_catalog_tenant_source_key")
+  @@index([tenantId, tariffSystem, code], map: "tariff_catalog_tenant_system_code_idx")
+  @@index([tenantId, updatedAt])
+  @@map("tariff_catalog_items")
+}
+
+model ObjectTariffAssignment {
+  id                  String    @id @default(uuid())
+  tenantId            String    @map("tenant_id")
+  objectId            String?   @map("object_id")
+  tariffCatalogItemId String?   @map("tariff_catalog_item_id")
+  tariffSystem        String    @map("tariff_system")
+  code                String?
+  description         String
+  position            Int?
+  defaultQuantity     Float?    @map("default_quantity")
+  unit                String?
+  priceOverride       Float?    @map("price_override")
+  taxPoints           Float?    @map("tax_points")
+  billingCode         String?   @map("billing_code")
+  intervalCode        String?   @map("interval_code")
+  flag13              String?   @map("flag_13")
+  flag14              String?   @map("flag_14")
+  flag15              String?   @map("flag_15")
+  notes               String?
+  isActive            Boolean   @default(true) @map("is_active")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
+  version             Int       @default(1)
+  syncStatus          String    @default("synced") @map("sync_status")
+  lastSyncedAt        DateTime? @map("last_synced_at")
+  sourceSystem        String?   @map("source_system")
+  sourceFile          String?   @map("source_file")
+  sourceTable         String?   @map("source_table")
+  sourceKey           String?   @map("source_key")
+
+  tenant            Tenant                 @relation(fields: [tenantId], references: [id])
+  object            CustomerObject?        @relation(fields: [objectId], references: [id])
+  tariffCatalogItem TariffCatalogItem?     @relation(fields: [tariffCatalogItemId], references: [id])
+  serviceLines      WorkOrderServiceLine[]
+
+  @@unique([tenantId, sourceSystem, sourceKey], map: "object_tariffs_tenant_source_key")
+  @@index([tenantId, objectId], map: "object_tariffs_tenant_object_idx")
+  @@index([tenantId, tariffSystem, code], map: "object_tariffs_tenant_system_code_idx")
+  @@index([tenantId, updatedAt])
+  @@map("object_tariff_assignments")
+}
+
+model WorkOrderServiceLine {
+  id                       String    @id @default(uuid())
+  tenantId                 String    @map("tenant_id")
+  workOrderId              String    @map("work_order_id")
+  objectTariffAssignmentId String?   @map("object_tariff_assignment_id")
+  tariffCatalogItemId      String?   @map("tariff_catalog_item_id")
+  installationId           String?   @map("installation_id")
+  code                     String?
+  name                     String
+  quantity                 Float
+  unit                     String
+  unitPrice                Float?    @map("unit_price")
+  totalPrice               Float?    @map("total_price")
+  taxPoints                Float?    @map("tax_points")
+  status                   String    @default("performed")
+  notes                    String?
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+  deletedAt                DateTime? @map("deleted_at")
+  version                  Int       @default(1)
+  syncStatus               String    @default("synced") @map("sync_status")
+  lastSyncedAt             DateTime? @map("last_synced_at")
+
+  tenant                 Tenant                  @relation(fields: [tenantId], references: [id])
+  workOrder              WorkOrder               @relation(fields: [workOrderId], references: [id])
+  objectTariffAssignment ObjectTariffAssignment? @relation(fields: [objectTariffAssignmentId], references: [id])
+  tariffCatalogItem      TariffCatalogItem?      @relation(fields: [tariffCatalogItemId], references: [id])
+  installation           Installation?           @relation(fields: [installationId], references: [id])
+
+  @@index([tenantId, workOrderId], map: "work_order_service_lines_tenant_order_idx")
+  @@index([tenantId, updatedAt])
+  @@map("work_order_service_lines")
+}
+
 model Report {
   id                 String    @id @default(uuid())
   tenantId           String    @map("tenant_id")
@@ -477,6 +642,39 @@ model Report {
   @@unique([tenantId, reportNumber])
   @@index([tenantId, updatedAt])
   @@map("reports")
+}
+
+model ReportTemplate {
+  id                   String    @id @default(uuid())
+  tenantId             String    @map("tenant_id")
+  name                 String
+  reportType           String    @default("work_order") @map("report_type")
+  titlePrefix          String    @default("Rapport") @map("title_prefix")
+  locale               String    @default("de")
+  primaryColor         String    @default("#1f2937") @map("primary_color")
+  footerText           String?   @map("footer_text")
+  includeCustomer      Boolean   @default(true) @map("include_customer")
+  includeInstallations Boolean   @default(true) @map("include_installations")
+  includeMeasurements  Boolean   @default(true) @map("include_measurements")
+  includeDefects       Boolean   @default(true) @map("include_defects")
+  includeMaterials     Boolean   @default(true) @map("include_materials")
+  includeTimeEntries   Boolean   @default(true) @map("include_time_entries")
+  includePhotos        Boolean   @default(true) @map("include_photos")
+  includeSignature     Boolean   @default(true) @map("include_signature")
+  isDefault            Boolean   @default(false) @map("is_default")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  deletedAt            DateTime? @map("deleted_at")
+  version              Int       @default(1)
+  syncStatus           String    @default("synced") @map("sync_status")
+  lastSyncedAt         DateTime? @map("last_synced_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name], map: "report_templates_tenant_name_key")
+  @@index([tenantId, isDefault], map: "report_templates_tenant_default_idx")
+  @@index([tenantId, updatedAt])
+  @@map("report_templates")
 }
 
 model FileUpload {
@@ -534,4 +732,58 @@ model AuditLog {
 
   @@index([tenantId, entityType, entityId])
   @@map("audit_logs")
+}
+
+model LegacyImportBatch {
+  id            String    @id @default(uuid())
+  tenantId      String    @map("tenant_id")
+  sourceSystem  String    @default("genesis") @map("source_system")
+  archivePath   String    @map("archive_path")
+  archiveSha256 String    @map("archive_sha256")
+  status        String
+  startedAt     DateTime  @default(now()) @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  counts        Json?
+  warnings      Json?
+  summary       Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  tenant  Tenant               @relation(fields: [tenantId], references: [id])
+  records LegacyImportRecord[]
+
+  @@index([tenantId, createdAt], map: "legacy_batches_tenant_created_idx")
+  @@index([archiveSha256], map: "legacy_batches_archive_sha_idx")
+  @@map("legacy_import_batches")
+}
+
+model LegacyImportRecord {
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  batchId          String    @map("batch_id")
+  sourceSystem     String    @default("genesis") @map("source_system")
+  sourceFile       String    @map("source_file")
+  sourceTable      String    @map("source_table")
+  sourceKey        String    @map("source_key")
+  rowHash          String    @map("row_hash")
+  rowIndex         Int?      @map("row_index")
+  recordType       String    @default("row") @map("record_type")
+  mappedEntityType String?   @map("mapped_entity_type")
+  mappedEntityId   String?   @map("mapped_entity_id")
+  payload          Json
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+  version          Int       @default(1)
+  syncStatus       String    @default("synced") @map("sync_status")
+  lastSyncedAt     DateTime? @map("last_synced_at")
+
+  tenant Tenant            @relation(fields: [tenantId], references: [id])
+  batch  LegacyImportBatch @relation(fields: [batchId], references: [id])
+
+  @@unique([batchId, sourceFile, sourceTable, sourceKey], map: "legacy_records_batch_source_key")
+  @@index([tenantId, sourceFile, sourceTable], map: "legacy_records_source_idx")
+  @@index([tenantId, mappedEntityType, mappedEntityId], map: "legacy_records_mapped_idx")
+  @@index([tenantId, updatedAt], map: "legacy_records_tenant_updated_idx")
+  @@map("legacy_import_records")
 }

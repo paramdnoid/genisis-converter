@@ -20,6 +20,15 @@ interface SyncPushEntry {
   payload?: Record<string, unknown>;
 }
 
+const BACKEND_ONLY_SYNC_FIELDS = new Set([
+  "passwordHash",
+  "sourceSystem",
+  "sourceFile",
+  "sourceTable",
+  "sourceKey",
+]);
+const SYNC_PULL_LIMIT = "100000";
+
 @Injectable()
 export class SyncService {
   constructor(
@@ -57,10 +66,14 @@ export class SyncService {
     const changes: Record<string, unknown[]> = {};
     for (const key of SYNC_ENTITY_KEYS) {
       const definition = ENTITY_DEFINITIONS[key];
-      changes[definition.collection] = await this.crud.list(key, tenantId, {
+      const records = await this.crud.list(key, tenantId, {
         includeDeleted: "true",
         since: cursor,
+        limit: SYNC_PULL_LIMIT,
       });
+      changes[definition.collection] = records.map((record) =>
+        this.toSyncRecord(record, key),
+      );
     }
 
     return {
@@ -108,13 +121,32 @@ export class SyncService {
     const records = await this.crud.list(entity, tenantId, {
       includeDeleted: "true",
       since: cursor,
+      limit: SYNC_PULL_LIMIT,
     });
 
     return records.map((record) => ({
       entityType: definition.singular,
       operation: this.isDeleted(record) ? "delete" : "upsert",
-      data: record,
+      data: this.toSyncRecord(record, entity),
     }));
+  }
+
+  private toSyncRecord(record: unknown, entity?: EntityKey) {
+    if (typeof record !== "object" || record === null) {
+      return record;
+    }
+
+    const data = { ...(record as Record<string, unknown>) };
+    if (entity === "legacy_import_records") {
+      data.payloadJson = JSON.stringify(data.payload ?? null);
+      delete data.payload;
+      return data;
+    }
+
+    for (const field of BACKEND_ONLY_SYNC_FIELDS) {
+      delete data[field];
+    }
+    return data;
   }
 
   private async processPushEntry(

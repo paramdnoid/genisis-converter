@@ -6,6 +6,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../../../core/files/file_storage_service.dart';
+import '../../../data/db/app_database.dart';
 import '../../../l10n/generated/app_localizations_de.dart';
 import 'report_data_aggregator.dart';
 
@@ -21,6 +22,8 @@ final class PdfReportGenerator {
     final order = data.header.workOrder;
     final customer = data.header.customer;
     final object = data.header.object;
+    final template = data.reportTemplate;
+    final accentColor = _templateColor(template?.primaryColor);
     final logo = _loadLocalImage(data.logoPhoto?.localPath);
     final signature = _loadLocalImage(data.signaturePhoto?.localPath);
     final decimal = NumberFormat.decimalPatternDigits(
@@ -49,10 +52,11 @@ final class PdfReportGenerator {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        'Rapport ${order.orderNumber}',
+                        '${_templateTitlePrefix(template)} ${order.orderNumber}',
                         style: pw.TextStyle(
                           fontSize: 24,
                           fontWeight: pw.FontWeight.bold,
+                          color: accentColor,
                         ),
                       ),
                       pw.Text(order.title),
@@ -68,100 +72,133 @@ final class PdfReportGenerator {
               ],
             ),
           ),
-          _section('Kunde und Objekt', [
-            customer.displayName,
-            '${object.street} ${object.houseNumber}, ${object.postalCode} ${object.city}',
-            if (object.accessNotes != null) 'Zugang: ${object.accessNotes}',
-            if (object.safetyNotes != null) 'Sicherheit: ${object.safetyNotes}',
-          ]),
-          _table(
-            'Anlagen',
-            ['Typ', 'Hersteller/Modell', 'Standort'],
-            data.installations
-                .map(
-                  (row) => [
-                    row.type,
-                    [row.manufacturer, row.model].whereType<String>().join(' '),
-                    row.locationDescription ?? '',
-                  ],
-                )
-                .toList(),
-          ),
-          _table(
-            'Messwerte',
-            ['Art', 'Wert', 'Einheit', 'Notiz'],
-            data.measurements
-                .map(
-                  (row) => [
-                    row.measurementType,
-                    decimal.format(row.value),
-                    row.unit,
-                    row.notes ?? '',
-                  ],
-                )
-                .toList(),
-          ),
-          _table(
-            'Mängel',
-            ['Schweregrad', 'Titel', 'Beschreibung', 'Massnahme'],
-            data.defects
-                .map(
-                  (row) => [
-                    row.severity,
-                    row.title,
-                    row.description,
-                    row.recommendedAction ?? '',
-                  ],
-                )
-                .toList(),
-          ),
-          _table(
-            'Material',
-            ['Bezeichnung', 'Menge', 'Einheit', 'Notiz'],
-            data.materials
-                .map(
-                  (row) => [
-                    row.name,
-                    quantity.format(row.quantity),
-                    row.unit,
-                    row.notes ?? '',
-                  ],
-                )
-                .toList(),
-          ),
-          _table(
-            'Zeiten',
-            ['Typ', 'Start', 'Ende', 'Minuten'],
-            data.timeEntries
-                .map(
-                  (row) => [
-                    row.type,
-                    row.startTime,
-                    row.endTime ?? '',
-                    '${row.durationMinutes ?? ''}',
-                  ],
-                )
-                .toList(),
-          ),
-          _section(
-            'Fotos und Signatur',
-            data.photos.isEmpty
-                ? ['Keine Fotos gespeichert.']
-                : data.photos
-                      .map(
-                        (photo) =>
-                            '${photo.caption ?? photo.fileName}: ${photo.localPath}',
-                      )
-                      .toList(),
-          ),
-          _section('Abschlussnotiz', [order.completionNotes ?? '-']),
-          _signatureSection(
-            customerName: order.customerSignatureFileId == null
-                ? null
-                : data.signaturePhoto?.caption?.replaceFirst('Signatur ', ''),
-            signature: signature,
-          ),
+          if (template?.includeCustomer ?? true)
+            _section('Kunde und Objekt', [
+              customer.displayName,
+              '${object.street} ${object.houseNumber}, ${object.postalCode} ${object.city}',
+              if (object.accessNotes != null) 'Zugang: ${object.accessNotes}',
+              if (object.safetyNotes != null)
+                'Sicherheit: ${object.safetyNotes}',
+            ], accentColor),
+          if (template?.includeInstallations ?? true)
+            _table(
+              'Anlagen',
+              ['Typ', 'Hersteller/Modell', 'Standort'],
+              data.installations
+                  .map(
+                    (row) => [
+                      row.type,
+                      [
+                        row.manufacturer,
+                        row.model,
+                      ].whereType<String>().join(' '),
+                      row.locationDescription ?? '',
+                    ],
+                  )
+                  .toList(),
+              accentColor,
+            ),
+          if (template?.includeMeasurements ?? true)
+            _table(
+              'Messwerte',
+              ['Art', 'Wert', 'Einheit', 'Notiz'],
+              data.measurements
+                  .map(
+                    (row) => [
+                      row.measurementType,
+                      decimal.format(row.value),
+                      row.unit,
+                      row.notes ?? '',
+                    ],
+                  )
+                  .toList(),
+              accentColor,
+            ),
+          if (template?.includeDefects ?? true)
+            _table(
+              'Mängel',
+              ['Schweregrad', 'Titel', 'Beschreibung', 'Massnahme'],
+              data.defects
+                  .map(
+                    (row) => [
+                      row.severity,
+                      row.title,
+                      row.description,
+                      row.recommendedAction ?? '',
+                    ],
+                  )
+                  .toList(),
+              accentColor,
+            ),
+          if (template?.includeMaterials ?? true)
+            _table(
+              'Material',
+              ['Bezeichnung', 'Menge', 'Einheit', 'Notiz'],
+              data.materials
+                  .map(
+                    (row) => [
+                      row.name,
+                      quantity.format(row.quantity),
+                      row.unit,
+                      row.notes ?? '',
+                    ],
+                  )
+                  .toList(),
+              accentColor,
+            ),
+          if (template?.includeTimeEntries ?? true)
+            _table(
+              'Zeiten',
+              ['Typ', 'Start', 'Ende', 'Minuten'],
+              data.timeEntries
+                  .map(
+                    (row) => [
+                      row.type,
+                      row.startTime,
+                      row.endTime ?? '',
+                      '${row.durationMinutes ?? ''}',
+                    ],
+                  )
+                  .toList(),
+              accentColor,
+            ),
+          if (template?.includePhotos ?? true)
+            _section(
+              'Fotos',
+              data.photos.isEmpty
+                  ? ['Keine Fotos gespeichert.']
+                  : data.photos
+                        .map(
+                          (photo) =>
+                              '${photo.caption ?? photo.fileName}: ${photo.localPath}',
+                        )
+                        .toList(),
+              accentColor,
+            ),
+          _section('Abschlussnotiz', [
+            order.completionNotes ?? '-',
+          ], accentColor),
+          if (template?.includeSignature ?? true)
+            _signatureSection(
+              customerName: order.customerSignatureFileId == null
+                  ? null
+                  : data.signaturePhoto?.caption?.replaceFirst('Signatur ', ''),
+              signature: signature,
+              accentColor: accentColor,
+            ),
         ],
+        footer: template?.footerText == null
+            ? null
+            : (context) => pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                  '${template!.footerText!} · ${context.pageNumber}/${context.pagesCount}',
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+              ),
       ),
     );
 
@@ -184,7 +221,7 @@ final class PdfReportGenerator {
     );
   }
 
-  pw.Widget _section(String title, List<String> lines) {
+  pw.Widget _section(String title, List<String> lines, PdfColor accentColor) {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 18),
       child: pw.Column(
@@ -192,7 +229,11 @@ final class PdfReportGenerator {
         children: [
           pw.Text(
             title,
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: accentColor,
+            ),
           ),
           pw.SizedBox(height: 6),
           ...lines.map((line) => pw.Text(line)),
@@ -236,6 +277,7 @@ final class PdfReportGenerator {
   pw.Widget _signatureSection({
     required String? customerName,
     required pw.MemoryImage? signature,
+    required PdfColor accentColor,
   }) {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(top: 8),
@@ -244,7 +286,11 @@ final class PdfReportGenerator {
         children: [
           pw.Text(
             _pdfL10n.customerSignatureTitle,
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: accentColor,
+            ),
           ),
           pw.SizedBox(height: 6),
           pw.Text('${_pdfL10n.pdfSignerLabel}: ${customerName ?? '-'}'),
@@ -280,6 +326,7 @@ final class PdfReportGenerator {
     String title,
     List<String> headers,
     List<List<String>> rows,
+    PdfColor accentColor,
   ) {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 18),
@@ -288,7 +335,11 @@ final class PdfReportGenerator {
         children: [
           pw.Text(
             title,
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: accentColor,
+            ),
           ),
           pw.SizedBox(height: 6),
           if (rows.isEmpty)
@@ -297,8 +348,8 @@ final class PdfReportGenerator {
             pw.TableHelper.fromTextArray(
               headers: headers,
               data: rows,
-              headerDecoration: const pw.BoxDecoration(
-                color: PdfColors.grey300,
+              headerDecoration: pw.BoxDecoration(
+                color: _mutedHeaderColor(accentColor),
               ),
               cellAlignment: pw.Alignment.centerLeft,
               cellStyle: const pw.TextStyle(fontSize: 9),
@@ -309,6 +360,36 @@ final class PdfReportGenerator {
             ),
         ],
       ),
+    );
+  }
+
+  String _templateTitlePrefix(ReportTemplateRow? template) {
+    final configured = template?.titlePrefix.trim();
+    return configured == null || configured.isEmpty ? 'Rapport' : configured;
+  }
+
+  PdfColor _templateColor(String? configured) {
+    final value = configured?.trim();
+    if (value == null || value.isEmpty) {
+      return PdfColors.grey800;
+    }
+
+    final hex = value.startsWith('#') ? value.substring(1) : value;
+    if (!RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(hex)) {
+      return PdfColors.grey800;
+    }
+
+    final red = int.parse(hex.substring(0, 2), radix: 16) / 255;
+    final green = int.parse(hex.substring(2, 4), radix: 16) / 255;
+    final blue = int.parse(hex.substring(4, 6), radix: 16) / 255;
+    return PdfColor(red, green, blue);
+  }
+
+  PdfColor _mutedHeaderColor(PdfColor accentColor) {
+    return PdfColor(
+      0.88 + (accentColor.red * 0.12),
+      0.88 + (accentColor.green * 0.12),
+      0.88 + (accentColor.blue * 0.12),
     );
   }
 }

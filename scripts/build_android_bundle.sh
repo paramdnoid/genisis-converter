@@ -28,9 +28,43 @@ case "$FLAVOR" in
     ;;
 esac
 
+firebase_defines=()
+for key in \
+  FIREBASE_API_KEY \
+  FIREBASE_APP_ID \
+  FIREBASE_MESSAGING_SENDER_ID \
+  FIREBASE_PROJECT_ID \
+  FIREBASE_IOS_BUNDLE_ID \
+  APP_VERSION \
+  TENANT_SLUG; do
+  if [[ -n "${!key:-}" ]]; then
+    firebase_defines+=(--dart-define="$key=${!key}")
+  fi
+done
+
 cd "$(dirname "$0")/../mobile"
+
+SIGNING_FILE="android/key.properties"
+missing_keys=()
+if [[ ! -f "$SIGNING_FILE" ]]; then
+  echo "Missing Android release signing config. Copy mobile/android/key.properties.example to mobile/android/key.properties and set real release signing values." >&2
+  exit 78
+fi
+
+for key in storePassword keyPassword keyAlias storeFile; do
+  if ! grep -Eq "^[[:space:]]*$key[[:space:]]*=[[:space:]]*.+" "$SIGNING_FILE"; then
+    missing_keys+=("$key")
+  fi
+done
+
+if (( ${#missing_keys[@]} > 0 )); then
+  echo "Incomplete Android release signing config in mobile/android/key.properties. Missing: ${missing_keys[*]}." >&2
+  exit 78
+fi
+
 flutter build appbundle \
   --dart-define=APP_ENV="$APP_ENV" \
   --dart-define=API_BASE_URL="$API_BASE_URL" \
   --dart-define=LOG_LEVEL="$LOG_LEVEL" \
-  --dart-define=ENFORCE_HTTPS="$ENFORCE_HTTPS"
+  --dart-define=ENFORCE_HTTPS="$ENFORCE_HTTPS" \
+  "${firebase_defines[@]}"

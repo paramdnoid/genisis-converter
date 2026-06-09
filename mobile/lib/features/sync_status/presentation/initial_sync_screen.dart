@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../data/db/database_providers.dart';
+import '../../../data/sync/sync_providers.dart';
 import '../../../l10n/app_localizations_x.dart';
 
 class InitialSyncScreen extends ConsumerStatefulWidget {
@@ -90,8 +93,12 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
     try {
       ref.invalidate(databaseReadyProvider);
       await ref.read(databaseReadyProvider.future);
+      ref.invalidate(syncNowProvider);
 
       for (var i = 0; i < steps.length; i += 1) {
+        if (i == 1) {
+          _startBestEffortSync();
+        }
         await Future<void>.delayed(const Duration(milliseconds: 180));
         if (!mounted) {
           return;
@@ -115,5 +122,11 @@ class _InitialSyncScreenState extends ConsumerState<InitialSyncScreen> {
         _running = false;
       });
     }
+  }
+
+  void _startBestEffortSync() {
+    unawaited(
+      ref.read(syncNowProvider.future).then<void>((_) {}).catchError((_) {}),
+    );
   }
 }

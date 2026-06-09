@@ -8,8 +8,8 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_skeleton.dart';
 import '../../../domain/entities/customer_object.dart';
-import '../../../domain/entities/work_order.dart';
 import '../../../l10n/app_localizations_x.dart';
+import '../../work_orders/presentation/work_order_history_section.dart';
 import '../application/customer_providers.dart';
 
 class CustomerDetailScreen extends ConsumerWidget {
@@ -66,7 +66,11 @@ class CustomerDetailScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.lg),
                 _ObjectList(objects: detail.objects),
                 const SizedBox(height: AppSpacing.lg),
-                _HistoryList(history: detail.history),
+                WorkOrderHistorySection(
+                  title: context.l10n.orderHistoryTitle,
+                  emptyTitle: context.l10n.previousOrdersEmptyTitle,
+                  history: detail.history,
+                ),
               ],
             );
           },
@@ -192,35 +196,6 @@ class _ObjectList extends StatelessWidget {
   }
 }
 
-class _HistoryList extends StatelessWidget {
-  const _HistoryList({required this.history});
-
-  final List<WorkOrder> history;
-
-  @override
-  Widget build(BuildContext context) {
-    return _SectionCard(
-      title: context.l10n.orderHistoryTitle,
-      emptyIcon: Icons.history_outlined,
-      emptyTitle: context.l10n.previousOrdersEmptyTitle,
-      children: history
-          .map(
-            (order) => ListTile(
-              leading: const Icon(Icons.assignment_outlined),
-              title: Text(order.title),
-              subtitle: Text(
-                '${order.orderNumber} · ${_formatDate(context, order.scheduledStart)}',
-              ),
-              trailing: Text(order.status.label),
-              onTap: () =>
-                  context.push(AppRoutes.workOrderDetailPath(order.id)),
-            ),
-          )
-          .toList(growable: false),
-    );
-  }
-}
-
 class _InfoCard extends StatelessWidget {
   const _InfoCard({required this.title, required this.rows});
 
@@ -306,11 +281,4 @@ class _SectionCard extends StatelessWidget {
       ),
     );
   }
-}
-
-String _formatDate(BuildContext context, DateTime? value) {
-  if (value == null) {
-    return context.l10n.noAppointment;
-  }
-  return context.formatShortDate(value);
 }

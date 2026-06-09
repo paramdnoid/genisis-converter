@@ -27,15 +27,21 @@ void main() {
         Permission.camera: PermissionStatus.granted,
         Permission.photos: PermissionStatus.limited,
         Permission.locationWhenInUse: PermissionStatus.denied,
+        Permission.bluetoothScan: PermissionStatus.granted,
+        Permission.bluetoothConnect: PermissionStatus.granted,
       });
 
       expect(await service.isGranted(AppPermission.camera), isTrue);
       expect(await service.isGranted(AppPermission.photos), isTrue);
       expect(await service.isGranted(AppPermission.location), isFalse);
+      expect(await service.isGranted(AppPermission.bluetoothScan), isTrue);
+      expect(await service.isGranted(AppPermission.bluetoothConnect), isTrue);
       expect(platform.checkedPermissions, [
         Permission.camera,
         Permission.photos,
         Permission.locationWhenInUse,
+        Permission.bluetoothScan,
+        Permission.bluetoothConnect,
       ]);
     },
   );
@@ -46,14 +52,20 @@ void main() {
       platform.requestStatuses.addAll({
         Permission.camera: PermissionStatus.granted,
         Permission.photos: PermissionStatus.limited,
+        Permission.bluetoothScan: PermissionStatus.granted,
+        Permission.bluetoothConnect: PermissionStatus.granted,
       });
 
       await service.require(AppPermission.camera);
       await service.require(AppPermission.photos);
+      await service.require(AppPermission.bluetoothScan);
+      await service.require(AppPermission.bluetoothConnect);
 
       expect(platform.requestedPermissions, [
         [Permission.camera],
         [Permission.photos],
+        [Permission.bluetoothScan],
+        [Permission.bluetoothConnect],
       ]);
     },
   );

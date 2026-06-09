@@ -48,6 +48,7 @@ class MaterialScreen extends ConsumerWidget {
               ),
               children: [
                 _MaterialForm(workOrderId: workOrderId, catalog: catalog),
+                _InventorySummary(catalog: catalog),
                 const SizedBox(height: AppSpacing.lg),
                 if (usages.isEmpty)
                   EmptyState(
@@ -99,6 +100,8 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedItem = _findCatalogItem(_materialId);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -114,6 +117,7 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
             const SizedBox(height: AppSpacing.md),
             DropdownButtonFormField<String?>(
               initialValue: _materialId,
+              isExpanded: true,
               items: [
                 DropdownMenuItem<String?>(
                   value: null,
@@ -122,20 +126,17 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
                 ...widget.catalog.map(
                   (item) => DropdownMenuItem<String?>(
                     value: item.id,
-                    child: Text(item.name),
+                    child: Text(
+                      _catalogLabel(context, item),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ],
               onChanged: (value) {
                 setState(() {
                   _materialId = value;
-                  MaterialItem? item;
-                  for (final candidate in widget.catalog) {
-                    if (candidate.id == value) {
-                      item = candidate;
-                      break;
-                    }
-                  }
+                  final item = _findCatalogItem(value);
                   if (item != null) {
                     _nameController.text = item.name;
                     _unitController.text = item.unit;
@@ -147,6 +148,10 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
                 prefixIcon: const Icon(Icons.inventory_2_outlined),
               ),
             ),
+            if (selectedItem != null && selectedItem.isStockTracked) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _SelectedStockHint(item: selectedItem),
+            ],
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _nameController,
@@ -225,10 +230,27 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
     }
 
     final create = await ref.read(createMaterialUsageProvider.future);
-    await create(draft);
+    try {
+      await create(draft);
+    } on Object catch (error) {
+      _showMessage(error.toString());
+      return;
+    }
     _quantityController.text = '1';
     _notesController.clear();
     _showMessage('Material lokal gespeichert.');
+  }
+
+  MaterialItem? _findCatalogItem(String? id) {
+    if (id == null) {
+      return null;
+    }
+    for (final item in widget.catalog) {
+      if (item.id == id) {
+        return item;
+      }
+    }
+    return null;
   }
 
   void _showMessage(String message) {
@@ -238,6 +260,140 @@ class _MaterialFormState extends ConsumerState<_MaterialForm> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _SelectedStockHint extends StatelessWidget {
+  const _SelectedStockHint({required this.item});
+
+  final MaterialItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final stock = item.stockQuantity;
+    if (stock == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      children: [
+        Icon(
+          item.isLowStock ? Icons.warning_amber_outlined : Icons.inventory,
+          color: item.isLowStock
+              ? Theme.of(context).colorScheme.error
+              : Theme.of(context).colorScheme.primary,
+          size: 18,
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Text(
+            context.l10n.materialStockAvailable(
+              context.formatDecimal(stock, decimalDigits: 2),
+              item.unit,
+            ),
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InventorySummary extends StatelessWidget {
+  const _InventorySummary({required this.catalog});
+
+  final List<MaterialItem> catalog;
+
+  @override
+  Widget build(BuildContext context) {
+    final trackedItems = catalog
+        .where((item) => item.isStockTracked)
+        .toList(growable: false);
+    if (trackedItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          context.l10n.materialStockSectionTitle,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        ...trackedItems.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: _InventoryCard(item: item),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InventoryCard extends StatelessWidget {
+  const _InventoryCard({required this.item});
+
+  final MaterialItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final stock = item.stockQuantity ?? 0;
+    final minimum = item.minStockQuantity;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            const Icon(Icons.inventory_2_outlined),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    context.l10n.materialStockAvailable(
+                      context.formatDecimal(stock, decimalDigits: 2),
+                      item.unit,
+                    ),
+                  ),
+                  if (minimum != null)
+                    Text(
+                      context.l10n.materialStockMinimum(
+                        context.formatDecimal(minimum, decimalDigits: 2),
+                        item.unit,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            StatusBadge(
+              label: item.isLowStock
+                  ? context.l10n.materialLowStockLabel
+                  : context.l10n.materialSufficientStockLabel,
+              icon: item.isLowStock
+                  ? Icons.warning_amber_outlined
+                  : Icons.check_circle_outline,
+              tone: item.isLowStock
+                  ? StatusBadgeTone.warning
+                  : StatusBadgeTone.success,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -282,4 +438,13 @@ class _MaterialCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _catalogLabel(BuildContext context, MaterialItem item) {
+  final stock = item.stockQuantity;
+  if (stock == null) {
+    return item.name;
+  }
+
+  return '${item.name} - ${context.formatDecimal(stock, decimalDigits: 2)} ${item.unit}';
 }

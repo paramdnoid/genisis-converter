@@ -80,6 +80,8 @@ void main() {
     await tester.tap(find.text('Minimaldaten laden'));
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(find.byTooltip('Alle Aufträge'));
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Alle Aufträge'));
     await tester.pumpAndSettle();
 
@@ -100,6 +102,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Auftragsdetail'), findsOneWidget);
+    await tester.dragUntilVisible(
+      find.text('Familie Keller'),
+      find.byType(ListView),
+      const Offset(0, -240),
+    );
     expect(find.text('Familie Keller'), findsOneWidget);
 
     await tester.dragUntilVisible(
@@ -132,6 +139,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Messwert lokal gespeichert.'), findsOneWidget);
+    await tester.dragUntilVisible(
+      find.text('18,0 ppm'),
+      find.byType(ListView),
+      const Offset(0, -240),
+    );
     expect(find.text('18,0 ppm'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));

@@ -20,6 +20,70 @@
   "openSyncsMetricLabel": "Offene Syncs",
   "urgentMetricLabel": "Dringend",
   "nextOrderTitle": "Nächster Auftrag",
+  "routeOptimizationTitle": "Tagesroute",
+  "routeOptimizationReadyMessage": "{count} Tagesstopp(s) für die Route bereit.",
+  "@routeOptimizationReadyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "routeOptimizationCoordinateMode": "Koordinatenoptimiert",
+  "routeOptimizationScheduleMode": "Terminreihenfolge",
+  "routeOptimizationNoStopsMessage": "Keine Tagesstopps mit Adresse vorhanden.",
+  "routeOptimizationOpenAction": "Optimierte Route öffnen",
+  "routeOptimizationOpenError": "Optimierte Route konnte nicht geöffnet werden.",
+  "offlineRouteMapTitle": "Offline-Karte",
+  "offlineRouteMapAction": "Offline-Karte",
+  "offlineRouteMapSubtitle": "{count} Stopp(s) lokal aus Koordinaten gezeichnet.",
+  "@offlineRouteMapSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineRouteMapEmptyTitle": "Keine Offline-Route",
+  "offlineRouteMapNoCoordinatesTitle": "Keine Koordinaten",
+  "offlineRouteMapNoCoordinatesMessage": "Für die lokale Karte braucht mindestens ein Tagesstopp gespeicherte Koordinaten.",
+  "offlineRouteMapStopsTitle": "Stopps",
+  "offlineRouteMapUnmappedTitle": "Ohne Koordinaten",
+  "recurringWorkOrdersTitle": "Wiederkehrende Aufträge",
+  "recurringWorkOrdersDueCount": "{count} fällig",
+  "@recurringWorkOrdersDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringWorkOrdersReadyMessage": "{count} Anlage(n) sind für einen neuen Auftrag fällig.",
+  "@recurringWorkOrdersReadyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringWorkOrdersEmptyMessage": "Keine fälligen Intervallaufträge.",
+  "recurringWorkOrdersCreateAction": "Fällige Aufträge erstellen",
+  "recurringWorkOrdersCreatedMessage": "{count} wiederkehrende Auftrag/Aufträge lokal erstellt.",
+  "@recurringWorkOrdersCreatedMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringWorkOrdersErrorMessage": "Wiederkehrende Aufträge konnten nicht erstellt werden: {error}",
+  "@recurringWorkOrdersErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "startOrderAction": "Starten",
   "pauseOrderAction": "Pausieren",
   "resumeOrderAction": "Fortsetzen",
@@ -40,6 +104,11 @@
   "quickActionsTitle": "Schnellaktionen",
   "searchAction": "Suche",
   "settingsTitle": "Einstellungen",
+  "languageTitle": "Sprache",
+  "languageSystemOption": "System",
+  "languageGermanOption": "Deutsch",
+  "languageFrenchOption": "Français",
+  "languageItalianOption": "Italiano",
   "noAppointment": "ohne Termin",
   "noDate": "ohne Datum",
   "searchTitle": "Suche",
@@ -72,6 +141,17 @@
   "callOpenError": "Anruf konnte nicht gestartet werden.",
   "navigationAction": "Navigation",
   "callAction": "Anrufen",
+  "calendarShareAction": "Kalender",
+  "calendarShareSuccessMessage": "Kalendereintrag wurde an die Freigabe übergeben.",
+  "calendarShareCancelledMessage": "Kalenderfreigabe wurde abgebrochen.",
+  "calendarShareErrorMessage": "Kalendereintrag konnte nicht geteilt werden: {error}",
+  "@calendarShareErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "phoneLabel": "Telefon",
   "addressLabel": "Adresse",
   "customerTypeLabel": "Typ",
@@ -110,6 +190,50 @@
   "reportNoPdfMessage": "Der Rapport kann offline generiert werden.",
   "reportSavePdfAction": "PDF lokal speichern",
   "reportPdfSavedMessage": "PDF lokal gespeichert.",
+  "reportEmailShareAction": "Rapport per E-Mail senden",
+  "reportEmailShareSuccessMessage": "Rapport wurde an die Freigabe übergeben.",
+  "reportEmailShareCancelledMessage": "Freigabe wurde abgebrochen.",
+  "reportEmailShareErrorMessage": "Rapport konnte nicht geteilt werden: {error}",
+  "@reportEmailShareErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceExportAction": "Rechnungsentwurf exportieren",
+  "invoiceExportSuccessMessage": "Rechnungsentwurf wurde an die Freigabe übergeben.",
+  "invoiceExportCancelledMessage": "Rechnungsexport wurde abgebrochen.",
+  "invoiceExportErrorMessage": "Rechnungsentwurf konnte nicht exportiert werden: {error}",
+  "@invoiceExportErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportEmailSubject": "Rapport {orderNumber} - {customerName}",
+  "@reportEmailSubject": {
+    "placeholders": {
+      "orderNumber": {
+        "type": "String"
+      },
+      "customerName": {
+        "type": "String"
+      }
+    }
+  },
+  "reportEmailBody": "Guten Tag\n\nIm Anhang finden Sie den Rapport {orderNumber} für {customerName}.\n\nFreundliche Grüsse",
+  "@reportEmailBody": {
+    "placeholders": {
+      "customerName": {
+        "type": "String"
+      },
+      "orderNumber": {
+        "type": "String"
+      }
+    }
+  },
   "reportPreviewErrorTitle": "Vorschau konnte nicht erstellt werden",
   "reportNoPreviewTitle": "Keine Vorschau",
   "reportNoPreviewMessage": "Der Auftrag ist lokal nicht vorhanden.",
@@ -126,6 +250,15 @@
   "notesFieldLabel": "Notizen",
   "notesSectionTitle": "Notizen",
   "saveMeasurementAction": "Messwert speichern",
+  "bluetoothMeasurementTitle": "Bluetooth-Messgerät",
+  "bluetoothMeasurementSubtitle": "BLE-Messgeräte scannen, verbinden und Messwerte direkt lokal übernehmen.",
+  "startBluetoothScanAction": "Scan starten",
+  "stopBluetoothScanAction": "Scan stoppen",
+  "bluetoothDevicesEmptyMessage": "Noch kein Messgerät gefunden.",
+  "bluetoothDeviceConnectingStatus": "Verbinden...",
+  "bluetoothReadingSaveAction": "Messwert übernehmen",
+  "bluetoothReadingSavedMessage": "Bluetooth-Messwert lokal gespeichert.",
+  "measurementDeviceLabel": "Gerät",
   "photosLoadErrorTitle": "Fotos konnten nicht geladen werden",
   "photosEmptyTitle": "Keine Fotos gespeichert",
   "photosEmptyMessage": "Fotos werden lokal im App-Verzeichnis abgelegt.",
@@ -153,6 +286,19 @@
   "objectHistoryTitle": "Objekthistorie",
   "objectNotesTitle": "Objektnotizen",
   "installationListSearchLabel": "Anlage suchen",
+  "installationScanTooltip": "QR-/Barcode scannen",
+  "installationScanTitle": "Anlage scannen",
+  "installationScanManualLabel": "Anlagen-ID oder Seriennummer",
+  "installationScanManualAction": "Code suchen",
+  "installationScanNoMatchMessage": "Keine lokale Anlage für \"{code}\" gefunden.",
+  "@installationScanNoMatchMessage": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "installationScanCameraError": "Kamera konnte nicht gestartet werden. Gib die Anlagen-ID oder Seriennummer manuell ein.",
   "installationsLoadErrorTitle": "Anlagen konnten nicht geladen werden",
   "installationsEmptyTitle": "Keine Anlagen",
   "installationsEmptyMessage": "Die Anlagen werden aus der lokalen DB geladen.",
@@ -215,6 +361,23 @@
   "materialAddTitle": "Material erfassen",
   "freeTextOption": "Freitext",
   "materialCatalogFieldLabel": "Materialstamm",
+  "materialStockSectionTitle": "Lagerbestand",
+  "materialStockAvailable": "Bestand: {quantity} {unit}",
+  "@materialStockAvailable": {
+    "placeholders": {
+      "quantity": {},
+      "unit": {}
+    }
+  },
+  "materialStockMinimum": "Minimum: {quantity} {unit}",
+  "@materialStockMinimum": {
+    "placeholders": {
+      "quantity": {},
+      "unit": {}
+    }
+  },
+  "materialLowStockLabel": "Knapp",
+  "materialSufficientStockLabel": "OK",
   "nameFieldLabel": "Bezeichnung",
   "quantityFieldLabel": "Menge",
   "saveMaterialAction": "Material speichern",
@@ -251,6 +414,15 @@
   "objectsTitle": "Objekte",
   "objectsEmptyTitle": "Keine Objekte",
   "orderHistoryTitle": "Auftragshistorie",
+  "historyTotalMetricLabel": "Gesamt",
+  "historyCompletedMetricLabel": "Erledigt",
+  "historyOpenMetricLabel": "Offen",
+  "historyOverdueMetricLabel": "Überfällig",
+  "historyLocalMetricLabel": "Lokal",
+  "historyLastCompletedLabel": "Letzter Abschluss",
+  "historyNextScheduledLabel": "Nächster Termin",
+  "historyNoCompletedOrders": "kein Abschluss",
+  "historyNoUpcomingOrders": "kein offener Termin",
   "previousOrdersEmptyTitle": "Keine früheren Aufträge",
   "ordersEmptyTitle": "Keine Aufträge",
   "checklistLoadErrorTitle": "Checkliste konnte nicht geladen werden",

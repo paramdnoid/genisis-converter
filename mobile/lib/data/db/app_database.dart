@@ -26,9 +26,17 @@ abstract final class DevelopmentSeed {
   static const customerId = '33333333-3333-4333-8333-333333333333';
   static const objectId = '44444444-4444-4444-8444-444444444444';
   static const installationId = '55555555-5555-4555-8555-555555555555';
+  static const materialCleaningId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   static const workOrderInspectionId = '66666666-6666-4666-8666-666666666666';
   static const workOrderCleaningId = '77777777-7777-4777-8777-777777777777';
+  static const tariffCatalogInspectionId =
+      'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+  static const tariffCatalogCleaningId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+  static const objectTariffInspectionId =
+      'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+  static const objectTariffCleaningId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
   static const checklistTemplateId = '99999999-9999-4999-8999-999999999999';
+  static const reportTemplateId = '12121212-1212-4212-8212-121212121212';
 }
 
 mixin SyncColumns on Table {
@@ -283,6 +291,9 @@ class Materials extends Table with SyncColumns {
   TextColumn get name => text()();
   TextColumn get unit => text()();
   RealColumn get defaultPrice => real().nullable().named('default_price')();
+  RealColumn get stockQuantity => real().nullable().named('stock_quantity')();
+  RealColumn get minStockQuantity =>
+      real().nullable().named('min_stock_quantity')();
   BoolColumn get isActive =>
       boolean().named('is_active').withDefault(const Constant(true))();
 
@@ -303,6 +314,91 @@ class WorkOrderMaterials extends Table with SyncColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('TariffCatalogItemRow')
+class TariffCatalogItems extends Table with SyncColumns {
+  TextColumn get tariffSystem => text().named('tariff_system')();
+  TextColumn get code => text()();
+  TextColumn get description => text()();
+  RealColumn get defaultPrice => real().nullable().named('default_price')();
+  TextColumn get taxCategory => text().nullable().named('tax_category')();
+  RealColumn get taxPoints => real().nullable().named('tax_points')();
+  BoolColumn get isActive =>
+      boolean().named('is_active').withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ObjectTariffAssignmentRow')
+class ObjectTariffAssignments extends Table with SyncColumns {
+  TextColumn get objectId => text().nullable().named('object_id')();
+  TextColumn get tariffCatalogItemId =>
+      text().nullable().named('tariff_catalog_item_id')();
+  TextColumn get tariffSystem => text().named('tariff_system')();
+  TextColumn get code => text().nullable()();
+  TextColumn get description => text()();
+  IntColumn get position => integer().nullable()();
+  RealColumn get defaultQuantity =>
+      real().nullable().named('default_quantity')();
+  TextColumn get unit => text().nullable()();
+  RealColumn get priceOverride => real().nullable().named('price_override')();
+  RealColumn get taxPoints => real().nullable().named('tax_points')();
+  TextColumn get billingCode => text().nullable().named('billing_code')();
+  TextColumn get intervalCode => text().nullable().named('interval_code')();
+  TextColumn get flag13 => text().nullable().named('flag_13')();
+  TextColumn get flag14 => text().nullable().named('flag_14')();
+  TextColumn get flag15 => text().nullable().named('flag_15')();
+  TextColumn get notes => text().nullable()();
+  BoolColumn get isActive =>
+      boolean().named('is_active').withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('WorkOrderServiceLineRow')
+class WorkOrderServiceLines extends Table with SyncColumns {
+  TextColumn get workOrderId => text().named('work_order_id')();
+  TextColumn get objectTariffAssignmentId =>
+      text().nullable().named('object_tariff_assignment_id')();
+  TextColumn get tariffCatalogItemId =>
+      text().nullable().named('tariff_catalog_item_id')();
+  TextColumn get installationId => text().nullable().named('installation_id')();
+  TextColumn get code => text().nullable()();
+  TextColumn get name => text()();
+  RealColumn get quantity => real()();
+  TextColumn get unit => text()();
+  RealColumn get unitPrice => real().nullable().named('unit_price')();
+  RealColumn get totalPrice => real().nullable().named('total_price')();
+  RealColumn get taxPoints => real().nullable().named('tax_points')();
+  TextColumn get status => text().withDefault(const Constant('performed'))();
+  TextColumn get notes => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('LegacyImportRecordRow')
+class LegacyImportRecords extends Table with SyncColumns {
+  TextColumn get batchId => text().named('batch_id')();
+  TextColumn get sourceSystem => text().named('source_system')();
+  TextColumn get sourceFile => text().named('source_file')();
+  TextColumn get sourceTable => text().named('source_table')();
+  TextColumn get sourceKey => text().named('source_key')();
+  TextColumn get rowHash => text().named('row_hash')();
+  IntColumn get rowIndex => integer().nullable().named('row_index')();
+  TextColumn get recordType =>
+      text().named('record_type').withDefault(const Constant('row'))();
+  TextColumn get mappedEntityType =>
+      text().nullable().named('mapped_entity_type')();
+  TextColumn get mappedEntityId =>
+      text().nullable().named('mapped_entity_id')();
+  TextColumn get payloadJson => text().named('payload_json')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DataClassName('ReportRow')
 class Reports extends Table with SyncColumns {
   TextColumn get workOrderId => text().named('work_order_id')();
@@ -314,6 +410,43 @@ class Reports extends Table with SyncColumns {
   TextColumn get signedAt => text().nullable().named('signed_at')();
   TextColumn get customerNameSigned =>
       text().nullable().named('customer_name_signed')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ReportTemplateRow')
+class ReportTemplates extends Table with SyncColumns {
+  TextColumn get name => text()();
+  TextColumn get reportType =>
+      text().named('report_type').withDefault(const Constant('work_order'))();
+  TextColumn get titlePrefix =>
+      text().named('title_prefix').withDefault(const Constant('Rapport'))();
+  TextColumn get locale => text().withDefault(const Constant('de'))();
+  TextColumn get primaryColor =>
+      text().named('primary_color').withDefault(const Constant('#1f2937'))();
+  TextColumn get footerText => text().nullable().named('footer_text')();
+  BoolColumn get includeCustomer =>
+      boolean().named('include_customer').withDefault(const Constant(true))();
+  BoolColumn get includeInstallations => boolean()
+      .named('include_installations')
+      .withDefault(const Constant(true))();
+  BoolColumn get includeMeasurements => boolean()
+      .named('include_measurements')
+      .withDefault(const Constant(true))();
+  BoolColumn get includeDefects =>
+      boolean().named('include_defects').withDefault(const Constant(true))();
+  BoolColumn get includeMaterials =>
+      boolean().named('include_materials').withDefault(const Constant(true))();
+  BoolColumn get includeTimeEntries => boolean()
+      .named('include_time_entries')
+      .withDefault(const Constant(true))();
+  BoolColumn get includePhotos =>
+      boolean().named('include_photos').withDefault(const Constant(true))();
+  BoolColumn get includeSignature =>
+      boolean().named('include_signature').withDefault(const Constant(true))();
+  BoolColumn get isDefault =>
+      boolean().named('is_default').withDefault(const Constant(false))();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -366,6 +499,11 @@ class SyncStates extends Table {
     TimeEntries,
     Materials,
     WorkOrderMaterials,
+    TariffCatalogItems,
+    ObjectTariffAssignments,
+    WorkOrderServiceLines,
+    LegacyImportRecords,
+    ReportTemplates,
     Reports,
     OutboxEntries,
     SyncStates,
@@ -382,6 +520,7 @@ class SyncStates extends Table {
     PhotoDao,
     TimeEntryDao,
     MaterialDao,
+    ReportTemplateDao,
     ReportDao,
     OutboxDao,
     SyncStateDao,
@@ -393,11 +532,28 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        await migrator.createTable(tariffCatalogItems);
+        await migrator.createTable(objectTariffAssignments);
+        await migrator.createTable(workOrderServiceLines);
+      }
+      if (from < 3) {
+        await migrator.createTable(legacyImportRecords);
+      }
+      if (from < 4) {
+        await migrator.addColumn(materials, materials.stockQuantity);
+        await migrator.addColumn(materials, materials.minStockQuantity);
+      }
+      if (from < 5) {
+        await migrator.createTable(reportTemplates);
+      }
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
@@ -474,6 +630,11 @@ class AppDatabase extends _$AppDatabase {
       'photo' => 'photos',
       'time_entry' => 'time_entries',
       'work_order_material' => 'work_order_materials',
+      'tariff_catalog_item' => 'tariff_catalog_items',
+      'object_tariff_assignment' => 'object_tariff_assignments',
+      'work_order_service_line' => 'work_order_service_lines',
+      'legacy_import_record' => 'legacy_import_records',
+      'report_template' => 'report_templates',
       'report' => 'reports',
       _ => null,
     };
@@ -628,6 +789,8 @@ class AppDatabase extends _$AppDatabase {
           postalCode: '8610',
           city: 'Uster',
           country: 'CH',
+          latitude: const Value(47.349962),
+          longitude: const Value(8.718269),
           accessNotes: const Value('Schluesselbox beim Carport.'),
           safetyNotes: const Value('Dachzugang nur mit Sicherung.'),
           createdAt: Value(now),
@@ -712,6 +875,30 @@ class AppDatabase extends _$AppDatabase {
           name: 'Kontrolle Feuerstaette Standard',
           type: 'inspection',
           versionNumber: 1,
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      batch.insert(
+        reportTemplates,
+        ReportTemplatesCompanion.insert(
+          id: DevelopmentSeed.reportTemplateId,
+          tenantId: DevelopmentSeed.tenantId,
+          name: 'Standard Rapport',
+          reportType: const Value('work_order'),
+          titlePrefix: const Value('Rapport'),
+          locale: const Value('de'),
+          primaryColor: const Value('#1f2937'),
+          footerText: const Value('Kaminfeger Muster AG'),
+          includeCustomer: const Value(true),
+          includeInstallations: const Value(true),
+          includeMeasurements: const Value(true),
+          includeDefects: const Value(true),
+          includeMaterials: const Value(true),
+          includeTimeEntries: const Value(true),
+          includePhotos: const Value(true),
+          includeSignature: const Value(true),
+          isDefault: const Value(true),
           createdAt: Value(now),
           updatedAt: Value(now),
         ),
@@ -807,12 +994,88 @@ class AppDatabase extends _$AppDatabase {
       batch.insert(
         materials,
         MaterialsCompanion.insert(
-          id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          id: DevelopmentSeed.materialCleaningId,
           tenantId: DevelopmentSeed.tenantId,
           sku: const Value('REIN-001'),
           name: 'Reinigungspauschale Kleinauftrag',
           unit: 'Stueck',
           defaultPrice: const Value(85),
+          stockQuantity: const Value(6),
+          minStockQuantity: const Value(2),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      batch.insert(
+        tariffCatalogItems,
+        TariffCatalogItemsCompanion.insert(
+          id: DevelopmentSeed.tariffCatalogInspectionId,
+          tenantId: DevelopmentSeed.tenantId,
+          tariffSystem: 'kfd',
+          code: 'K-100',
+          description: 'Jahreskontrolle Holzfeuerung',
+          defaultPrice: const Value(120),
+          taxPoints: const Value(12),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      batch.insert(
+        tariffCatalogItems,
+        TariffCatalogItemsCompanion.insert(
+          id: DevelopmentSeed.tariffCatalogCleaningId,
+          tenantId: DevelopmentSeed.tenantId,
+          tariffSystem: 'kfd',
+          code: 'R-210',
+          description: 'Reinigung Abgasanlage',
+          defaultPrice: const Value(95),
+          taxPoints: const Value(9.5),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      batch.insert(
+        objectTariffAssignments,
+        ObjectTariffAssignmentsCompanion.insert(
+          id: DevelopmentSeed.objectTariffInspectionId,
+          tenantId: DevelopmentSeed.tenantId,
+          objectId: const Value(DevelopmentSeed.objectId),
+          tariffCatalogItemId: const Value(
+            DevelopmentSeed.tariffCatalogInspectionId,
+          ),
+          tariffSystem: 'kfd',
+          code: const Value('K-100'),
+          description: 'Jahreskontrolle Holzfeuerung',
+          position: const Value(1),
+          defaultQuantity: const Value(1),
+          unit: const Value('Stk'),
+          priceOverride: const Value(120),
+          taxPoints: const Value(12),
+          billingCode: const Value('HOLZ-KONTROLLE'),
+          notes: const Value('Aus Genesis Objekt-Tarif zugeordnet.'),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      batch.insert(
+        objectTariffAssignments,
+        ObjectTariffAssignmentsCompanion.insert(
+          id: DevelopmentSeed.objectTariffCleaningId,
+          tenantId: DevelopmentSeed.tenantId,
+          objectId: const Value(DevelopmentSeed.objectId),
+          tariffCatalogItemId: const Value(
+            DevelopmentSeed.tariffCatalogCleaningId,
+          ),
+          tariffSystem: 'kfd',
+          code: const Value('R-210'),
+          description: 'Reinigung Abgasanlage',
+          position: const Value(2),
+          defaultQuantity: const Value(1),
+          unit: const Value('Stk'),
+          priceOverride: const Value(95),
+          taxPoints: const Value(9.5),
+          billingCode: const Value('REINIGUNG'),
+          notes: const Value('Aus Genesis Objekt-Tarif zugeordnet.'),
           createdAt: Value(now),
           updatedAt: Value(now),
         ),
@@ -1047,6 +1310,25 @@ final class WorkOrderDetailHeaderRow {
   final CustomerObjectRow object;
 }
 
+final class WorkOrderRouteStopRow {
+  const WorkOrderRouteStopRow({required this.workOrder, required this.object});
+
+  final WorkOrderRow workOrder;
+  final CustomerObjectRow object;
+}
+
+final class DueRecurringWorkOrderRow {
+  const DueRecurringWorkOrderRow({
+    required this.installation,
+    required this.object,
+    required this.customer,
+  });
+
+  final InstallationRow installation;
+  final CustomerObjectRow object;
+  final CustomerRow customer;
+}
+
 @DriftAccessor(
   tables: [
     WorkOrders,
@@ -1055,6 +1337,8 @@ final class WorkOrderDetailHeaderRow {
     Installations,
     WorkOrderInstallations,
     TimeEntries,
+    ObjectTariffAssignments,
+    WorkOrderServiceLines,
     OutboxEntries,
   ],
 )
@@ -1081,6 +1365,130 @@ class WorkOrderDao extends DatabaseAccessor<AppDatabase>
           .where((row) => _isSameLocalDate(row.scheduledStart, day))
           .toList(growable: false),
     );
+  }
+
+  Stream<List<WorkOrderRouteStopRow>> watchTodayRouteStops(
+    String tenantId,
+    DateTime day,
+  ) {
+    final query =
+        select(workOrders).join([
+          innerJoin(
+            customerObjects,
+            customerObjects.id.equalsExp(workOrders.objectId),
+          ),
+        ])..where(
+          workOrders.tenantId.equals(tenantId) &
+              workOrders.deletedAt.isNull() &
+              customerObjects.deletedAt.isNull(),
+        );
+
+    return query.watch().map((rows) {
+      final stops = rows
+          .map(
+            (row) => WorkOrderRouteStopRow(
+              workOrder: row.readTable(workOrders),
+              object: row.readTable(customerObjects),
+            ),
+          )
+          .where((row) => _isSameLocalDate(row.workOrder.scheduledStart, day))
+          .toList(growable: false);
+      stops.sort((a, b) {
+        final startCompare = _compareIsoDateTime(
+          a.workOrder.scheduledStart,
+          b.workOrder.scheduledStart,
+        );
+        if (startCompare != 0) {
+          return startCompare;
+        }
+        return a.workOrder.orderNumber.compareTo(b.workOrder.orderNumber);
+      });
+      return stops;
+    });
+  }
+
+  Stream<List<DueRecurringWorkOrderRow>> watchDueRecurringCandidates(
+    String tenantId,
+    DateTime dueOn,
+  ) {
+    final query =
+        select(installations).join([
+          innerJoin(
+            customerObjects,
+            customerObjects.id.equalsExp(installations.objectId),
+          ),
+          innerJoin(
+            customers,
+            customers.id.equalsExp(customerObjects.customerId),
+          ),
+          leftOuterJoin(
+            workOrderInstallations,
+            workOrderInstallations.installationId.equalsExp(installations.id) &
+                workOrderInstallations.deletedAt.isNull(),
+          ),
+          leftOuterJoin(
+            workOrders,
+            workOrders.id.equalsExp(workOrderInstallations.workOrderId) &
+                workOrders.deletedAt.isNull(),
+          ),
+        ])..where(
+          installations.tenantId.equals(tenantId) &
+              installations.deletedAt.isNull() &
+              customerObjects.deletedAt.isNull() &
+              customers.deletedAt.isNull(),
+        );
+
+    return query.watch().map((rows) {
+      final grouped = <String, _RecurringCandidateAccumulator>{};
+      for (final row in rows) {
+        final installation = row.readTable(installations);
+        final object = row.readTable(customerObjects);
+        final customer = row.readTable(customers);
+        final linkedOrder = row.readTableOrNull(workOrders);
+
+        final accumulator = grouped.putIfAbsent(
+          installation.id,
+          () => _RecurringCandidateAccumulator(
+            installation: installation,
+            object: object,
+            customer: customer,
+          ),
+        );
+        final dueDate = DateTime.tryParse(installation.nextServiceDate ?? '');
+        if (dueDate != null &&
+            linkedOrder != null &&
+            linkedOrder.status != 'cancelled' &&
+            _isSameLocalDate(linkedOrder.scheduledStart, dueDate)) {
+          accumulator.hasExistingOrderForDueDate = true;
+        }
+      }
+
+      final due = grouped.values
+          .where(
+            (item) =>
+                !item.hasExistingOrderForDueDate &&
+                _isDueRecurringInstallation(item.installation, dueOn),
+          )
+          .map(
+            (item) => DueRecurringWorkOrderRow(
+              installation: item.installation,
+              object: item.object,
+              customer: item.customer,
+            ),
+          )
+          .toList(growable: false);
+      due.sort((left, right) {
+        final dateCompare = _compareIsoDateTime(
+          left.installation.nextServiceDate,
+          right.installation.nextServiceDate,
+        );
+        if (dateCompare != 0) {
+          return dateCompare;
+        }
+        return left.object.name.compareTo(right.object.name);
+      });
+      return due;
+    });
   }
 
   Stream<List<WorkOrderRow>> watchForCustomer(
@@ -1175,6 +1583,170 @@ class WorkOrderDao extends DatabaseAccessor<AppDatabase>
         object: row.readTable(customerObjects),
       );
     });
+  }
+
+  Stream<List<ObjectTariffAssignmentRow>> watchObjectTariffs(
+    String tenantId,
+    String objectId,
+  ) {
+    return (select(objectTariffAssignments)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.objectId.equals(objectId) &
+                table.deletedAt.isNull() &
+                table.isActive.equals(true),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.position),
+            (table) => OrderingTerm.asc(table.description),
+          ]))
+        .watch();
+  }
+
+  Stream<List<WorkOrderServiceLineRow>> watchServiceLines(
+    String tenantId,
+    String workOrderId,
+  ) {
+    return (select(workOrderServiceLines)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.workOrderId.equals(workOrderId) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.name),
+            (table) => OrderingTerm.asc(table.createdAt),
+          ]))
+        .watch();
+  }
+
+  Future<void> createServiceLineLocal({
+    required String tenantId,
+    required String workOrderId,
+    required String name,
+    required double quantity,
+    required String unit,
+    String? objectTariffAssignmentId,
+    String? tariffCatalogItemId,
+    String? installationId,
+    String? code,
+    double? unitPrice,
+    double? taxPoints,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+    final totalPrice = unitPrice == null ? null : unitPrice * quantity;
+
+    await transaction(() async {
+      await into(workOrderServiceLines).insert(
+        WorkOrderServiceLinesCompanion.insert(
+          id: id,
+          tenantId: tenantId,
+          workOrderId: workOrderId,
+          objectTariffAssignmentId: Value(objectTariffAssignmentId),
+          tariffCatalogItemId: Value(tariffCatalogItemId),
+          installationId: Value(installationId),
+          code: Value(code),
+          name: name,
+          quantity: quantity,
+          unit: unit,
+          unitPrice: Value(unitPrice),
+          totalPrice: Value(totalPrice),
+          taxPoints: Value(taxPoints),
+          notes: Value(notes),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+          syncStatus: const Value('pending'),
+        ),
+      );
+      await db.enqueueOutbox(
+        tenantId: tenantId,
+        entityType: 'work_order_service_line',
+        entityId: id,
+        operation: 'create',
+        payload: {
+          'id': id,
+          'workOrderId': workOrderId,
+          'objectTariffAssignmentId': objectTariffAssignmentId,
+          'tariffCatalogItemId': tariffCatalogItemId,
+          'installationId': installationId,
+          'code': code,
+          'name': name,
+          'quantity': quantity,
+          'unit': unit,
+          'unitPrice': unitPrice,
+          'totalPrice': totalPrice,
+          'taxPoints': taxPoints,
+          'status': 'performed',
+          'notes': notes,
+        },
+      );
+    });
+  }
+
+  Future<List<WorkOrderRow>> createDueRecurringLocal({
+    required String tenantId,
+    required String userId,
+    required DateTime dueOn,
+  }) async {
+    final candidates = await watchDueRecurringCandidates(tenantId, dueOn).first;
+    if (candidates.isEmpty) {
+      return const [];
+    }
+
+    final created = <WorkOrderRow>[];
+    await transaction(() async {
+      for (final candidate in candidates) {
+        if (await _hasWorkOrderForInstallationDueDate(candidate.installation)) {
+          continue;
+        }
+
+        final workOrder = _buildRecurringWorkOrder(
+          candidate: candidate,
+          userId: userId,
+        );
+        final link = _buildRecurringWorkOrderInstallation(
+          tenantId: tenantId,
+          workOrderId: workOrder.id,
+          installationId: candidate.installation.id,
+        );
+        final updatedInstallation = _advanceRecurringInstallation(
+          candidate.installation,
+          dueOn: dueOn,
+        );
+
+        await into(workOrders).insert(workOrder);
+        await into(workOrderInstallations).insert(link);
+        await update(installations).replace(updatedInstallation);
+        await db.enqueueOutbox(
+          tenantId: tenantId,
+          entityType: 'work_order',
+          entityId: workOrder.id,
+          operation: 'create',
+          payload: workOrder.toJson(),
+        );
+        await db.enqueueOutbox(
+          tenantId: tenantId,
+          entityType: 'work_order_installation',
+          entityId: link.id,
+          operation: 'create',
+          payload: link.toJson(),
+        );
+        await db.enqueueOutbox(
+          tenantId: tenantId,
+          entityType: 'installation',
+          entityId: updatedInstallation.id,
+          operation: 'update',
+          payload: updatedInstallation.toJson(),
+        );
+        created.add(workOrder);
+      }
+    });
+
+    return created;
   }
 
   Future<void> startLocal({required String id, required String userId}) async {
@@ -1357,6 +1929,105 @@ class WorkOrderDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  Future<bool> _hasWorkOrderForInstallationDueDate(
+    InstallationRow installation,
+  ) async {
+    final dueDate = DateTime.tryParse(installation.nextServiceDate ?? '');
+    if (dueDate == null) {
+      return true;
+    }
+
+    final query =
+        select(workOrders).join([
+          innerJoin(
+            workOrderInstallations,
+            workOrderInstallations.workOrderId.equalsExp(workOrders.id),
+          ),
+        ])..where(
+          workOrders.tenantId.equals(installation.tenantId) &
+              workOrders.deletedAt.isNull() &
+              workOrders.status.equals('cancelled').not() &
+              workOrderInstallations.deletedAt.isNull() &
+              workOrderInstallations.installationId.equals(installation.id),
+        );
+
+    final rows = await query.get();
+    return rows.any(
+      (row) =>
+          _isSameLocalDate(row.readTable(workOrders).scheduledStart, dueDate),
+    );
+  }
+
+  WorkOrderRow _buildRecurringWorkOrder({
+    required DueRecurringWorkOrderRow candidate,
+    required String userId,
+  }) {
+    final id = _uuid.v4();
+    final now = _utcNowIso();
+    final dueDate = DateTime.parse(candidate.installation.nextServiceDate!);
+    final scheduledStart = _dateWithLocalTime(dueDate, hour: 8).toUtc();
+    final scheduledEnd = scheduledStart.add(const Duration(hours: 1));
+    final installationName = _installationDisplayName(candidate.installation);
+
+    return WorkOrderRow(
+      id: id,
+      tenantId: candidate.installation.tenantId,
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      syncStatus: 'pending',
+      customerId: candidate.customer.id,
+      objectId: candidate.object.id,
+      assignedUserId: userId,
+      orderNumber: _recurringOrderNumber(id, scheduledStart),
+      title: 'Wiederkehrende Arbeit $installationName',
+      description:
+          'Automatisch aus dem ${candidate.installation.intervalMonths}-Monats-Intervall der Anlage erzeugt.',
+      type: 'recurring_service',
+      status: 'scheduled',
+      priority: 'normal',
+      scheduledStart: scheduledStart.toIso8601String(),
+      scheduledEnd: scheduledEnd.toIso8601String(),
+    );
+  }
+
+  WorkOrderInstallationRow _buildRecurringWorkOrderInstallation({
+    required String tenantId,
+    required String workOrderId,
+    required String installationId,
+  }) {
+    final now = _utcNowIso();
+    return WorkOrderInstallationRow(
+      id: _uuid.v4(),
+      tenantId: tenantId,
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      syncStatus: 'pending',
+      workOrderId: workOrderId,
+      installationId: installationId,
+    );
+  }
+
+  InstallationRow _advanceRecurringInstallation(
+    InstallationRow installation, {
+    required DateTime dueOn,
+  }) {
+    final interval = installation.intervalMonths ?? 0;
+    final nextDate = DateTime.parse(installation.nextServiceDate!);
+    var advanced = _addMonths(nextDate, interval);
+    while (!_isAfterLocalDate(advanced, dueOn)) {
+      advanced = _addMonths(advanced, interval);
+    }
+
+    return installation.copyWith(
+      nextServiceDate: Value(advanced.toUtc().toIso8601String()),
+      updatedAt: _utcNowIso(),
+      version: installation.version + 1,
+      syncStatus: 'pending',
+    );
+  }
+
   Future<void> _createTimeEntry({
     required String tenantId,
     required String workOrderId,
@@ -1442,6 +2113,103 @@ class WorkOrderDao extends DatabaseAccessor<AppDatabase>
         parsed.month == day.month &&
         parsed.day == day.day;
   }
+
+  static bool _isDueRecurringInstallation(
+    InstallationRow installation,
+    DateTime dueOn,
+  ) {
+    final nextServiceDate = DateTime.tryParse(
+      installation.nextServiceDate ?? '',
+    );
+    final interval = installation.intervalMonths;
+    if (nextServiceDate == null || interval == null || interval <= 0) {
+      return false;
+    }
+
+    return !_isAfterLocalDate(nextServiceDate, dueOn);
+  }
+
+  static bool _isAfterLocalDate(DateTime left, DateTime right) {
+    final leftLocal = left.toLocal();
+    final rightLocal = right.toLocal();
+    final leftDate = DateTime(leftLocal.year, leftLocal.month, leftLocal.day);
+    final rightDate = DateTime(
+      rightLocal.year,
+      rightLocal.month,
+      rightLocal.day,
+    );
+    return leftDate.isAfter(rightDate);
+  }
+
+  static int _compareIsoDateTime(String? left, String? right) {
+    final leftDate = left == null ? null : DateTime.tryParse(left);
+    final rightDate = right == null ? null : DateTime.tryParse(right);
+    if (leftDate == null && rightDate == null) {
+      return 0;
+    }
+    if (leftDate == null) {
+      return 1;
+    }
+    if (rightDate == null) {
+      return -1;
+    }
+    return leftDate.compareTo(rightDate);
+  }
+
+  static DateTime _dateWithLocalTime(DateTime value, {required int hour}) {
+    final local = value.toLocal();
+    return DateTime(local.year, local.month, local.day, hour);
+  }
+
+  static DateTime _addMonths(DateTime value, int months) {
+    final local = value.toLocal();
+    final targetMonth = local.month + months;
+    final targetYear = local.year + ((targetMonth - 1) ~/ 12);
+    final normalizedMonth = ((targetMonth - 1) % 12) + 1;
+    final day = local.day.clamp(1, _daysInMonth(targetYear, normalizedMonth));
+    return DateTime(
+      targetYear,
+      normalizedMonth,
+      day,
+      local.hour,
+      local.minute,
+      local.second,
+      local.millisecond,
+      local.microsecond,
+    );
+  }
+
+  static int _daysInMonth(int year, int month) {
+    return DateTime(year, month + 1, 0).day;
+  }
+
+  static String _installationDisplayName(InstallationRow row) {
+    final parts = [row.manufacturer, row.model]
+        .where((part) => part != null && part.trim().isNotEmpty)
+        .cast<String>()
+        .join(' ');
+    return parts.isEmpty ? row.type : parts;
+  }
+
+  static String _recurringOrderNumber(String id, DateTime scheduledStart) {
+    final date = scheduledStart.toUtc();
+    String two(int value) => value.toString().padLeft(2, '0');
+    return 'WO-REC-${date.year}${two(date.month)}${two(date.day)}-'
+        '${id.substring(0, 8).toUpperCase()}';
+  }
+}
+
+final class _RecurringCandidateAccumulator {
+  _RecurringCandidateAccumulator({
+    required this.installation,
+    required this.object,
+    required this.customer,
+  });
+
+  final InstallationRow installation;
+  final CustomerObjectRow object;
+  final CustomerRow customer;
+  bool hasExistingOrderForDueDate = false;
 }
 
 @DriftAccessor(
@@ -2135,6 +2903,33 @@ class MaterialDao extends DatabaseAccessor<AppDatabase>
     String? materialId,
     String? notes,
   }) async {
+    final selectedMaterial = materialId == null
+        ? null
+        : await (select(materials)..where(
+                (table) =>
+                    table.id.equals(materialId) &
+                    table.tenantId.equals(tenantId) &
+                    table.deletedAt.isNull() &
+                    table.isActive.equals(true),
+              ))
+              .getSingleOrNull();
+
+    if (materialId != null && selectedMaterial == null) {
+      throw StateError('Material nicht gefunden.');
+    }
+    if (selectedMaterial?.stockQuantity != null) {
+      final catalogUnit = selectedMaterial!.unit.trim().toLowerCase();
+      final usageUnit = unit.trim().toLowerCase();
+      if (catalogUnit != usageUnit) {
+        throw StateError(
+          'Materialbestand wird in ${selectedMaterial.unit} gefuehrt.',
+        );
+      }
+      if (quantity > selectedMaterial.stockQuantity! + 0.000001) {
+        throw StateError('Nicht genuegend Lagerbestand verfuegbar.');
+      }
+    }
+
     final id = _uuid.v4();
     final now = _utcNowIso();
     final row = WorkOrderMaterialsCompanion.insert(
@@ -2153,6 +2948,22 @@ class MaterialDao extends DatabaseAccessor<AppDatabase>
 
     await transaction(() async {
       await into(workOrderMaterials).insert(row);
+      if (selectedMaterial?.stockQuantity != null) {
+        final nextMaterial = selectedMaterial!.copyWith(
+          stockQuantity: Value(selectedMaterial.stockQuantity! - quantity),
+          updatedAt: now,
+          version: selectedMaterial.version + 1,
+          syncStatus: 'pending',
+        );
+        await update(materials).replace(nextMaterial);
+        await db.enqueueOutbox(
+          tenantId: tenantId,
+          entityType: 'material',
+          entityId: nextMaterial.id,
+          operation: 'update',
+          payload: nextMaterial.toJson(),
+        );
+      }
       await db.enqueueOutbox(
         tenantId: tenantId,
         entityType: 'work_order_material',
@@ -2170,6 +2981,38 @@ class MaterialDao extends DatabaseAccessor<AppDatabase>
         },
       );
     });
+  }
+}
+
+@DriftAccessor(tables: [ReportTemplates])
+class ReportTemplateDao extends DatabaseAccessor<AppDatabase>
+    with _$ReportTemplateDaoMixin {
+  ReportTemplateDao(super.db);
+
+  Future<ReportTemplateRow?> getDefault(String tenantId) {
+    return (select(reportTemplates)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) &
+                table.isDefault.equals(true) &
+                table.deletedAt.isNull(),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.updatedAt)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  Future<List<ReportTemplateRow>> listActive(String tenantId) {
+    return (select(reportTemplates)
+          ..where(
+            (table) =>
+                table.tenantId.equals(tenantId) & table.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.desc(table.isDefault),
+            (table) => OrderingTerm.asc(table.name),
+          ]))
+        .get();
   }
 }
 

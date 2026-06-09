@@ -25,6 +25,7 @@ final class AppEnvironment {
     required this.apiBaseUrl,
     required this.logLevel,
     required this.enforceHttps,
+    this.tenantSlug,
   });
 
   factory AppEnvironment.fromFlavor(
@@ -32,6 +33,7 @@ final class AppEnvironment {
     Uri? apiBaseUrl,
     LogLevel? logLevel,
     bool? enforceHttps,
+    String? tenantSlug,
   }) {
     return switch (flavor) {
       AppFlavor.dev => AppEnvironment(
@@ -39,6 +41,7 @@ final class AppEnvironment {
         apiBaseUrl: apiBaseUrl ?? Uri.parse('https://api.example.invalid'),
         logLevel: logLevel ?? LogLevel.debug,
         enforceHttps: enforceHttps ?? false,
+        tenantSlug: tenantSlug,
       ),
       AppFlavor.staging => AppEnvironment(
         flavor: flavor,
@@ -46,12 +49,14 @@ final class AppEnvironment {
             apiBaseUrl ?? Uri.parse('https://staging-api.example.invalid'),
         logLevel: logLevel ?? LogLevel.info,
         enforceHttps: enforceHttps ?? true,
+        tenantSlug: tenantSlug,
       ),
       AppFlavor.prod => AppEnvironment(
         flavor: flavor,
         apiBaseUrl: apiBaseUrl ?? Uri.parse('https://api.example.invalid'),
         logLevel: logLevel ?? LogLevel.warning,
         enforceHttps: enforceHttps ?? true,
+        tenantSlug: tenantSlug,
       ),
     };
   }
@@ -65,6 +70,7 @@ final class AppEnvironment {
     const rawLogLevel = String.fromEnvironment('LOG_LEVEL');
     const rawDebugLogging = String.fromEnvironment('SYNC_DEBUG_LOGGING');
     const rawEnforceHttps = String.fromEnvironment('ENFORCE_HTTPS');
+    const rawTenantSlug = String.fromEnvironment('TENANT_SLUG');
 
     final flavor = AppFlavor.parse(rawFlavor);
     final defaults = AppEnvironment.fromFlavor(flavor);
@@ -80,6 +86,7 @@ final class AppEnvironment {
         fallback: defaults.logLevel,
       ),
       enforceHttps: _parseBool(rawEnforceHttps) ?? defaults.enforceHttps,
+      tenantSlug: rawTenantSlug.trim().isEmpty ? null : rawTenantSlug.trim(),
     );
   }
 
@@ -87,6 +94,7 @@ final class AppEnvironment {
   final Uri apiBaseUrl;
   final LogLevel logLevel;
   final bool enforceHttps;
+  final String? tenantSlug;
 
   String get label => flavor.label;
   bool get isDevelopment => flavor == AppFlavor.dev;

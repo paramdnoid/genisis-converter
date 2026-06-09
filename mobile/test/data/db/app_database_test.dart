@@ -20,6 +20,7 @@ import 'package:kaminfeger_mobile/domain/entities/material_usage.dart';
 import 'package:kaminfeger_mobile/domain/entities/measurement.dart';
 import 'package:kaminfeger_mobile/domain/entities/photo_attachment.dart';
 import 'package:kaminfeger_mobile/domain/entities/time_entry.dart';
+import 'package:kaminfeger_mobile/domain/entities/work_order_service.dart';
 import 'package:kaminfeger_mobile/domain/enums/checklist_answer_type.dart';
 import 'package:kaminfeger_mobile/domain/enums/work_order_status.dart';
 import 'package:kaminfeger_mobile/domain/use_cases/save_measurement.dart';
@@ -104,8 +105,64 @@ void main() {
       expect(detail.object.city, 'Uster');
       expect(detail.installations, hasLength(1));
       expect(detail.installations.single.displayName, 'Rueegg RIII 45');
+      expect(detail.availableTariffs, hasLength(2));
+      expect(detail.serviceLines, isEmpty);
     },
   );
+
+  test('creates local service lines from object tariff assignments', () async {
+    await database.seedDevelopmentData();
+    final repository = DriftWorkOrderRepository(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+      userId: DevelopmentSeed.technicianUserId,
+    );
+
+    final detail = await repository
+        .watchDetail(DevelopmentSeed.workOrderInspectionId)
+        .first;
+    final tariff = detail!.availableTariffs.firstWhere(
+      (item) => item.id == DevelopmentSeed.objectTariffInspectionId,
+    );
+
+    await repository.addServiceLine(
+      WorkOrderServiceLineDraft(
+        workOrderId: detail.workOrder.id,
+        objectTariffAssignmentId: tariff.id,
+        tariffCatalogItemId: tariff.tariffCatalogItemId,
+        installationId: detail.installations.single.id,
+        code: tariff.code,
+        name: tariff.description,
+        quantity: tariff.suggestedQuantity,
+        unit: tariff.displayUnit,
+        unitPrice: tariff.priceOverride,
+        taxPoints: tariff.taxPoints,
+      ),
+    );
+
+    final updated = await repository
+        .watchDetail(DevelopmentSeed.workOrderInspectionId)
+        .firstWhere((item) => item?.serviceLines.isNotEmpty ?? false);
+    final serviceLine = updated!.serviceLines.single;
+    final pendingOutbox = await database.outboxDao
+        .watchPending(DevelopmentSeed.tenantId)
+        .first;
+    final serviceOutbox = pendingOutbox.singleWhere(
+      (entry) => entry.entityType == 'work_order_service_line',
+    );
+    final payload =
+        jsonDecode(serviceOutbox.payloadJson) as Map<String, Object?>;
+
+    expect(serviceLine.syncStatus, 'pending');
+    expect(serviceLine.objectTariffAssignmentId, tariff.id);
+    expect(serviceLine.name, 'Jahreskontrolle Holzfeuerung');
+    expect(serviceLine.totalPrice, 120);
+    expect(serviceOutbox.operation, 'create');
+    expect(payload['workOrderId'], DevelopmentSeed.workOrderInspectionId);
+    expect(payload['objectTariffAssignmentId'], tariff.id);
+    expect(payload['tariffCatalogItemId'], tariff.tariffCatalogItemId);
+    expect(payload['work_order_id'], isNull);
+  });
 
   test('pause and complete close open time entries with duration', () async {
     await database.seedDevelopmentData();
@@ -324,6 +381,96 @@ void main() {
     expect(times.single.durationMinutes, 30);
     expect(materials.single.name, 'Dichtung');
     expect(materials.single.syncStatus, 'pending');
+  });
+
+  test('deducts tracked catalog stock when material is consumed', () async {
+    await database.seedDevelopmentData();
+    final materialRepository = DriftMaterialRepository(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    );
+
+    final before = await materialRepository.watchCatalog().first;
+    final catalogMaterial = before.singleWhere(
+      (item) => item.id == DevelopmentSeed.materialCleaningId,
+    );
+
+    expect(catalogMaterial.stockQuantity, 6);
+    expect(catalogMaterial.minStockQuantity, 2);
+    expect(catalogMaterial.isLowStock, isFalse);
+
+    await materialRepository.createUsage(
+      WorkOrderMaterialDraft(
+        workOrderId: DevelopmentSeed.workOrderInspectionId,
+        materialId: catalogMaterial.id,
+        name: catalogMaterial.name,
+        quantity: 4,
+        unit: catalogMaterial.unit,
+      ),
+    );
+
+    final after = await materialRepository.watchCatalog().first;
+    final updatedMaterial = after.singleWhere(
+      (item) => item.id == DevelopmentSeed.materialCleaningId,
+    );
+    final usages = await materialRepository
+        .watchForWorkOrder(DevelopmentSeed.workOrderInspectionId)
+        .first;
+    final outbox = await database.outboxDao
+        .watchPending(DevelopmentSeed.tenantId)
+        .first;
+    final materialUpdate = outbox.singleWhere(
+      (entry) => entry.entityType == 'material',
+    );
+    final materialPayload =
+        jsonDecode(materialUpdate.payloadJson) as Map<String, Object?>;
+
+    expect(updatedMaterial.stockQuantity, 2);
+    expect(updatedMaterial.isLowStock, isTrue);
+    expect(usages.single.materialId, DevelopmentSeed.materialCleaningId);
+    expect(
+      outbox.map((entry) => '${entry.entityType}:${entry.operation}'),
+      containsAll(['work_order_material:create', 'material:update']),
+    );
+    expect(materialPayload['stockQuantity'], 2);
+    expect(materialPayload['minStockQuantity'], 2);
+  });
+
+  test('rejects catalog material consumption above available stock', () async {
+    await database.seedDevelopmentData();
+    final materialRepository = DriftMaterialRepository(
+      database: database,
+      tenantId: DevelopmentSeed.tenantId,
+    );
+    final catalogMaterial = (await materialRepository.watchCatalog().first)
+        .singleWhere((item) => item.id == DevelopmentSeed.materialCleaningId);
+
+    await expectLater(
+      materialRepository.createUsage(
+        WorkOrderMaterialDraft(
+          workOrderId: DevelopmentSeed.workOrderInspectionId,
+          materialId: catalogMaterial.id,
+          name: catalogMaterial.name,
+          quantity: 7,
+          unit: catalogMaterial.unit,
+        ),
+      ),
+      throwsA(isA<StateError>()),
+    );
+
+    final after = (await materialRepository.watchCatalog().first).singleWhere(
+      (item) => item.id == DevelopmentSeed.materialCleaningId,
+    );
+    final usages = await materialRepository
+        .watchForWorkOrder(DevelopmentSeed.workOrderInspectionId)
+        .first;
+    final outbox = await database.outboxDao
+        .watchPending(DevelopmentSeed.tenantId)
+        .first;
+
+    expect(after.stockQuantity, 6);
+    expect(usages, isEmpty);
+    expect(outbox, isEmpty);
   });
 
   test('creates photo upload metadata and processes outbox sync', () async {

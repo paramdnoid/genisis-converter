@@ -2,7 +2,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../errors/app_error.dart';
 
-enum AppPermission { camera, photos, location }
+enum AppPermission { camera, photos, location, bluetoothScan, bluetoothConnect }
 
 final class PermissionService {
   const PermissionService();
@@ -24,6 +24,8 @@ final class PermissionService {
       AppPermission.camera => Permission.camera,
       AppPermission.photos => Permission.photos,
       AppPermission.location => Permission.locationWhenInUse,
+      AppPermission.bluetoothScan => Permission.bluetoothScan,
+      AppPermission.bluetoothConnect => Permission.bluetoothConnect,
     };
   }
 }

@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:drift/drift.dart' hide isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kaminfeger_mobile/core/config/app_environment.dart';
 import 'package:kaminfeger_mobile/data/api/api_client.dart';
 import 'package:kaminfeger_mobile/data/db/app_database.dart';
 import 'package:kaminfeger_mobile/data/sync/pull_sync_service.dart';
+import 'package:kaminfeger_mobile/data/sync/work_order_notification_sink.dart';
 
 import '../../helpers/fake_http_client_adapter.dart';
 
@@ -122,6 +124,277 @@ void main() {
   });
 
   test(
+    'does not notify for work orders during initial bootstrap pull',
+    () async {
+      final existingOrder = await database.workOrderDao.getById(
+        DevelopmentSeed.workOrderInspectionId,
+      );
+      final sink = _RecordingNotificationSink();
+      final client = _FakePullSyncClient({
+        'work_orders': PullSyncPage(
+          cursor: 'work-orders-cursor-1',
+          changes: [
+            ServerEntityChange(
+              entityType: 'work_order',
+              data: {
+                ...existingOrder!.toJson(),
+                'id': 'remote-bootstrap-work-order',
+                'orderNumber': 'WO-2026-0098',
+                'title': 'Bootstrap-Auftrag',
+                'version': 1,
+              },
+            ),
+          ],
+        ),
+      });
+      final service = PullSyncService(
+        database: database,
+        client: client,
+        notificationSink: sink,
+      );
+
+      await service.pull(tenantId: DevelopmentSeed.tenantId);
+
+      expect(sink.notifications, isEmpty);
+      expect(
+        await database.workOrderDao.getById('remote-bootstrap-work-order'),
+        isNotNull,
+      );
+    },
+  );
+
+  test('notifies once for new work orders on cursor-based pulls', () async {
+    await (database.update(database.syncStates)..where(
+          (table) =>
+              table.tenantId.equals(DevelopmentSeed.tenantId) &
+              table.entityType.equals('work_orders'),
+        ))
+        .write(
+          SyncStatesCompanion(
+            cursor: const Value('work-orders-cursor-1'),
+            lastSuccessfulSyncAt: Value(
+              DateTime.utc(2026, 6, 8, 7).toIso8601String(),
+            ),
+          ),
+        );
+
+    final existingOrder = await database.workOrderDao.getById(
+      DevelopmentSeed.workOrderInspectionId,
+    );
+    final sink = _RecordingNotificationSink();
+    final client = _FakePullSyncClient({
+      'work_orders': PullSyncPage(
+        cursor: 'work-orders-cursor-2',
+        changes: [
+          ServerEntityChange(
+            entityType: 'work_order',
+            data: {
+              ...existingOrder!.toJson(),
+              'id': 'remote-new-work-order',
+              'orderNumber': 'WO-2026-0099',
+              'title': 'Neue Serverreinigung',
+              'scheduledStart': DateTime.utc(2026, 6, 9, 8).toIso8601String(),
+              'version': 1,
+            },
+          ),
+        ],
+      ),
+    });
+    final service = PullSyncService(
+      database: database,
+      client: client,
+      notificationSink: sink,
+    );
+
+    await service.pull(tenantId: DevelopmentSeed.tenantId);
+
+    final notification = sink.notifications.single;
+    expect(notification.workOrderId, 'remote-new-work-order');
+    expect(notification.orderNumber, 'WO-2026-0099');
+    expect(notification.title, 'Neue Serverreinigung');
+    expect(notification.scheduledStart, DateTime.utc(2026, 6, 9, 8));
+    expect(
+      await database.workOrderDao.getById('remote-new-work-order'),
+      isNotNull,
+    );
+  });
+
+  test('downloads tariff catalog, object tariffs, and service lines', () async {
+    final client = _FakePullSyncClient({
+      'tariff_catalog_items': const PullSyncPage(
+        changes: [
+          ServerEntityChange(
+            entityType: 'tariff_catalog_item',
+            data: {
+              'id': 'tariff-cleaning',
+              'tariffSystem': 'kfd',
+              'code': '00+00',
+              'description': 'Reinigung / Kontrolle von:',
+              'defaultPrice': 0.0,
+              'taxCategory': '1',
+              'taxPoints': 0.0,
+              'isActive': true,
+              'version': 1,
+            },
+          ),
+        ],
+      ),
+      'object_tariff_assignments': const PullSyncPage(
+        changes: [
+          ServerEntityChange(
+            entityType: 'object_tariff_assignment',
+            data: {
+              'id': 'object-tariff-cleaning',
+              'objectId': DevelopmentSeed.objectId,
+              'tariffCatalogItemId': 'tariff-cleaning',
+              'tariffSystem': 'kfd',
+              'code': '00+00',
+              'description': 'Reinigung von:',
+              'position': 1,
+              'defaultQuantity': 1.0,
+              'unit': 'Stk',
+              'priceOverride': 0.0,
+              'billingCode': 'J',
+              'isActive': true,
+              'version': 1,
+            },
+          ),
+        ],
+      ),
+      'work_order_service_lines': const PullSyncPage(
+        changes: [
+          ServerEntityChange(
+            entityType: 'work_order_service_line',
+            data: {
+              'id': 'service-line-cleaning',
+              'workOrderId': DevelopmentSeed.workOrderInspectionId,
+              'objectTariffAssignmentId': 'object-tariff-cleaning',
+              'tariffCatalogItemId': 'tariff-cleaning',
+              'code': '00+00',
+              'name': 'Reinigung von:',
+              'quantity': 1.0,
+              'unit': 'Stk',
+              'unitPrice': 0.0,
+              'totalPrice': 0.0,
+              'status': 'performed',
+              'version': 1,
+            },
+          ),
+        ],
+      ),
+    });
+    final service = PullSyncService(database: database, client: client);
+
+    await service.pull(tenantId: DevelopmentSeed.tenantId);
+
+    final catalog = await (database.select(
+      database.tariffCatalogItems,
+    )..where((table) => table.id.equals('tariff-cleaning'))).getSingle();
+    final assignment = await (database.select(
+      database.objectTariffAssignments,
+    )..where((table) => table.id.equals('object-tariff-cleaning'))).getSingle();
+    final serviceLine = await (database.select(
+      database.workOrderServiceLines,
+    )..where((table) => table.id.equals('service-line-cleaning'))).getSingle();
+
+    expect(catalog.description, 'Reinigung / Kontrolle von:');
+    expect(assignment.objectId, DevelopmentSeed.objectId);
+    expect(assignment.tariffCatalogItemId, 'tariff-cleaning');
+    expect(serviceLine.workOrderId, DevelopmentSeed.workOrderInspectionId);
+    expect(serviceLine.objectTariffAssignmentId, 'object-tariff-cleaning');
+    expect(client.requestedEntityTypes, contains('tariff_catalog_items'));
+    expect(client.requestedEntityTypes, contains('object_tariff_assignments'));
+    expect(client.requestedEntityTypes, contains('work_order_service_lines'));
+  });
+
+  test('downloads raw Genesis legacy records with payload JSON', () async {
+    final client = _FakePullSyncClient({
+      'legacy_import_records': const PullSyncPage(
+        changes: [
+          ServerEntityChange(
+            entityType: 'legacy_import_record',
+            data: {
+              'id': 'legacy-rechzeile-1',
+              'batchId': 'batch-1',
+              'sourceSystem': 'genesis',
+              'sourceFile': 'Daten/KFKRECH.MDB',
+              'sourceTable': 'RechZeilen',
+              'sourceKey': 'row:KFKRECH.RechZeilen:0:abc',
+              'rowHash': 'abc',
+              'rowIndex': 0,
+              'recordType': 'row',
+              'mappedEntityType': null,
+              'mappedEntityId': null,
+              'payloadJson':
+                  '{"OPRechNr":123,"PossBez":"Amtliche Holzfeuerungskontrolle"}',
+              'version': 1,
+            },
+          ),
+        ],
+      ),
+    });
+    final service = PullSyncService(database: database, client: client);
+
+    await service.pull(tenantId: DevelopmentSeed.tenantId);
+
+    final legacyRecord = await (database.select(
+      database.legacyImportRecords,
+    )..where((table) => table.id.equals('legacy-rechzeile-1'))).getSingle();
+
+    expect(legacyRecord.sourceFile, 'Daten/KFKRECH.MDB');
+    expect(legacyRecord.sourceTable, 'RechZeilen');
+    expect(legacyRecord.payloadJson, contains('Holzfeuerungskontrolle'));
+    expect(client.requestedEntityTypes, contains('legacy_import_records'));
+  });
+
+  test(
+    'downloads tenant report templates for offline PDF generation',
+    () async {
+      final client = _FakePullSyncClient({
+        'report_templates': const PullSyncPage(
+          changes: [
+            ServerEntityChange(
+              entityType: 'report_template',
+              data: {
+                'id': 'remote-report-template',
+                'name': 'Mandant Vorlage',
+                'reportType': 'work_order',
+                'titlePrefix': 'Serviceprotokoll',
+                'locale': 'de',
+                'primaryColor': '#0f766e',
+                'footerText': 'Mandantenfooter',
+                'includeCustomer': true,
+                'includeInstallations': true,
+                'includeMeasurements': false,
+                'includeDefects': true,
+                'includeMaterials': true,
+                'includeTimeEntries': true,
+                'includePhotos': false,
+                'includeSignature': true,
+                'isDefault': true,
+                'version': 1,
+              },
+            ),
+          ],
+        ),
+      });
+      final service = PullSyncService(database: database, client: client);
+
+      await service.pull(tenantId: DevelopmentSeed.tenantId);
+
+      final template = await database.reportTemplateDao.getDefault(
+        DevelopmentSeed.tenantId,
+      );
+
+      expect(template?.id, 'remote-report-template');
+      expect(template?.titlePrefix, 'Serviceprotokoll');
+      expect(template?.includeMeasurements, isFalse);
+      expect(template?.includePhotos, isFalse);
+      expect(client.requestedEntityTypes, contains('report_templates'));
+    },
+  );
+
+  test(
     'marks conflict instead of overwriting unsynced local changes',
     () async {
       await database.customerDao.updateNotesLocal(
@@ -168,6 +441,7 @@ void main() {
   test('DioPullSyncClient requests cursor and parses server payload', () async {
     final adapter = FakeHttpClientAdapter((options) {
       expect(options.path, '/sync/pull');
+      expect(options.headers['Authorization'], 'Bearer sync-token');
       expect(options.queryParameters['tenantId'], DevelopmentSeed.tenantId);
       expect(options.queryParameters['entityType'], 'customers');
       expect(options.queryParameters['cursor'], 'cursor-1');
@@ -195,6 +469,7 @@ void main() {
           apiBaseUrl: Uri.parse('https://sync.test'),
         ),
         dio: dio,
+        accessTokenProvider: () => 'sync-token',
       ),
     );
 
@@ -226,5 +501,14 @@ final class _FakePullSyncClient implements PullSyncClient {
     requestedEntityTypes.add(entityType);
     return _pages[entityType] ??
         PullSyncPage(changes: const [], cursor: cursor);
+  }
+}
+
+final class _RecordingNotificationSink implements WorkOrderNotificationSink {
+  final notifications = <NewWorkOrderNotification>[];
+
+  @override
+  Future<void> notifyNewWorkOrder(NewWorkOrderNotification notification) async {
+    notifications.add(notification);
   }
 }

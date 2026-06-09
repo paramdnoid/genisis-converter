@@ -52,6 +52,8 @@ MaterialItem _mapCatalogRow(MaterialRow row) {
     name: row.name,
     unit: row.unit,
     defaultPrice: row.defaultPrice,
+    stockQuantity: row.stockQuantity,
+    minStockQuantity: row.minStockQuantity,
     isActive: row.isActive,
   );
 }

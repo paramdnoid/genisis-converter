@@ -16,9 +16,16 @@ The backend lives in `backend/` and uses NestJS with Prisma/PostgreSQL.
 Implemented backend layers:
 
 - `AuthModule` for login, refresh, logout, and `/me`.
+- `TenancyModule` for SaaS tenant signup, current-tenant profile reads, and
+  tenant-admin profile updates.
 - Global JWT guard plus tenant middleware for server-side tenant isolation.
+- Global permission guard for route-level RBAC across generated CRUD and
+  specialized backend modules.
 - `EntitiesModule` for tenant-scoped REST CRUD routes across the domain model.
 - `ReportsModule` for report metadata generation and report CRUD.
+- Tenant-scoped `report_templates` for configurable mobile PDF report layouts,
+  distributed through the same CRUD and sync infrastructure as other domain
+  entities.
 - `FilesModule` for upload init/PUT/complete metadata flow.
 - `SyncModule` for cursor pull, idempotent push, conflict detection, soft deletes, and audit logging.
 - `PrismaModule` for database access and lifecycle management.

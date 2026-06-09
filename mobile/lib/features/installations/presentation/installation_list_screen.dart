@@ -28,7 +28,16 @@ class _InstallationListScreenState
     final installations = ref.watch(installationListProvider(_query));
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.installationsTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.installationsTitle),
+        actions: [
+          IconButton(
+            tooltip: context.l10n.installationScanTooltip,
+            onPressed: () => context.push(AppRoutes.installationScan),
+            icon: const Icon(Icons.qr_code_scanner_outlined),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(

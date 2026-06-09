@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_spacing.dart';
@@ -12,8 +13,10 @@ import '../../../core/widgets/loading_skeleton.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../domain/entities/installation.dart';
 import '../../../domain/entities/work_order_detail.dart';
+import '../../../domain/entities/work_order_service.dart';
 import '../../../domain/enums/work_order_status.dart';
 import '../../../l10n/app_localizations_x.dart';
+import '../application/work_order_calendar_share_service.dart';
 import '../application/work_order_providers.dart';
 
 class WorkOrderDetailScreen extends ConsumerWidget {
@@ -76,6 +79,8 @@ class _DetailContent extends ConsumerWidget {
         _ObjectCard(detail: detail),
         const SizedBox(height: AppSpacing.lg),
         _InstallationList(installations: detail.installations),
+        const SizedBox(height: AppSpacing.lg),
+        _ServiceLineSection(detail: detail),
         const SizedBox(height: AppSpacing.lg),
         _WorkflowShortcuts(orderId: detail.workOrder.id),
       ],
@@ -190,6 +195,13 @@ class _ActionGrid extends ConsumerWidget {
               onPressed: detail.hasPhone
                   ? () => _callCustomer(context, detail)
                   : null,
+            ),
+            _ActionButton(
+              icon: Icons.event_available_outlined,
+              label: context.l10n.calendarShareAction,
+              onPressed: order.scheduledStart == null
+                  ? null
+                  : () => _shareCalendar(context, detail),
             ),
             _ActionButton(
               icon: Icons.play_arrow,
@@ -470,6 +482,154 @@ class _WorkflowShortcuts extends StatelessWidget {
   }
 }
 
+class _ServiceLineSection extends ConsumerWidget {
+  const _ServiceLineSection({required this.detail});
+
+  final WorkOrderDetail detail;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _SectionCard(
+      title: 'Leistungen',
+      icon: Icons.playlist_add_check_outlined,
+      children: [
+        if (detail.serviceLines.isEmpty)
+          Text(
+            'Noch keine Leistungen erfasst.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        else
+          ...detail.serviceLines.map(
+            (line) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _ServiceLineRow(line: line),
+            ),
+          ),
+        const Divider(height: AppSpacing.lg * 2),
+        Text(
+          'Objekt-Tarife aus Genesis',
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        if (detail.availableTariffs.isEmpty)
+          const Text('Keine objektbezogenen Tarife synchronisiert.')
+        else
+          ...detail.availableTariffs.map(
+            (tariff) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: _TariffAssignmentButton(
+                tariff: tariff,
+                onPressed: () =>
+                    _addServiceLineFromTariff(context, ref, detail, tariff),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ServiceLineRow extends StatelessWidget {
+  const _ServiceLineRow({required this.line});
+
+  final WorkOrderServiceLine line;
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = [
+      if (line.code?.trim().isNotEmpty ?? false) line.code!.trim(),
+      '${_formatNumber(line.quantity)} ${line.unit}',
+      if (line.totalPrice != null) _formatCurrency(line.totalPrice!),
+    ].join(' · ');
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(Icons.task_alt_outlined, size: 20),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                line.name,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(meta),
+            ],
+          ),
+        ),
+        if (line.isDirty) ...[
+          const SizedBox(width: AppSpacing.sm),
+          const StatusBadge(
+            label: 'Lokal',
+            icon: Icons.cloud_upload_outlined,
+            tone: StatusBadgeTone.warning,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _TariffAssignmentButton extends StatelessWidget {
+  const _TariffAssignmentButton({
+    required this.tariff,
+    required this.onPressed,
+  });
+
+  final ObjectTariffAssignment tariff;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = [
+      tariff.tariffSystem.toUpperCase(),
+      tariff.displayCode,
+      '${_formatNumber(tariff.suggestedQuantity)} ${tariff.displayUnit}',
+      if (tariff.priceOverride != null) _formatCurrency(tariff.priceOverride!),
+    ].join(' · ');
+
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(AppSpacing.md),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.add_task_outlined),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  tariff.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(meta, maxLines: 2, overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
     required this.title,
@@ -604,6 +764,64 @@ Future<void> _callCustomer(BuildContext context, WorkOrderDetail detail) async {
   await _launchExternal(context, uri, context.l10n.callOpenError);
 }
 
+Future<void> _shareCalendar(
+  BuildContext context,
+  WorkOrderDetail detail,
+) async {
+  try {
+    final result = await WorkOrderCalendarShareService().share(detail);
+    if (!context.mounted) {
+      return;
+    }
+
+    _showMessage(
+      context,
+      result.status == ShareResultStatus.dismissed
+          ? context.l10n.calendarShareCancelledMessage
+          : context.l10n.calendarShareSuccessMessage,
+    );
+  } catch (error) {
+    if (context.mounted) {
+      _showMessage(context, context.l10n.calendarShareErrorMessage('$error'));
+    }
+  }
+}
+
+Future<void> _addServiceLineFromTariff(
+  BuildContext context,
+  WidgetRef ref,
+  WorkOrderDetail detail,
+  ObjectTariffAssignment tariff,
+) async {
+  var saved = false;
+  final installationId = detail.installations.length == 1
+      ? detail.installations.single.id
+      : null;
+
+  await _runAction(context, () async {
+    final useCase = await ref.read(addWorkOrderServiceLineProvider.future);
+    await useCase(
+      WorkOrderServiceLineDraft(
+        workOrderId: detail.workOrder.id,
+        objectTariffAssignmentId: tariff.id,
+        tariffCatalogItemId: tariff.tariffCatalogItemId,
+        installationId: installationId,
+        code: tariff.code,
+        name: tariff.description,
+        quantity: tariff.suggestedQuantity,
+        unit: tariff.displayUnit,
+        unitPrice: tariff.priceOverride,
+        taxPoints: tariff.taxPoints,
+      ),
+    );
+    saved = true;
+  });
+
+  if (saved && context.mounted) {
+    _showMessage(context, 'Leistung lokal gespeichert.');
+  }
+}
+
 Future<void> _launchExternal(
   BuildContext context,
   Uri uri,
@@ -634,3 +852,12 @@ String _formattedTime(BuildContext context, DateTime? value) {
 
   return context.formatShortTime(value);
 }
+
+String _formatNumber(double value) {
+  if (value == value.roundToDouble()) {
+    return value.toStringAsFixed(0);
+  }
+  return value.toStringAsFixed(2);
+}
+
+String _formatCurrency(double value) => 'CHF ${value.toStringAsFixed(2)}';

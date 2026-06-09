@@ -2,6 +2,7 @@ import { Body, Controller, Param, Post, Put, Req } from "@nestjs/common";
 import { Request } from "express";
 
 import { CurrentUser } from "../common/decorators/current-user.decorator";
+import { RequirePermissions } from "../common/decorators/require-permissions.decorator";
 import { TenantId } from "../common/decorators/tenant-id.decorator";
 import { RequestUser } from "../common/types/request-user";
 import { FilesService } from "./files.service";
@@ -10,11 +11,13 @@ import { FilesService } from "./files.service";
 export class FilesController {
   constructor(private readonly files: FilesService) {}
 
+  @RequirePermissions("files:write")
   @Post("init")
   init(@TenantId() tenantId: string, @Body() body: Record<string, unknown>) {
     return this.files.init(tenantId, body);
   }
 
+  @RequirePermissions("files:write")
   @Put(":id")
   put(
     @TenantId() tenantId: string,
@@ -28,6 +31,7 @@ export class FilesController {
     );
   }
 
+  @RequirePermissions("files:write")
   @Post("complete")
   complete(
     @TenantId() tenantId: string,

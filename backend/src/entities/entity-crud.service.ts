@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Optional } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
+import { PushService } from "../push/push.service";
 import { ENTITY_DEFINITIONS, EntityDefinition, EntityKey } from "./entity-map";
 
 type PrismaDelegate = {
@@ -38,7 +39,10 @@ const RESERVED_FIELDS = new Set([
 
 @Injectable()
 export class EntityCrudService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly push?: PushService,
+  ) {}
 
   async list(entity: EntityKey, tenantId: string, query: ListQuery = {}) {
     const definition = ENTITY_DEFINITIONS[entity];
@@ -80,7 +84,9 @@ export class EntityCrudService {
       lastSyncedAt: new Date(),
     };
 
-    return this.delegate(definition).create({ data });
+    const record = await this.delegate(definition).create({ data });
+    this.queueWorkOrderNotification(entity, tenantId, record);
+    return record;
   }
 
   async update(
@@ -95,7 +101,7 @@ export class EntityCrudService {
       throw new NotFoundException(`${entity} record not found.`);
     }
 
-    return this.delegate(definition).update({
+    const record = await this.delegate(definition).update({
       where: { id },
       data: {
         ...this.cleanWritePayload(body, { allowId: false }),
@@ -104,6 +110,8 @@ export class EntityCrudService {
         lastSyncedAt: new Date(),
       },
     });
+    this.queueWorkOrderNotification(entity, tenantId, record, existing);
+    return record;
   }
 
   async softDelete(entity: EntityKey, tenantId: string, id: string) {
@@ -227,6 +235,31 @@ export class EntityCrudService {
     if (!Number.isFinite(parsed)) {
       return 500;
     }
-    return Math.max(1, Math.min(1000, parsed));
+    return Math.max(1, Math.min(100000, parsed));
+  }
+
+  private queueWorkOrderNotification(
+    entity: EntityKey,
+    tenantId: string,
+    record: Record<string, unknown>,
+    previous?: Record<string, unknown> | null,
+  ) {
+    if (entity !== "work_orders" || !this.push) {
+      return;
+    }
+
+    const workOrderId = record.id?.toString();
+    const assignedUserId = record.assignedUserId?.toString();
+    const previousAssignedUserId = previous?.assignedUserId?.toString() ?? null;
+    if (!workOrderId || !assignedUserId) {
+      return;
+    }
+    if (previous && previousAssignedUserId === assignedUserId) {
+      return;
+    }
+
+    void this.push.queueNewWorkOrderNotification(tenantId, workOrderId, {
+      previousAssignedUserId,
+    });
   }
 }

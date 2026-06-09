@@ -4,10 +4,17 @@ import '../../core/errors/app_error.dart';
 import 'api_client.dart';
 
 final class AuthTokens {
-  const AuthTokens({required this.accessToken, required this.refreshToken});
+  const AuthTokens({
+    required this.accessToken,
+    required this.refreshToken,
+    this.tenantId,
+    this.userId,
+  });
 
   final String accessToken;
   final String refreshToken;
+  final String? tenantId;
+  final String? userId;
 }
 
 final class AuthApi {
@@ -18,6 +25,8 @@ final class AuthApi {
   Future<AuthTokens> login({
     required String email,
     required String password,
+    String? tenantSlug,
+    String? tenantId,
   }) async {
     if (email.trim().isEmpty || password.isEmpty) {
       throw ArgumentError('E-Mail und Passwort sind erforderlich.');
@@ -33,7 +42,14 @@ final class AuthApi {
     try {
       final response = await _client.dio.post<Map<String, Object?>>(
         '/auth/login',
-        data: {'email': email, 'password': password},
+        data: {
+          'email': email,
+          'password': password,
+          if (tenantSlug != null && tenantSlug.trim().isNotEmpty)
+            'tenantSlug': tenantSlug.trim(),
+          if (tenantId != null && tenantId.trim().isNotEmpty)
+            'tenantId': tenantId.trim(),
+        },
       );
       return _parseTokens(response.data ?? const {});
     } on DioException catch (error, stackTrace) {
@@ -72,9 +88,15 @@ final class AuthApi {
     Map<String, Object?> data, {
     String? fallbackRefreshToken,
   }) {
-    final accessToken = data['accessToken']?.toString() ?? '';
+    final nestedTokens = data['tokens'];
+    final tokenData = nestedTokens is Map
+        ? Map<String, Object?>.from(nestedTokens)
+        : data;
+    final accessToken = tokenData['accessToken']?.toString() ?? '';
     final refreshToken =
-        data['refreshToken']?.toString() ?? fallbackRefreshToken ?? '';
+        tokenData['refreshToken']?.toString() ?? fallbackRefreshToken ?? '';
+    final rawUser = data['user'];
+    final user = rawUser is Map ? Map<String, Object?>.from(rawUser) : null;
 
     if (accessToken.isEmpty || refreshToken.isEmpty) {
       throw const AuthError(
@@ -82,6 +104,11 @@ final class AuthApi {
       );
     }
 
-    return AuthTokens(accessToken: accessToken, refreshToken: refreshToken);
+    return AuthTokens(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      tenantId: user?['tenantId']?.toString(),
+      userId: user?['id']?.toString(),
+    );
   }
 }

@@ -3,6 +3,7 @@ import '../../domain/entities/customer_object.dart';
 import '../../domain/entities/installation.dart';
 import '../../domain/entities/photo_attachment.dart';
 import '../../domain/entities/work_order.dart';
+import '../../domain/entities/work_order_service.dart';
 import '../../domain/enums/work_order_status.dart';
 import '../db/app_database.dart';
 
@@ -100,6 +101,53 @@ PhotoAttachment mapPhotoRow(PhotoRow row) {
     caption: row.caption,
     takenAt: DateTime.parse(row.takenAt),
     uploadStatus: row.uploadStatus,
+    version: row.version,
+    syncStatus: row.syncStatus,
+  );
+}
+
+ObjectTariffAssignment mapObjectTariffAssignmentRow(
+  ObjectTariffAssignmentRow row,
+) {
+  return ObjectTariffAssignment(
+    id: row.id,
+    tenantId: row.tenantId,
+    objectId: row.objectId,
+    tariffCatalogItemId: row.tariffCatalogItemId,
+    tariffSystem: row.tariffSystem,
+    code: row.code,
+    description: row.description,
+    position: row.position,
+    defaultQuantity: row.defaultQuantity,
+    unit: row.unit,
+    priceOverride: row.priceOverride,
+    taxPoints: row.taxPoints,
+    billingCode: row.billingCode,
+    intervalCode: row.intervalCode,
+    notes: row.notes,
+    isActive: row.isActive,
+    version: row.version,
+    syncStatus: row.syncStatus,
+  );
+}
+
+WorkOrderServiceLine mapWorkOrderServiceLineRow(WorkOrderServiceLineRow row) {
+  return WorkOrderServiceLine(
+    id: row.id,
+    tenantId: row.tenantId,
+    workOrderId: row.workOrderId,
+    objectTariffAssignmentId: row.objectTariffAssignmentId,
+    tariffCatalogItemId: row.tariffCatalogItemId,
+    installationId: row.installationId,
+    code: row.code,
+    name: row.name,
+    quantity: row.quantity,
+    unit: row.unit,
+    unitPrice: row.unitPrice,
+    totalPrice: row.totalPrice,
+    taxPoints: row.taxPoints,
+    status: row.status,
+    notes: row.notes,
     version: row.version,
     syncStatus: row.syncStatus,
   );

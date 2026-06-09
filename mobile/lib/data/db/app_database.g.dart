@@ -13275,6 +13275,28 @@ class $MaterialsTable extends Materials
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _stockQuantityMeta = const VerificationMeta(
+    'stockQuantity',
+  );
+  @override
+  late final GeneratedColumn<double> stockQuantity = GeneratedColumn<double>(
+    'stock_quantity',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _minStockQuantityMeta = const VerificationMeta(
+    'minStockQuantity',
+  );
+  @override
+  late final GeneratedColumn<double> minStockQuantity = GeneratedColumn<double>(
+    'min_stock_quantity',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -13304,6 +13326,8 @@ class $MaterialsTable extends Materials
     name,
     unit,
     defaultPrice,
+    stockQuantity,
+    minStockQuantity,
     isActive,
   ];
   @override
@@ -13401,6 +13425,24 @@ class $MaterialsTable extends Materials
         ),
       );
     }
+    if (data.containsKey('stock_quantity')) {
+      context.handle(
+        _stockQuantityMeta,
+        stockQuantity.isAcceptableOrUnknown(
+          data['stock_quantity']!,
+          _stockQuantityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('min_stock_quantity')) {
+      context.handle(
+        _minStockQuantityMeta,
+        minStockQuantity.isAcceptableOrUnknown(
+          data['min_stock_quantity']!,
+          _minStockQuantityMeta,
+        ),
+      );
+    }
     if (data.containsKey('is_active')) {
       context.handle(
         _isActiveMeta,
@@ -13464,6 +13506,14 @@ class $MaterialsTable extends Materials
         DriftSqlType.double,
         data['${effectivePrefix}default_price'],
       ),
+      stockQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}stock_quantity'],
+      ),
+      minStockQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}min_stock_quantity'],
+      ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -13490,6 +13540,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
   final String name;
   final String unit;
   final double? defaultPrice;
+  final double? stockQuantity;
+  final double? minStockQuantity;
   final bool isActive;
   const MaterialRow({
     required this.id,
@@ -13504,6 +13556,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
     required this.name,
     required this.unit,
     this.defaultPrice,
+    this.stockQuantity,
+    this.minStockQuantity,
     required this.isActive,
   });
   @override
@@ -13529,6 +13583,12 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
     if (!nullToAbsent || defaultPrice != null) {
       map['default_price'] = Variable<double>(defaultPrice);
     }
+    if (!nullToAbsent || stockQuantity != null) {
+      map['stock_quantity'] = Variable<double>(stockQuantity);
+    }
+    if (!nullToAbsent || minStockQuantity != null) {
+      map['min_stock_quantity'] = Variable<double>(minStockQuantity);
+    }
     map['is_active'] = Variable<bool>(isActive);
     return map;
   }
@@ -13553,6 +13613,12 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
       defaultPrice: defaultPrice == null && nullToAbsent
           ? const Value.absent()
           : Value(defaultPrice),
+      stockQuantity: stockQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stockQuantity),
+      minStockQuantity: minStockQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minStockQuantity),
       isActive: Value(isActive),
     );
   }
@@ -13575,6 +13641,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
       name: serializer.fromJson<String>(json['name']),
       unit: serializer.fromJson<String>(json['unit']),
       defaultPrice: serializer.fromJson<double?>(json['defaultPrice']),
+      stockQuantity: serializer.fromJson<double?>(json['stockQuantity']),
+      minStockQuantity: serializer.fromJson<double?>(json['minStockQuantity']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
@@ -13594,6 +13662,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
       'name': serializer.toJson<String>(name),
       'unit': serializer.toJson<String>(unit),
       'defaultPrice': serializer.toJson<double?>(defaultPrice),
+      'stockQuantity': serializer.toJson<double?>(stockQuantity),
+      'minStockQuantity': serializer.toJson<double?>(minStockQuantity),
       'isActive': serializer.toJson<bool>(isActive),
     };
   }
@@ -13611,6 +13681,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
     String? name,
     String? unit,
     Value<double?> defaultPrice = const Value.absent(),
+    Value<double?> stockQuantity = const Value.absent(),
+    Value<double?> minStockQuantity = const Value.absent(),
     bool? isActive,
   }) => MaterialRow(
     id: id ?? this.id,
@@ -13625,6 +13697,12 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
     name: name ?? this.name,
     unit: unit ?? this.unit,
     defaultPrice: defaultPrice.present ? defaultPrice.value : this.defaultPrice,
+    stockQuantity: stockQuantity.present
+        ? stockQuantity.value
+        : this.stockQuantity,
+    minStockQuantity: minStockQuantity.present
+        ? minStockQuantity.value
+        : this.minStockQuantity,
     isActive: isActive ?? this.isActive,
   );
   MaterialRow copyWithCompanion(MaterialsCompanion data) {
@@ -13647,6 +13725,12 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
       defaultPrice: data.defaultPrice.present
           ? data.defaultPrice.value
           : this.defaultPrice,
+      stockQuantity: data.stockQuantity.present
+          ? data.stockQuantity.value
+          : this.stockQuantity,
+      minStockQuantity: data.minStockQuantity.present
+          ? data.minStockQuantity.value
+          : this.minStockQuantity,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
   }
@@ -13666,6 +13750,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
           ..write('name: $name, ')
           ..write('unit: $unit, ')
           ..write('defaultPrice: $defaultPrice, ')
+          ..write('stockQuantity: $stockQuantity, ')
+          ..write('minStockQuantity: $minStockQuantity, ')
           ..write('isActive: $isActive')
           ..write(')'))
         .toString();
@@ -13685,6 +13771,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
     name,
     unit,
     defaultPrice,
+    stockQuantity,
+    minStockQuantity,
     isActive,
   );
   @override
@@ -13703,6 +13791,8 @@ class MaterialRow extends DataClass implements Insertable<MaterialRow> {
           other.name == this.name &&
           other.unit == this.unit &&
           other.defaultPrice == this.defaultPrice &&
+          other.stockQuantity == this.stockQuantity &&
+          other.minStockQuantity == this.minStockQuantity &&
           other.isActive == this.isActive);
 }
 
@@ -13719,6 +13809,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
   final Value<String> name;
   final Value<String> unit;
   final Value<double?> defaultPrice;
+  final Value<double?> stockQuantity;
+  final Value<double?> minStockQuantity;
   final Value<bool> isActive;
   final Value<int> rowid;
   const MaterialsCompanion({
@@ -13734,6 +13826,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
     this.name = const Value.absent(),
     this.unit = const Value.absent(),
     this.defaultPrice = const Value.absent(),
+    this.stockQuantity = const Value.absent(),
+    this.minStockQuantity = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -13750,6 +13844,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
     required String name,
     required String unit,
     this.defaultPrice = const Value.absent(),
+    this.stockQuantity = const Value.absent(),
+    this.minStockQuantity = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -13769,6 +13865,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
     Expression<String>? name,
     Expression<String>? unit,
     Expression<double>? defaultPrice,
+    Expression<double>? stockQuantity,
+    Expression<double>? minStockQuantity,
     Expression<bool>? isActive,
     Expression<int>? rowid,
   }) {
@@ -13785,6 +13883,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
       if (name != null) 'name': name,
       if (unit != null) 'unit': unit,
       if (defaultPrice != null) 'default_price': defaultPrice,
+      if (stockQuantity != null) 'stock_quantity': stockQuantity,
+      if (minStockQuantity != null) 'min_stock_quantity': minStockQuantity,
       if (isActive != null) 'is_active': isActive,
       if (rowid != null) 'rowid': rowid,
     });
@@ -13803,6 +13903,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
     Value<String>? name,
     Value<String>? unit,
     Value<double?>? defaultPrice,
+    Value<double?>? stockQuantity,
+    Value<double?>? minStockQuantity,
     Value<bool>? isActive,
     Value<int>? rowid,
   }) {
@@ -13819,6 +13921,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
       name: name ?? this.name,
       unit: unit ?? this.unit,
       defaultPrice: defaultPrice ?? this.defaultPrice,
+      stockQuantity: stockQuantity ?? this.stockQuantity,
+      minStockQuantity: minStockQuantity ?? this.minStockQuantity,
       isActive: isActive ?? this.isActive,
       rowid: rowid ?? this.rowid,
     );
@@ -13863,6 +13967,12 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
     if (defaultPrice.present) {
       map['default_price'] = Variable<double>(defaultPrice.value);
     }
+    if (stockQuantity.present) {
+      map['stock_quantity'] = Variable<double>(stockQuantity.value);
+    }
+    if (minStockQuantity.present) {
+      map['min_stock_quantity'] = Variable<double>(minStockQuantity.value);
+    }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
@@ -13887,6 +13997,8 @@ class MaterialsCompanion extends UpdateCompanion<MaterialRow> {
           ..write('name: $name, ')
           ..write('unit: $unit, ')
           ..write('defaultPrice: $defaultPrice, ')
+          ..write('stockQuantity: $stockQuantity, ')
+          ..write('minStockQuantity: $minStockQuantity, ')
           ..write('isActive: $isActive, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -14694,6 +14806,5808 @@ class WorkOrderMaterialsCompanion
           ..write('quantity: $quantity, ')
           ..write('unit: $unit, ')
           ..write('notes: $notes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TariffCatalogItemsTable extends TariffCatalogItems
+    with TableInfo<$TariffCatalogItemsTable, TariffCatalogItemRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TariffCatalogItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<String> tenantId = GeneratedColumn<String>(
+    'tenant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<String> deletedAt = GeneratedColumn<String>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('synced'),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<String> lastSyncedAt = GeneratedColumn<String>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tariffSystemMeta = const VerificationMeta(
+    'tariffSystem',
+  );
+  @override
+  late final GeneratedColumn<String> tariffSystem = GeneratedColumn<String>(
+    'tariff_system',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _defaultPriceMeta = const VerificationMeta(
+    'defaultPrice',
+  );
+  @override
+  late final GeneratedColumn<double> defaultPrice = GeneratedColumn<double>(
+    'default_price',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _taxCategoryMeta = const VerificationMeta(
+    'taxCategory',
+  );
+  @override
+  late final GeneratedColumn<String> taxCategory = GeneratedColumn<String>(
+    'tax_category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _taxPointsMeta = const VerificationMeta(
+    'taxPoints',
+  );
+  @override
+  late final GeneratedColumn<double> taxPoints = GeneratedColumn<double>(
+    'tax_points',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    tariffSystem,
+    code,
+    description,
+    defaultPrice,
+    taxCategory,
+    taxPoints,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tariff_catalog_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TariffCatalogItemRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tenantIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tariff_system')) {
+      context.handle(
+        _tariffSystemMeta,
+        tariffSystem.isAcceptableOrUnknown(
+          data['tariff_system']!,
+          _tariffSystemMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_tariffSystemMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('default_price')) {
+      context.handle(
+        _defaultPriceMeta,
+        defaultPrice.isAcceptableOrUnknown(
+          data['default_price']!,
+          _defaultPriceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tax_category')) {
+      context.handle(
+        _taxCategoryMeta,
+        taxCategory.isAcceptableOrUnknown(
+          data['tax_category']!,
+          _taxCategoryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tax_points')) {
+      context.handle(
+        _taxPointsMeta,
+        taxPoints.isAcceptableOrUnknown(data['tax_points']!, _taxPointsMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TariffCatalogItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TariffCatalogItemRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tenant_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      tariffSystem: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tariff_system'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      defaultPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}default_price'],
+      ),
+      taxCategory: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tax_category'],
+      ),
+      taxPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}tax_points'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $TariffCatalogItemsTable createAlias(String alias) {
+    return $TariffCatalogItemsTable(attachedDatabase, alias);
+  }
+}
+
+class TariffCatalogItemRow extends DataClass
+    implements Insertable<TariffCatalogItemRow> {
+  final String id;
+  final String tenantId;
+  final String createdAt;
+  final String updatedAt;
+  final String? deletedAt;
+  final int version;
+  final String syncStatus;
+  final String? lastSyncedAt;
+  final String tariffSystem;
+  final String code;
+  final String description;
+  final double? defaultPrice;
+  final String? taxCategory;
+  final double? taxPoints;
+  final bool isActive;
+  const TariffCatalogItemRow({
+    required this.id,
+    required this.tenantId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.version,
+    required this.syncStatus,
+    this.lastSyncedAt,
+    required this.tariffSystem,
+    required this.code,
+    required this.description,
+    this.defaultPrice,
+    this.taxCategory,
+    this.taxPoints,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['tenant_id'] = Variable<String>(tenantId);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<String>(deletedAt);
+    }
+    map['version'] = Variable<int>(version);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt);
+    }
+    map['tariff_system'] = Variable<String>(tariffSystem);
+    map['code'] = Variable<String>(code);
+    map['description'] = Variable<String>(description);
+    if (!nullToAbsent || defaultPrice != null) {
+      map['default_price'] = Variable<double>(defaultPrice);
+    }
+    if (!nullToAbsent || taxCategory != null) {
+      map['tax_category'] = Variable<String>(taxCategory);
+    }
+    if (!nullToAbsent || taxPoints != null) {
+      map['tax_points'] = Variable<double>(taxPoints);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  TariffCatalogItemsCompanion toCompanion(bool nullToAbsent) {
+    return TariffCatalogItemsCompanion(
+      id: Value(id),
+      tenantId: Value(tenantId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      version: Value(version),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      tariffSystem: Value(tariffSystem),
+      code: Value(code),
+      description: Value(description),
+      defaultPrice: defaultPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultPrice),
+      taxCategory: taxCategory == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxCategory),
+      taxPoints: taxPoints == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxPoints),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory TariffCatalogItemRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TariffCatalogItemRow(
+      id: serializer.fromJson<String>(json['id']),
+      tenantId: serializer.fromJson<String>(json['tenantId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      deletedAt: serializer.fromJson<String?>(json['deletedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<String?>(json['lastSyncedAt']),
+      tariffSystem: serializer.fromJson<String>(json['tariffSystem']),
+      code: serializer.fromJson<String>(json['code']),
+      description: serializer.fromJson<String>(json['description']),
+      defaultPrice: serializer.fromJson<double?>(json['defaultPrice']),
+      taxCategory: serializer.fromJson<String?>(json['taxCategory']),
+      taxPoints: serializer.fromJson<double?>(json['taxPoints']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'tenantId': serializer.toJson<String>(tenantId),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'deletedAt': serializer.toJson<String?>(deletedAt),
+      'version': serializer.toJson<int>(version),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<String?>(lastSyncedAt),
+      'tariffSystem': serializer.toJson<String>(tariffSystem),
+      'code': serializer.toJson<String>(code),
+      'description': serializer.toJson<String>(description),
+      'defaultPrice': serializer.toJson<double?>(defaultPrice),
+      'taxCategory': serializer.toJson<String?>(taxCategory),
+      'taxPoints': serializer.toJson<double?>(taxPoints),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  TariffCatalogItemRow copyWith({
+    String? id,
+    String? tenantId,
+    String? createdAt,
+    String? updatedAt,
+    Value<String?> deletedAt = const Value.absent(),
+    int? version,
+    String? syncStatus,
+    Value<String?> lastSyncedAt = const Value.absent(),
+    String? tariffSystem,
+    String? code,
+    String? description,
+    Value<double?> defaultPrice = const Value.absent(),
+    Value<String?> taxCategory = const Value.absent(),
+    Value<double?> taxPoints = const Value.absent(),
+    bool? isActive,
+  }) => TariffCatalogItemRow(
+    id: id ?? this.id,
+    tenantId: tenantId ?? this.tenantId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    version: version ?? this.version,
+    syncStatus: syncStatus ?? this.syncStatus,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    tariffSystem: tariffSystem ?? this.tariffSystem,
+    code: code ?? this.code,
+    description: description ?? this.description,
+    defaultPrice: defaultPrice.present ? defaultPrice.value : this.defaultPrice,
+    taxCategory: taxCategory.present ? taxCategory.value : this.taxCategory,
+    taxPoints: taxPoints.present ? taxPoints.value : this.taxPoints,
+    isActive: isActive ?? this.isActive,
+  );
+  TariffCatalogItemRow copyWithCompanion(TariffCatalogItemsCompanion data) {
+    return TariffCatalogItemRow(
+      id: data.id.present ? data.id.value : this.id,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      tariffSystem: data.tariffSystem.present
+          ? data.tariffSystem.value
+          : this.tariffSystem,
+      code: data.code.present ? data.code.value : this.code,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      defaultPrice: data.defaultPrice.present
+          ? data.defaultPrice.value
+          : this.defaultPrice,
+      taxCategory: data.taxCategory.present
+          ? data.taxCategory.value
+          : this.taxCategory,
+      taxPoints: data.taxPoints.present ? data.taxPoints.value : this.taxPoints,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TariffCatalogItemRow(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('tariffSystem: $tariffSystem, ')
+          ..write('code: $code, ')
+          ..write('description: $description, ')
+          ..write('defaultPrice: $defaultPrice, ')
+          ..write('taxCategory: $taxCategory, ')
+          ..write('taxPoints: $taxPoints, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    tariffSystem,
+    code,
+    description,
+    defaultPrice,
+    taxCategory,
+    taxPoints,
+    isActive,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TariffCatalogItemRow &&
+          other.id == this.id &&
+          other.tenantId == this.tenantId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.version == this.version &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.tariffSystem == this.tariffSystem &&
+          other.code == this.code &&
+          other.description == this.description &&
+          other.defaultPrice == this.defaultPrice &&
+          other.taxCategory == this.taxCategory &&
+          other.taxPoints == this.taxPoints &&
+          other.isActive == this.isActive);
+}
+
+class TariffCatalogItemsCompanion
+    extends UpdateCompanion<TariffCatalogItemRow> {
+  final Value<String> id;
+  final Value<String> tenantId;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String?> deletedAt;
+  final Value<int> version;
+  final Value<String> syncStatus;
+  final Value<String?> lastSyncedAt;
+  final Value<String> tariffSystem;
+  final Value<String> code;
+  final Value<String> description;
+  final Value<double?> defaultPrice;
+  final Value<String?> taxCategory;
+  final Value<double?> taxPoints;
+  final Value<bool> isActive;
+  final Value<int> rowid;
+  const TariffCatalogItemsCompanion({
+    this.id = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.tariffSystem = const Value.absent(),
+    this.code = const Value.absent(),
+    this.description = const Value.absent(),
+    this.defaultPrice = const Value.absent(),
+    this.taxCategory = const Value.absent(),
+    this.taxPoints = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TariffCatalogItemsCompanion.insert({
+    required String id,
+    required String tenantId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    required String tariffSystem,
+    required String code,
+    required String description,
+    this.defaultPrice = const Value.absent(),
+    this.taxCategory = const Value.absent(),
+    this.taxPoints = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       tenantId = Value(tenantId),
+       tariffSystem = Value(tariffSystem),
+       code = Value(code),
+       description = Value(description);
+  static Insertable<TariffCatalogItemRow> custom({
+    Expression<String>? id,
+    Expression<String>? tenantId,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? deletedAt,
+    Expression<int>? version,
+    Expression<String>? syncStatus,
+    Expression<String>? lastSyncedAt,
+    Expression<String>? tariffSystem,
+    Expression<String>? code,
+    Expression<String>? description,
+    Expression<double>? defaultPrice,
+    Expression<String>? taxCategory,
+    Expression<double>? taxPoints,
+    Expression<bool>? isActive,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (version != null) 'version': version,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (tariffSystem != null) 'tariff_system': tariffSystem,
+      if (code != null) 'code': code,
+      if (description != null) 'description': description,
+      if (defaultPrice != null) 'default_price': defaultPrice,
+      if (taxCategory != null) 'tax_category': taxCategory,
+      if (taxPoints != null) 'tax_points': taxPoints,
+      if (isActive != null) 'is_active': isActive,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TariffCatalogItemsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? tenantId,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<String?>? deletedAt,
+    Value<int>? version,
+    Value<String>? syncStatus,
+    Value<String?>? lastSyncedAt,
+    Value<String>? tariffSystem,
+    Value<String>? code,
+    Value<String>? description,
+    Value<double?>? defaultPrice,
+    Value<String?>? taxCategory,
+    Value<double?>? taxPoints,
+    Value<bool>? isActive,
+    Value<int>? rowid,
+  }) {
+    return TariffCatalogItemsCompanion(
+      id: id ?? this.id,
+      tenantId: tenantId ?? this.tenantId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      version: version ?? this.version,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      tariffSystem: tariffSystem ?? this.tariffSystem,
+      code: code ?? this.code,
+      description: description ?? this.description,
+      defaultPrice: defaultPrice ?? this.defaultPrice,
+      taxCategory: taxCategory ?? this.taxCategory,
+      taxPoints: taxPoints ?? this.taxPoints,
+      isActive: isActive ?? this.isActive,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<String>(tenantId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<String>(deletedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt.value);
+    }
+    if (tariffSystem.present) {
+      map['tariff_system'] = Variable<String>(tariffSystem.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (defaultPrice.present) {
+      map['default_price'] = Variable<double>(defaultPrice.value);
+    }
+    if (taxCategory.present) {
+      map['tax_category'] = Variable<String>(taxCategory.value);
+    }
+    if (taxPoints.present) {
+      map['tax_points'] = Variable<double>(taxPoints.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TariffCatalogItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('tariffSystem: $tariffSystem, ')
+          ..write('code: $code, ')
+          ..write('description: $description, ')
+          ..write('defaultPrice: $defaultPrice, ')
+          ..write('taxCategory: $taxCategory, ')
+          ..write('taxPoints: $taxPoints, ')
+          ..write('isActive: $isActive, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ObjectTariffAssignmentsTable extends ObjectTariffAssignments
+    with TableInfo<$ObjectTariffAssignmentsTable, ObjectTariffAssignmentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ObjectTariffAssignmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<String> tenantId = GeneratedColumn<String>(
+    'tenant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<String> deletedAt = GeneratedColumn<String>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('synced'),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<String> lastSyncedAt = GeneratedColumn<String>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _objectIdMeta = const VerificationMeta(
+    'objectId',
+  );
+  @override
+  late final GeneratedColumn<String> objectId = GeneratedColumn<String>(
+    'object_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tariffCatalogItemIdMeta =
+      const VerificationMeta('tariffCatalogItemId');
+  @override
+  late final GeneratedColumn<String> tariffCatalogItemId =
+      GeneratedColumn<String>(
+        'tariff_catalog_item_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _tariffSystemMeta = const VerificationMeta(
+    'tariffSystem',
+  );
+  @override
+  late final GeneratedColumn<String> tariffSystem = GeneratedColumn<String>(
+    'tariff_system',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _defaultQuantityMeta = const VerificationMeta(
+    'defaultQuantity',
+  );
+  @override
+  late final GeneratedColumn<double> defaultQuantity = GeneratedColumn<double>(
+    'default_quantity',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _priceOverrideMeta = const VerificationMeta(
+    'priceOverride',
+  );
+  @override
+  late final GeneratedColumn<double> priceOverride = GeneratedColumn<double>(
+    'price_override',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _taxPointsMeta = const VerificationMeta(
+    'taxPoints',
+  );
+  @override
+  late final GeneratedColumn<double> taxPoints = GeneratedColumn<double>(
+    'tax_points',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _billingCodeMeta = const VerificationMeta(
+    'billingCode',
+  );
+  @override
+  late final GeneratedColumn<String> billingCode = GeneratedColumn<String>(
+    'billing_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _intervalCodeMeta = const VerificationMeta(
+    'intervalCode',
+  );
+  @override
+  late final GeneratedColumn<String> intervalCode = GeneratedColumn<String>(
+    'interval_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _flag13Meta = const VerificationMeta('flag13');
+  @override
+  late final GeneratedColumn<String> flag13 = GeneratedColumn<String>(
+    'flag_13',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _flag14Meta = const VerificationMeta('flag14');
+  @override
+  late final GeneratedColumn<String> flag14 = GeneratedColumn<String>(
+    'flag_14',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _flag15Meta = const VerificationMeta('flag15');
+  @override
+  late final GeneratedColumn<String> flag15 = GeneratedColumn<String>(
+    'flag_15',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    objectId,
+    tariffCatalogItemId,
+    tariffSystem,
+    code,
+    description,
+    position,
+    defaultQuantity,
+    unit,
+    priceOverride,
+    taxPoints,
+    billingCode,
+    intervalCode,
+    flag13,
+    flag14,
+    flag15,
+    notes,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'object_tariff_assignments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ObjectTariffAssignmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tenantIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('object_id')) {
+      context.handle(
+        _objectIdMeta,
+        objectId.isAcceptableOrUnknown(data['object_id']!, _objectIdMeta),
+      );
+    }
+    if (data.containsKey('tariff_catalog_item_id')) {
+      context.handle(
+        _tariffCatalogItemIdMeta,
+        tariffCatalogItemId.isAcceptableOrUnknown(
+          data['tariff_catalog_item_id']!,
+          _tariffCatalogItemIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tariff_system')) {
+      context.handle(
+        _tariffSystemMeta,
+        tariffSystem.isAcceptableOrUnknown(
+          data['tariff_system']!,
+          _tariffSystemMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_tariffSystemMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    }
+    if (data.containsKey('default_quantity')) {
+      context.handle(
+        _defaultQuantityMeta,
+        defaultQuantity.isAcceptableOrUnknown(
+          data['default_quantity']!,
+          _defaultQuantityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    }
+    if (data.containsKey('price_override')) {
+      context.handle(
+        _priceOverrideMeta,
+        priceOverride.isAcceptableOrUnknown(
+          data['price_override']!,
+          _priceOverrideMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tax_points')) {
+      context.handle(
+        _taxPointsMeta,
+        taxPoints.isAcceptableOrUnknown(data['tax_points']!, _taxPointsMeta),
+      );
+    }
+    if (data.containsKey('billing_code')) {
+      context.handle(
+        _billingCodeMeta,
+        billingCode.isAcceptableOrUnknown(
+          data['billing_code']!,
+          _billingCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('interval_code')) {
+      context.handle(
+        _intervalCodeMeta,
+        intervalCode.isAcceptableOrUnknown(
+          data['interval_code']!,
+          _intervalCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('flag_13')) {
+      context.handle(
+        _flag13Meta,
+        flag13.isAcceptableOrUnknown(data['flag_13']!, _flag13Meta),
+      );
+    }
+    if (data.containsKey('flag_14')) {
+      context.handle(
+        _flag14Meta,
+        flag14.isAcceptableOrUnknown(data['flag_14']!, _flag14Meta),
+      );
+    }
+    if (data.containsKey('flag_15')) {
+      context.handle(
+        _flag15Meta,
+        flag15.isAcceptableOrUnknown(data['flag_15']!, _flag15Meta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ObjectTariffAssignmentRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ObjectTariffAssignmentRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tenant_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      objectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}object_id'],
+      ),
+      tariffCatalogItemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tariff_catalog_item_id'],
+      ),
+      tariffSystem: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tariff_system'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      ),
+      defaultQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}default_quantity'],
+      ),
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      ),
+      priceOverride: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}price_override'],
+      ),
+      taxPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}tax_points'],
+      ),
+      billingCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}billing_code'],
+      ),
+      intervalCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}interval_code'],
+      ),
+      flag13: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flag_13'],
+      ),
+      flag14: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flag_14'],
+      ),
+      flag15: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flag_15'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $ObjectTariffAssignmentsTable createAlias(String alias) {
+    return $ObjectTariffAssignmentsTable(attachedDatabase, alias);
+  }
+}
+
+class ObjectTariffAssignmentRow extends DataClass
+    implements Insertable<ObjectTariffAssignmentRow> {
+  final String id;
+  final String tenantId;
+  final String createdAt;
+  final String updatedAt;
+  final String? deletedAt;
+  final int version;
+  final String syncStatus;
+  final String? lastSyncedAt;
+  final String? objectId;
+  final String? tariffCatalogItemId;
+  final String tariffSystem;
+  final String? code;
+  final String description;
+  final int? position;
+  final double? defaultQuantity;
+  final String? unit;
+  final double? priceOverride;
+  final double? taxPoints;
+  final String? billingCode;
+  final String? intervalCode;
+  final String? flag13;
+  final String? flag14;
+  final String? flag15;
+  final String? notes;
+  final bool isActive;
+  const ObjectTariffAssignmentRow({
+    required this.id,
+    required this.tenantId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.version,
+    required this.syncStatus,
+    this.lastSyncedAt,
+    this.objectId,
+    this.tariffCatalogItemId,
+    required this.tariffSystem,
+    this.code,
+    required this.description,
+    this.position,
+    this.defaultQuantity,
+    this.unit,
+    this.priceOverride,
+    this.taxPoints,
+    this.billingCode,
+    this.intervalCode,
+    this.flag13,
+    this.flag14,
+    this.flag15,
+    this.notes,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['tenant_id'] = Variable<String>(tenantId);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<String>(deletedAt);
+    }
+    map['version'] = Variable<int>(version);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt);
+    }
+    if (!nullToAbsent || objectId != null) {
+      map['object_id'] = Variable<String>(objectId);
+    }
+    if (!nullToAbsent || tariffCatalogItemId != null) {
+      map['tariff_catalog_item_id'] = Variable<String>(tariffCatalogItemId);
+    }
+    map['tariff_system'] = Variable<String>(tariffSystem);
+    if (!nullToAbsent || code != null) {
+      map['code'] = Variable<String>(code);
+    }
+    map['description'] = Variable<String>(description);
+    if (!nullToAbsent || position != null) {
+      map['position'] = Variable<int>(position);
+    }
+    if (!nullToAbsent || defaultQuantity != null) {
+      map['default_quantity'] = Variable<double>(defaultQuantity);
+    }
+    if (!nullToAbsent || unit != null) {
+      map['unit'] = Variable<String>(unit);
+    }
+    if (!nullToAbsent || priceOverride != null) {
+      map['price_override'] = Variable<double>(priceOverride);
+    }
+    if (!nullToAbsent || taxPoints != null) {
+      map['tax_points'] = Variable<double>(taxPoints);
+    }
+    if (!nullToAbsent || billingCode != null) {
+      map['billing_code'] = Variable<String>(billingCode);
+    }
+    if (!nullToAbsent || intervalCode != null) {
+      map['interval_code'] = Variable<String>(intervalCode);
+    }
+    if (!nullToAbsent || flag13 != null) {
+      map['flag_13'] = Variable<String>(flag13);
+    }
+    if (!nullToAbsent || flag14 != null) {
+      map['flag_14'] = Variable<String>(flag14);
+    }
+    if (!nullToAbsent || flag15 != null) {
+      map['flag_15'] = Variable<String>(flag15);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  ObjectTariffAssignmentsCompanion toCompanion(bool nullToAbsent) {
+    return ObjectTariffAssignmentsCompanion(
+      id: Value(id),
+      tenantId: Value(tenantId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      version: Value(version),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      objectId: objectId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(objectId),
+      tariffCatalogItemId: tariffCatalogItemId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tariffCatalogItemId),
+      tariffSystem: Value(tariffSystem),
+      code: code == null && nullToAbsent ? const Value.absent() : Value(code),
+      description: Value(description),
+      position: position == null && nullToAbsent
+          ? const Value.absent()
+          : Value(position),
+      defaultQuantity: defaultQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultQuantity),
+      unit: unit == null && nullToAbsent ? const Value.absent() : Value(unit),
+      priceOverride: priceOverride == null && nullToAbsent
+          ? const Value.absent()
+          : Value(priceOverride),
+      taxPoints: taxPoints == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxPoints),
+      billingCode: billingCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingCode),
+      intervalCode: intervalCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intervalCode),
+      flag13: flag13 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(flag13),
+      flag14: flag14 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(flag14),
+      flag15: flag15 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(flag15),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory ObjectTariffAssignmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ObjectTariffAssignmentRow(
+      id: serializer.fromJson<String>(json['id']),
+      tenantId: serializer.fromJson<String>(json['tenantId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      deletedAt: serializer.fromJson<String?>(json['deletedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<String?>(json['lastSyncedAt']),
+      objectId: serializer.fromJson<String?>(json['objectId']),
+      tariffCatalogItemId: serializer.fromJson<String?>(
+        json['tariffCatalogItemId'],
+      ),
+      tariffSystem: serializer.fromJson<String>(json['tariffSystem']),
+      code: serializer.fromJson<String?>(json['code']),
+      description: serializer.fromJson<String>(json['description']),
+      position: serializer.fromJson<int?>(json['position']),
+      defaultQuantity: serializer.fromJson<double?>(json['defaultQuantity']),
+      unit: serializer.fromJson<String?>(json['unit']),
+      priceOverride: serializer.fromJson<double?>(json['priceOverride']),
+      taxPoints: serializer.fromJson<double?>(json['taxPoints']),
+      billingCode: serializer.fromJson<String?>(json['billingCode']),
+      intervalCode: serializer.fromJson<String?>(json['intervalCode']),
+      flag13: serializer.fromJson<String?>(json['flag13']),
+      flag14: serializer.fromJson<String?>(json['flag14']),
+      flag15: serializer.fromJson<String?>(json['flag15']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'tenantId': serializer.toJson<String>(tenantId),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'deletedAt': serializer.toJson<String?>(deletedAt),
+      'version': serializer.toJson<int>(version),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<String?>(lastSyncedAt),
+      'objectId': serializer.toJson<String?>(objectId),
+      'tariffCatalogItemId': serializer.toJson<String?>(tariffCatalogItemId),
+      'tariffSystem': serializer.toJson<String>(tariffSystem),
+      'code': serializer.toJson<String?>(code),
+      'description': serializer.toJson<String>(description),
+      'position': serializer.toJson<int?>(position),
+      'defaultQuantity': serializer.toJson<double?>(defaultQuantity),
+      'unit': serializer.toJson<String?>(unit),
+      'priceOverride': serializer.toJson<double?>(priceOverride),
+      'taxPoints': serializer.toJson<double?>(taxPoints),
+      'billingCode': serializer.toJson<String?>(billingCode),
+      'intervalCode': serializer.toJson<String?>(intervalCode),
+      'flag13': serializer.toJson<String?>(flag13),
+      'flag14': serializer.toJson<String?>(flag14),
+      'flag15': serializer.toJson<String?>(flag15),
+      'notes': serializer.toJson<String?>(notes),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  ObjectTariffAssignmentRow copyWith({
+    String? id,
+    String? tenantId,
+    String? createdAt,
+    String? updatedAt,
+    Value<String?> deletedAt = const Value.absent(),
+    int? version,
+    String? syncStatus,
+    Value<String?> lastSyncedAt = const Value.absent(),
+    Value<String?> objectId = const Value.absent(),
+    Value<String?> tariffCatalogItemId = const Value.absent(),
+    String? tariffSystem,
+    Value<String?> code = const Value.absent(),
+    String? description,
+    Value<int?> position = const Value.absent(),
+    Value<double?> defaultQuantity = const Value.absent(),
+    Value<String?> unit = const Value.absent(),
+    Value<double?> priceOverride = const Value.absent(),
+    Value<double?> taxPoints = const Value.absent(),
+    Value<String?> billingCode = const Value.absent(),
+    Value<String?> intervalCode = const Value.absent(),
+    Value<String?> flag13 = const Value.absent(),
+    Value<String?> flag14 = const Value.absent(),
+    Value<String?> flag15 = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    bool? isActive,
+  }) => ObjectTariffAssignmentRow(
+    id: id ?? this.id,
+    tenantId: tenantId ?? this.tenantId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    version: version ?? this.version,
+    syncStatus: syncStatus ?? this.syncStatus,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    objectId: objectId.present ? objectId.value : this.objectId,
+    tariffCatalogItemId: tariffCatalogItemId.present
+        ? tariffCatalogItemId.value
+        : this.tariffCatalogItemId,
+    tariffSystem: tariffSystem ?? this.tariffSystem,
+    code: code.present ? code.value : this.code,
+    description: description ?? this.description,
+    position: position.present ? position.value : this.position,
+    defaultQuantity: defaultQuantity.present
+        ? defaultQuantity.value
+        : this.defaultQuantity,
+    unit: unit.present ? unit.value : this.unit,
+    priceOverride: priceOverride.present
+        ? priceOverride.value
+        : this.priceOverride,
+    taxPoints: taxPoints.present ? taxPoints.value : this.taxPoints,
+    billingCode: billingCode.present ? billingCode.value : this.billingCode,
+    intervalCode: intervalCode.present ? intervalCode.value : this.intervalCode,
+    flag13: flag13.present ? flag13.value : this.flag13,
+    flag14: flag14.present ? flag14.value : this.flag14,
+    flag15: flag15.present ? flag15.value : this.flag15,
+    notes: notes.present ? notes.value : this.notes,
+    isActive: isActive ?? this.isActive,
+  );
+  ObjectTariffAssignmentRow copyWithCompanion(
+    ObjectTariffAssignmentsCompanion data,
+  ) {
+    return ObjectTariffAssignmentRow(
+      id: data.id.present ? data.id.value : this.id,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      objectId: data.objectId.present ? data.objectId.value : this.objectId,
+      tariffCatalogItemId: data.tariffCatalogItemId.present
+          ? data.tariffCatalogItemId.value
+          : this.tariffCatalogItemId,
+      tariffSystem: data.tariffSystem.present
+          ? data.tariffSystem.value
+          : this.tariffSystem,
+      code: data.code.present ? data.code.value : this.code,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      position: data.position.present ? data.position.value : this.position,
+      defaultQuantity: data.defaultQuantity.present
+          ? data.defaultQuantity.value
+          : this.defaultQuantity,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      priceOverride: data.priceOverride.present
+          ? data.priceOverride.value
+          : this.priceOverride,
+      taxPoints: data.taxPoints.present ? data.taxPoints.value : this.taxPoints,
+      billingCode: data.billingCode.present
+          ? data.billingCode.value
+          : this.billingCode,
+      intervalCode: data.intervalCode.present
+          ? data.intervalCode.value
+          : this.intervalCode,
+      flag13: data.flag13.present ? data.flag13.value : this.flag13,
+      flag14: data.flag14.present ? data.flag14.value : this.flag14,
+      flag15: data.flag15.present ? data.flag15.value : this.flag15,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ObjectTariffAssignmentRow(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('objectId: $objectId, ')
+          ..write('tariffCatalogItemId: $tariffCatalogItemId, ')
+          ..write('tariffSystem: $tariffSystem, ')
+          ..write('code: $code, ')
+          ..write('description: $description, ')
+          ..write('position: $position, ')
+          ..write('defaultQuantity: $defaultQuantity, ')
+          ..write('unit: $unit, ')
+          ..write('priceOverride: $priceOverride, ')
+          ..write('taxPoints: $taxPoints, ')
+          ..write('billingCode: $billingCode, ')
+          ..write('intervalCode: $intervalCode, ')
+          ..write('flag13: $flag13, ')
+          ..write('flag14: $flag14, ')
+          ..write('flag15: $flag15, ')
+          ..write('notes: $notes, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    objectId,
+    tariffCatalogItemId,
+    tariffSystem,
+    code,
+    description,
+    position,
+    defaultQuantity,
+    unit,
+    priceOverride,
+    taxPoints,
+    billingCode,
+    intervalCode,
+    flag13,
+    flag14,
+    flag15,
+    notes,
+    isActive,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ObjectTariffAssignmentRow &&
+          other.id == this.id &&
+          other.tenantId == this.tenantId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.version == this.version &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.objectId == this.objectId &&
+          other.tariffCatalogItemId == this.tariffCatalogItemId &&
+          other.tariffSystem == this.tariffSystem &&
+          other.code == this.code &&
+          other.description == this.description &&
+          other.position == this.position &&
+          other.defaultQuantity == this.defaultQuantity &&
+          other.unit == this.unit &&
+          other.priceOverride == this.priceOverride &&
+          other.taxPoints == this.taxPoints &&
+          other.billingCode == this.billingCode &&
+          other.intervalCode == this.intervalCode &&
+          other.flag13 == this.flag13 &&
+          other.flag14 == this.flag14 &&
+          other.flag15 == this.flag15 &&
+          other.notes == this.notes &&
+          other.isActive == this.isActive);
+}
+
+class ObjectTariffAssignmentsCompanion
+    extends UpdateCompanion<ObjectTariffAssignmentRow> {
+  final Value<String> id;
+  final Value<String> tenantId;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String?> deletedAt;
+  final Value<int> version;
+  final Value<String> syncStatus;
+  final Value<String?> lastSyncedAt;
+  final Value<String?> objectId;
+  final Value<String?> tariffCatalogItemId;
+  final Value<String> tariffSystem;
+  final Value<String?> code;
+  final Value<String> description;
+  final Value<int?> position;
+  final Value<double?> defaultQuantity;
+  final Value<String?> unit;
+  final Value<double?> priceOverride;
+  final Value<double?> taxPoints;
+  final Value<String?> billingCode;
+  final Value<String?> intervalCode;
+  final Value<String?> flag13;
+  final Value<String?> flag14;
+  final Value<String?> flag15;
+  final Value<String?> notes;
+  final Value<bool> isActive;
+  final Value<int> rowid;
+  const ObjectTariffAssignmentsCompanion({
+    this.id = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.objectId = const Value.absent(),
+    this.tariffCatalogItemId = const Value.absent(),
+    this.tariffSystem = const Value.absent(),
+    this.code = const Value.absent(),
+    this.description = const Value.absent(),
+    this.position = const Value.absent(),
+    this.defaultQuantity = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.priceOverride = const Value.absent(),
+    this.taxPoints = const Value.absent(),
+    this.billingCode = const Value.absent(),
+    this.intervalCode = const Value.absent(),
+    this.flag13 = const Value.absent(),
+    this.flag14 = const Value.absent(),
+    this.flag15 = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ObjectTariffAssignmentsCompanion.insert({
+    required String id,
+    required String tenantId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.objectId = const Value.absent(),
+    this.tariffCatalogItemId = const Value.absent(),
+    required String tariffSystem,
+    this.code = const Value.absent(),
+    required String description,
+    this.position = const Value.absent(),
+    this.defaultQuantity = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.priceOverride = const Value.absent(),
+    this.taxPoints = const Value.absent(),
+    this.billingCode = const Value.absent(),
+    this.intervalCode = const Value.absent(),
+    this.flag13 = const Value.absent(),
+    this.flag14 = const Value.absent(),
+    this.flag15 = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       tenantId = Value(tenantId),
+       tariffSystem = Value(tariffSystem),
+       description = Value(description);
+  static Insertable<ObjectTariffAssignmentRow> custom({
+    Expression<String>? id,
+    Expression<String>? tenantId,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? deletedAt,
+    Expression<int>? version,
+    Expression<String>? syncStatus,
+    Expression<String>? lastSyncedAt,
+    Expression<String>? objectId,
+    Expression<String>? tariffCatalogItemId,
+    Expression<String>? tariffSystem,
+    Expression<String>? code,
+    Expression<String>? description,
+    Expression<int>? position,
+    Expression<double>? defaultQuantity,
+    Expression<String>? unit,
+    Expression<double>? priceOverride,
+    Expression<double>? taxPoints,
+    Expression<String>? billingCode,
+    Expression<String>? intervalCode,
+    Expression<String>? flag13,
+    Expression<String>? flag14,
+    Expression<String>? flag15,
+    Expression<String>? notes,
+    Expression<bool>? isActive,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (version != null) 'version': version,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (objectId != null) 'object_id': objectId,
+      if (tariffCatalogItemId != null)
+        'tariff_catalog_item_id': tariffCatalogItemId,
+      if (tariffSystem != null) 'tariff_system': tariffSystem,
+      if (code != null) 'code': code,
+      if (description != null) 'description': description,
+      if (position != null) 'position': position,
+      if (defaultQuantity != null) 'default_quantity': defaultQuantity,
+      if (unit != null) 'unit': unit,
+      if (priceOverride != null) 'price_override': priceOverride,
+      if (taxPoints != null) 'tax_points': taxPoints,
+      if (billingCode != null) 'billing_code': billingCode,
+      if (intervalCode != null) 'interval_code': intervalCode,
+      if (flag13 != null) 'flag_13': flag13,
+      if (flag14 != null) 'flag_14': flag14,
+      if (flag15 != null) 'flag_15': flag15,
+      if (notes != null) 'notes': notes,
+      if (isActive != null) 'is_active': isActive,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ObjectTariffAssignmentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? tenantId,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<String?>? deletedAt,
+    Value<int>? version,
+    Value<String>? syncStatus,
+    Value<String?>? lastSyncedAt,
+    Value<String?>? objectId,
+    Value<String?>? tariffCatalogItemId,
+    Value<String>? tariffSystem,
+    Value<String?>? code,
+    Value<String>? description,
+    Value<int?>? position,
+    Value<double?>? defaultQuantity,
+    Value<String?>? unit,
+    Value<double?>? priceOverride,
+    Value<double?>? taxPoints,
+    Value<String?>? billingCode,
+    Value<String?>? intervalCode,
+    Value<String?>? flag13,
+    Value<String?>? flag14,
+    Value<String?>? flag15,
+    Value<String?>? notes,
+    Value<bool>? isActive,
+    Value<int>? rowid,
+  }) {
+    return ObjectTariffAssignmentsCompanion(
+      id: id ?? this.id,
+      tenantId: tenantId ?? this.tenantId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      version: version ?? this.version,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      objectId: objectId ?? this.objectId,
+      tariffCatalogItemId: tariffCatalogItemId ?? this.tariffCatalogItemId,
+      tariffSystem: tariffSystem ?? this.tariffSystem,
+      code: code ?? this.code,
+      description: description ?? this.description,
+      position: position ?? this.position,
+      defaultQuantity: defaultQuantity ?? this.defaultQuantity,
+      unit: unit ?? this.unit,
+      priceOverride: priceOverride ?? this.priceOverride,
+      taxPoints: taxPoints ?? this.taxPoints,
+      billingCode: billingCode ?? this.billingCode,
+      intervalCode: intervalCode ?? this.intervalCode,
+      flag13: flag13 ?? this.flag13,
+      flag14: flag14 ?? this.flag14,
+      flag15: flag15 ?? this.flag15,
+      notes: notes ?? this.notes,
+      isActive: isActive ?? this.isActive,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<String>(tenantId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<String>(deletedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt.value);
+    }
+    if (objectId.present) {
+      map['object_id'] = Variable<String>(objectId.value);
+    }
+    if (tariffCatalogItemId.present) {
+      map['tariff_catalog_item_id'] = Variable<String>(
+        tariffCatalogItemId.value,
+      );
+    }
+    if (tariffSystem.present) {
+      map['tariff_system'] = Variable<String>(tariffSystem.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (defaultQuantity.present) {
+      map['default_quantity'] = Variable<double>(defaultQuantity.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (priceOverride.present) {
+      map['price_override'] = Variable<double>(priceOverride.value);
+    }
+    if (taxPoints.present) {
+      map['tax_points'] = Variable<double>(taxPoints.value);
+    }
+    if (billingCode.present) {
+      map['billing_code'] = Variable<String>(billingCode.value);
+    }
+    if (intervalCode.present) {
+      map['interval_code'] = Variable<String>(intervalCode.value);
+    }
+    if (flag13.present) {
+      map['flag_13'] = Variable<String>(flag13.value);
+    }
+    if (flag14.present) {
+      map['flag_14'] = Variable<String>(flag14.value);
+    }
+    if (flag15.present) {
+      map['flag_15'] = Variable<String>(flag15.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ObjectTariffAssignmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('objectId: $objectId, ')
+          ..write('tariffCatalogItemId: $tariffCatalogItemId, ')
+          ..write('tariffSystem: $tariffSystem, ')
+          ..write('code: $code, ')
+          ..write('description: $description, ')
+          ..write('position: $position, ')
+          ..write('defaultQuantity: $defaultQuantity, ')
+          ..write('unit: $unit, ')
+          ..write('priceOverride: $priceOverride, ')
+          ..write('taxPoints: $taxPoints, ')
+          ..write('billingCode: $billingCode, ')
+          ..write('intervalCode: $intervalCode, ')
+          ..write('flag13: $flag13, ')
+          ..write('flag14: $flag14, ')
+          ..write('flag15: $flag15, ')
+          ..write('notes: $notes, ')
+          ..write('isActive: $isActive, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WorkOrderServiceLinesTable extends WorkOrderServiceLines
+    with TableInfo<$WorkOrderServiceLinesTable, WorkOrderServiceLineRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WorkOrderServiceLinesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<String> tenantId = GeneratedColumn<String>(
+    'tenant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<String> deletedAt = GeneratedColumn<String>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('synced'),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<String> lastSyncedAt = GeneratedColumn<String>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _workOrderIdMeta = const VerificationMeta(
+    'workOrderId',
+  );
+  @override
+  late final GeneratedColumn<String> workOrderId = GeneratedColumn<String>(
+    'work_order_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _objectTariffAssignmentIdMeta =
+      const VerificationMeta('objectTariffAssignmentId');
+  @override
+  late final GeneratedColumn<String> objectTariffAssignmentId =
+      GeneratedColumn<String>(
+        'object_tariff_assignment_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _tariffCatalogItemIdMeta =
+      const VerificationMeta('tariffCatalogItemId');
+  @override
+  late final GeneratedColumn<String> tariffCatalogItemId =
+      GeneratedColumn<String>(
+        'tariff_catalog_item_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _installationIdMeta = const VerificationMeta(
+    'installationId',
+  );
+  @override
+  late final GeneratedColumn<String> installationId = GeneratedColumn<String>(
+    'installation_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<double> quantity = GeneratedColumn<double>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitPriceMeta = const VerificationMeta(
+    'unitPrice',
+  );
+  @override
+  late final GeneratedColumn<double> unitPrice = GeneratedColumn<double>(
+    'unit_price',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _totalPriceMeta = const VerificationMeta(
+    'totalPrice',
+  );
+  @override
+  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
+    'total_price',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _taxPointsMeta = const VerificationMeta(
+    'taxPoints',
+  );
+  @override
+  late final GeneratedColumn<double> taxPoints = GeneratedColumn<double>(
+    'tax_points',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('performed'),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    workOrderId,
+    objectTariffAssignmentId,
+    tariffCatalogItemId,
+    installationId,
+    code,
+    name,
+    quantity,
+    unit,
+    unitPrice,
+    totalPrice,
+    taxPoints,
+    status,
+    notes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'work_order_service_lines';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WorkOrderServiceLineRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tenantIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('work_order_id')) {
+      context.handle(
+        _workOrderIdMeta,
+        workOrderId.isAcceptableOrUnknown(
+          data['work_order_id']!,
+          _workOrderIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_workOrderIdMeta);
+    }
+    if (data.containsKey('object_tariff_assignment_id')) {
+      context.handle(
+        _objectTariffAssignmentIdMeta,
+        objectTariffAssignmentId.isAcceptableOrUnknown(
+          data['object_tariff_assignment_id']!,
+          _objectTariffAssignmentIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tariff_catalog_item_id')) {
+      context.handle(
+        _tariffCatalogItemIdMeta,
+        tariffCatalogItemId.isAcceptableOrUnknown(
+          data['tariff_catalog_item_id']!,
+          _tariffCatalogItemIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('installation_id')) {
+      context.handle(
+        _installationIdMeta,
+        installationId.isAcceptableOrUnknown(
+          data['installation_id']!,
+          _installationIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quantityMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('unit_price')) {
+      context.handle(
+        _unitPriceMeta,
+        unitPrice.isAcceptableOrUnknown(data['unit_price']!, _unitPriceMeta),
+      );
+    }
+    if (data.containsKey('total_price')) {
+      context.handle(
+        _totalPriceMeta,
+        totalPrice.isAcceptableOrUnknown(data['total_price']!, _totalPriceMeta),
+      );
+    }
+    if (data.containsKey('tax_points')) {
+      context.handle(
+        _taxPointsMeta,
+        taxPoints.isAcceptableOrUnknown(data['tax_points']!, _taxPointsMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WorkOrderServiceLineRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WorkOrderServiceLineRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tenant_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      workOrderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}work_order_id'],
+      )!,
+      objectTariffAssignmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}object_tariff_assignment_id'],
+      ),
+      tariffCatalogItemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tariff_catalog_item_id'],
+      ),
+      installationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}installation_id'],
+      ),
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}quantity'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      unitPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}unit_price'],
+      ),
+      totalPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}total_price'],
+      ),
+      taxPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}tax_points'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+    );
+  }
+
+  @override
+  $WorkOrderServiceLinesTable createAlias(String alias) {
+    return $WorkOrderServiceLinesTable(attachedDatabase, alias);
+  }
+}
+
+class WorkOrderServiceLineRow extends DataClass
+    implements Insertable<WorkOrderServiceLineRow> {
+  final String id;
+  final String tenantId;
+  final String createdAt;
+  final String updatedAt;
+  final String? deletedAt;
+  final int version;
+  final String syncStatus;
+  final String? lastSyncedAt;
+  final String workOrderId;
+  final String? objectTariffAssignmentId;
+  final String? tariffCatalogItemId;
+  final String? installationId;
+  final String? code;
+  final String name;
+  final double quantity;
+  final String unit;
+  final double? unitPrice;
+  final double? totalPrice;
+  final double? taxPoints;
+  final String status;
+  final String? notes;
+  const WorkOrderServiceLineRow({
+    required this.id,
+    required this.tenantId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.version,
+    required this.syncStatus,
+    this.lastSyncedAt,
+    required this.workOrderId,
+    this.objectTariffAssignmentId,
+    this.tariffCatalogItemId,
+    this.installationId,
+    this.code,
+    required this.name,
+    required this.quantity,
+    required this.unit,
+    this.unitPrice,
+    this.totalPrice,
+    this.taxPoints,
+    required this.status,
+    this.notes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['tenant_id'] = Variable<String>(tenantId);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<String>(deletedAt);
+    }
+    map['version'] = Variable<int>(version);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt);
+    }
+    map['work_order_id'] = Variable<String>(workOrderId);
+    if (!nullToAbsent || objectTariffAssignmentId != null) {
+      map['object_tariff_assignment_id'] = Variable<String>(
+        objectTariffAssignmentId,
+      );
+    }
+    if (!nullToAbsent || tariffCatalogItemId != null) {
+      map['tariff_catalog_item_id'] = Variable<String>(tariffCatalogItemId);
+    }
+    if (!nullToAbsent || installationId != null) {
+      map['installation_id'] = Variable<String>(installationId);
+    }
+    if (!nullToAbsent || code != null) {
+      map['code'] = Variable<String>(code);
+    }
+    map['name'] = Variable<String>(name);
+    map['quantity'] = Variable<double>(quantity);
+    map['unit'] = Variable<String>(unit);
+    if (!nullToAbsent || unitPrice != null) {
+      map['unit_price'] = Variable<double>(unitPrice);
+    }
+    if (!nullToAbsent || totalPrice != null) {
+      map['total_price'] = Variable<double>(totalPrice);
+    }
+    if (!nullToAbsent || taxPoints != null) {
+      map['tax_points'] = Variable<double>(taxPoints);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    return map;
+  }
+
+  WorkOrderServiceLinesCompanion toCompanion(bool nullToAbsent) {
+    return WorkOrderServiceLinesCompanion(
+      id: Value(id),
+      tenantId: Value(tenantId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      version: Value(version),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      workOrderId: Value(workOrderId),
+      objectTariffAssignmentId: objectTariffAssignmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(objectTariffAssignmentId),
+      tariffCatalogItemId: tariffCatalogItemId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tariffCatalogItemId),
+      installationId: installationId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(installationId),
+      code: code == null && nullToAbsent ? const Value.absent() : Value(code),
+      name: Value(name),
+      quantity: Value(quantity),
+      unit: Value(unit),
+      unitPrice: unitPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(unitPrice),
+      totalPrice: totalPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalPrice),
+      taxPoints: taxPoints == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxPoints),
+      status: Value(status),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+    );
+  }
+
+  factory WorkOrderServiceLineRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WorkOrderServiceLineRow(
+      id: serializer.fromJson<String>(json['id']),
+      tenantId: serializer.fromJson<String>(json['tenantId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      deletedAt: serializer.fromJson<String?>(json['deletedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<String?>(json['lastSyncedAt']),
+      workOrderId: serializer.fromJson<String>(json['workOrderId']),
+      objectTariffAssignmentId: serializer.fromJson<String?>(
+        json['objectTariffAssignmentId'],
+      ),
+      tariffCatalogItemId: serializer.fromJson<String?>(
+        json['tariffCatalogItemId'],
+      ),
+      installationId: serializer.fromJson<String?>(json['installationId']),
+      code: serializer.fromJson<String?>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      quantity: serializer.fromJson<double>(json['quantity']),
+      unit: serializer.fromJson<String>(json['unit']),
+      unitPrice: serializer.fromJson<double?>(json['unitPrice']),
+      totalPrice: serializer.fromJson<double?>(json['totalPrice']),
+      taxPoints: serializer.fromJson<double?>(json['taxPoints']),
+      status: serializer.fromJson<String>(json['status']),
+      notes: serializer.fromJson<String?>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'tenantId': serializer.toJson<String>(tenantId),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'deletedAt': serializer.toJson<String?>(deletedAt),
+      'version': serializer.toJson<int>(version),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<String?>(lastSyncedAt),
+      'workOrderId': serializer.toJson<String>(workOrderId),
+      'objectTariffAssignmentId': serializer.toJson<String?>(
+        objectTariffAssignmentId,
+      ),
+      'tariffCatalogItemId': serializer.toJson<String?>(tariffCatalogItemId),
+      'installationId': serializer.toJson<String?>(installationId),
+      'code': serializer.toJson<String?>(code),
+      'name': serializer.toJson<String>(name),
+      'quantity': serializer.toJson<double>(quantity),
+      'unit': serializer.toJson<String>(unit),
+      'unitPrice': serializer.toJson<double?>(unitPrice),
+      'totalPrice': serializer.toJson<double?>(totalPrice),
+      'taxPoints': serializer.toJson<double?>(taxPoints),
+      'status': serializer.toJson<String>(status),
+      'notes': serializer.toJson<String?>(notes),
+    };
+  }
+
+  WorkOrderServiceLineRow copyWith({
+    String? id,
+    String? tenantId,
+    String? createdAt,
+    String? updatedAt,
+    Value<String?> deletedAt = const Value.absent(),
+    int? version,
+    String? syncStatus,
+    Value<String?> lastSyncedAt = const Value.absent(),
+    String? workOrderId,
+    Value<String?> objectTariffAssignmentId = const Value.absent(),
+    Value<String?> tariffCatalogItemId = const Value.absent(),
+    Value<String?> installationId = const Value.absent(),
+    Value<String?> code = const Value.absent(),
+    String? name,
+    double? quantity,
+    String? unit,
+    Value<double?> unitPrice = const Value.absent(),
+    Value<double?> totalPrice = const Value.absent(),
+    Value<double?> taxPoints = const Value.absent(),
+    String? status,
+    Value<String?> notes = const Value.absent(),
+  }) => WorkOrderServiceLineRow(
+    id: id ?? this.id,
+    tenantId: tenantId ?? this.tenantId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    version: version ?? this.version,
+    syncStatus: syncStatus ?? this.syncStatus,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    workOrderId: workOrderId ?? this.workOrderId,
+    objectTariffAssignmentId: objectTariffAssignmentId.present
+        ? objectTariffAssignmentId.value
+        : this.objectTariffAssignmentId,
+    tariffCatalogItemId: tariffCatalogItemId.present
+        ? tariffCatalogItemId.value
+        : this.tariffCatalogItemId,
+    installationId: installationId.present
+        ? installationId.value
+        : this.installationId,
+    code: code.present ? code.value : this.code,
+    name: name ?? this.name,
+    quantity: quantity ?? this.quantity,
+    unit: unit ?? this.unit,
+    unitPrice: unitPrice.present ? unitPrice.value : this.unitPrice,
+    totalPrice: totalPrice.present ? totalPrice.value : this.totalPrice,
+    taxPoints: taxPoints.present ? taxPoints.value : this.taxPoints,
+    status: status ?? this.status,
+    notes: notes.present ? notes.value : this.notes,
+  );
+  WorkOrderServiceLineRow copyWithCompanion(
+    WorkOrderServiceLinesCompanion data,
+  ) {
+    return WorkOrderServiceLineRow(
+      id: data.id.present ? data.id.value : this.id,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      workOrderId: data.workOrderId.present
+          ? data.workOrderId.value
+          : this.workOrderId,
+      objectTariffAssignmentId: data.objectTariffAssignmentId.present
+          ? data.objectTariffAssignmentId.value
+          : this.objectTariffAssignmentId,
+      tariffCatalogItemId: data.tariffCatalogItemId.present
+          ? data.tariffCatalogItemId.value
+          : this.tariffCatalogItemId,
+      installationId: data.installationId.present
+          ? data.installationId.value
+          : this.installationId,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      unitPrice: data.unitPrice.present ? data.unitPrice.value : this.unitPrice,
+      totalPrice: data.totalPrice.present
+          ? data.totalPrice.value
+          : this.totalPrice,
+      taxPoints: data.taxPoints.present ? data.taxPoints.value : this.taxPoints,
+      status: data.status.present ? data.status.value : this.status,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkOrderServiceLineRow(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('workOrderId: $workOrderId, ')
+          ..write('objectTariffAssignmentId: $objectTariffAssignmentId, ')
+          ..write('tariffCatalogItemId: $tariffCatalogItemId, ')
+          ..write('installationId: $installationId, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('quantity: $quantity, ')
+          ..write('unit: $unit, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('totalPrice: $totalPrice, ')
+          ..write('taxPoints: $taxPoints, ')
+          ..write('status: $status, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    workOrderId,
+    objectTariffAssignmentId,
+    tariffCatalogItemId,
+    installationId,
+    code,
+    name,
+    quantity,
+    unit,
+    unitPrice,
+    totalPrice,
+    taxPoints,
+    status,
+    notes,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkOrderServiceLineRow &&
+          other.id == this.id &&
+          other.tenantId == this.tenantId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.version == this.version &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.workOrderId == this.workOrderId &&
+          other.objectTariffAssignmentId == this.objectTariffAssignmentId &&
+          other.tariffCatalogItemId == this.tariffCatalogItemId &&
+          other.installationId == this.installationId &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.quantity == this.quantity &&
+          other.unit == this.unit &&
+          other.unitPrice == this.unitPrice &&
+          other.totalPrice == this.totalPrice &&
+          other.taxPoints == this.taxPoints &&
+          other.status == this.status &&
+          other.notes == this.notes);
+}
+
+class WorkOrderServiceLinesCompanion
+    extends UpdateCompanion<WorkOrderServiceLineRow> {
+  final Value<String> id;
+  final Value<String> tenantId;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String?> deletedAt;
+  final Value<int> version;
+  final Value<String> syncStatus;
+  final Value<String?> lastSyncedAt;
+  final Value<String> workOrderId;
+  final Value<String?> objectTariffAssignmentId;
+  final Value<String?> tariffCatalogItemId;
+  final Value<String?> installationId;
+  final Value<String?> code;
+  final Value<String> name;
+  final Value<double> quantity;
+  final Value<String> unit;
+  final Value<double?> unitPrice;
+  final Value<double?> totalPrice;
+  final Value<double?> taxPoints;
+  final Value<String> status;
+  final Value<String?> notes;
+  final Value<int> rowid;
+  const WorkOrderServiceLinesCompanion({
+    this.id = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.workOrderId = const Value.absent(),
+    this.objectTariffAssignmentId = const Value.absent(),
+    this.tariffCatalogItemId = const Value.absent(),
+    this.installationId = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.unitPrice = const Value.absent(),
+    this.totalPrice = const Value.absent(),
+    this.taxPoints = const Value.absent(),
+    this.status = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WorkOrderServiceLinesCompanion.insert({
+    required String id,
+    required String tenantId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    required String workOrderId,
+    this.objectTariffAssignmentId = const Value.absent(),
+    this.tariffCatalogItemId = const Value.absent(),
+    this.installationId = const Value.absent(),
+    this.code = const Value.absent(),
+    required String name,
+    required double quantity,
+    required String unit,
+    this.unitPrice = const Value.absent(),
+    this.totalPrice = const Value.absent(),
+    this.taxPoints = const Value.absent(),
+    this.status = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       tenantId = Value(tenantId),
+       workOrderId = Value(workOrderId),
+       name = Value(name),
+       quantity = Value(quantity),
+       unit = Value(unit);
+  static Insertable<WorkOrderServiceLineRow> custom({
+    Expression<String>? id,
+    Expression<String>? tenantId,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? deletedAt,
+    Expression<int>? version,
+    Expression<String>? syncStatus,
+    Expression<String>? lastSyncedAt,
+    Expression<String>? workOrderId,
+    Expression<String>? objectTariffAssignmentId,
+    Expression<String>? tariffCatalogItemId,
+    Expression<String>? installationId,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<double>? quantity,
+    Expression<String>? unit,
+    Expression<double>? unitPrice,
+    Expression<double>? totalPrice,
+    Expression<double>? taxPoints,
+    Expression<String>? status,
+    Expression<String>? notes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (version != null) 'version': version,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (workOrderId != null) 'work_order_id': workOrderId,
+      if (objectTariffAssignmentId != null)
+        'object_tariff_assignment_id': objectTariffAssignmentId,
+      if (tariffCatalogItemId != null)
+        'tariff_catalog_item_id': tariffCatalogItemId,
+      if (installationId != null) 'installation_id': installationId,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (quantity != null) 'quantity': quantity,
+      if (unit != null) 'unit': unit,
+      if (unitPrice != null) 'unit_price': unitPrice,
+      if (totalPrice != null) 'total_price': totalPrice,
+      if (taxPoints != null) 'tax_points': taxPoints,
+      if (status != null) 'status': status,
+      if (notes != null) 'notes': notes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WorkOrderServiceLinesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? tenantId,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<String?>? deletedAt,
+    Value<int>? version,
+    Value<String>? syncStatus,
+    Value<String?>? lastSyncedAt,
+    Value<String>? workOrderId,
+    Value<String?>? objectTariffAssignmentId,
+    Value<String?>? tariffCatalogItemId,
+    Value<String?>? installationId,
+    Value<String?>? code,
+    Value<String>? name,
+    Value<double>? quantity,
+    Value<String>? unit,
+    Value<double?>? unitPrice,
+    Value<double?>? totalPrice,
+    Value<double?>? taxPoints,
+    Value<String>? status,
+    Value<String?>? notes,
+    Value<int>? rowid,
+  }) {
+    return WorkOrderServiceLinesCompanion(
+      id: id ?? this.id,
+      tenantId: tenantId ?? this.tenantId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      version: version ?? this.version,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      workOrderId: workOrderId ?? this.workOrderId,
+      objectTariffAssignmentId:
+          objectTariffAssignmentId ?? this.objectTariffAssignmentId,
+      tariffCatalogItemId: tariffCatalogItemId ?? this.tariffCatalogItemId,
+      installationId: installationId ?? this.installationId,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      quantity: quantity ?? this.quantity,
+      unit: unit ?? this.unit,
+      unitPrice: unitPrice ?? this.unitPrice,
+      totalPrice: totalPrice ?? this.totalPrice,
+      taxPoints: taxPoints ?? this.taxPoints,
+      status: status ?? this.status,
+      notes: notes ?? this.notes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<String>(tenantId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<String>(deletedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt.value);
+    }
+    if (workOrderId.present) {
+      map['work_order_id'] = Variable<String>(workOrderId.value);
+    }
+    if (objectTariffAssignmentId.present) {
+      map['object_tariff_assignment_id'] = Variable<String>(
+        objectTariffAssignmentId.value,
+      );
+    }
+    if (tariffCatalogItemId.present) {
+      map['tariff_catalog_item_id'] = Variable<String>(
+        tariffCatalogItemId.value,
+      );
+    }
+    if (installationId.present) {
+      map['installation_id'] = Variable<String>(installationId.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<double>(quantity.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (unitPrice.present) {
+      map['unit_price'] = Variable<double>(unitPrice.value);
+    }
+    if (totalPrice.present) {
+      map['total_price'] = Variable<double>(totalPrice.value);
+    }
+    if (taxPoints.present) {
+      map['tax_points'] = Variable<double>(taxPoints.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WorkOrderServiceLinesCompanion(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('workOrderId: $workOrderId, ')
+          ..write('objectTariffAssignmentId: $objectTariffAssignmentId, ')
+          ..write('tariffCatalogItemId: $tariffCatalogItemId, ')
+          ..write('installationId: $installationId, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('quantity: $quantity, ')
+          ..write('unit: $unit, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('totalPrice: $totalPrice, ')
+          ..write('taxPoints: $taxPoints, ')
+          ..write('status: $status, ')
+          ..write('notes: $notes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LegacyImportRecordsTable extends LegacyImportRecords
+    with TableInfo<$LegacyImportRecordsTable, LegacyImportRecordRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LegacyImportRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<String> tenantId = GeneratedColumn<String>(
+    'tenant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<String> deletedAt = GeneratedColumn<String>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('synced'),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<String> lastSyncedAt = GeneratedColumn<String>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _batchIdMeta = const VerificationMeta(
+    'batchId',
+  );
+  @override
+  late final GeneratedColumn<String> batchId = GeneratedColumn<String>(
+    'batch_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceSystemMeta = const VerificationMeta(
+    'sourceSystem',
+  );
+  @override
+  late final GeneratedColumn<String> sourceSystem = GeneratedColumn<String>(
+    'source_system',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceFileMeta = const VerificationMeta(
+    'sourceFile',
+  );
+  @override
+  late final GeneratedColumn<String> sourceFile = GeneratedColumn<String>(
+    'source_file',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceTableMeta = const VerificationMeta(
+    'sourceTable',
+  );
+  @override
+  late final GeneratedColumn<String> sourceTable = GeneratedColumn<String>(
+    'source_table',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceKeyMeta = const VerificationMeta(
+    'sourceKey',
+  );
+  @override
+  late final GeneratedColumn<String> sourceKey = GeneratedColumn<String>(
+    'source_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rowHashMeta = const VerificationMeta(
+    'rowHash',
+  );
+  @override
+  late final GeneratedColumn<String> rowHash = GeneratedColumn<String>(
+    'row_hash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rowIndexMeta = const VerificationMeta(
+    'rowIndex',
+  );
+  @override
+  late final GeneratedColumn<int> rowIndex = GeneratedColumn<int>(
+    'row_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _recordTypeMeta = const VerificationMeta(
+    'recordType',
+  );
+  @override
+  late final GeneratedColumn<String> recordType = GeneratedColumn<String>(
+    'record_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('row'),
+  );
+  static const VerificationMeta _mappedEntityTypeMeta = const VerificationMeta(
+    'mappedEntityType',
+  );
+  @override
+  late final GeneratedColumn<String> mappedEntityType = GeneratedColumn<String>(
+    'mapped_entity_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _mappedEntityIdMeta = const VerificationMeta(
+    'mappedEntityId',
+  );
+  @override
+  late final GeneratedColumn<String> mappedEntityId = GeneratedColumn<String>(
+    'mapped_entity_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    batchId,
+    sourceSystem,
+    sourceFile,
+    sourceTable,
+    sourceKey,
+    rowHash,
+    rowIndex,
+    recordType,
+    mappedEntityType,
+    mappedEntityId,
+    payloadJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'legacy_import_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LegacyImportRecordRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tenantIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('batch_id')) {
+      context.handle(
+        _batchIdMeta,
+        batchId.isAcceptableOrUnknown(data['batch_id']!, _batchIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_batchIdMeta);
+    }
+    if (data.containsKey('source_system')) {
+      context.handle(
+        _sourceSystemMeta,
+        sourceSystem.isAcceptableOrUnknown(
+          data['source_system']!,
+          _sourceSystemMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceSystemMeta);
+    }
+    if (data.containsKey('source_file')) {
+      context.handle(
+        _sourceFileMeta,
+        sourceFile.isAcceptableOrUnknown(data['source_file']!, _sourceFileMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceFileMeta);
+    }
+    if (data.containsKey('source_table')) {
+      context.handle(
+        _sourceTableMeta,
+        sourceTable.isAcceptableOrUnknown(
+          data['source_table']!,
+          _sourceTableMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceTableMeta);
+    }
+    if (data.containsKey('source_key')) {
+      context.handle(
+        _sourceKeyMeta,
+        sourceKey.isAcceptableOrUnknown(data['source_key']!, _sourceKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceKeyMeta);
+    }
+    if (data.containsKey('row_hash')) {
+      context.handle(
+        _rowHashMeta,
+        rowHash.isAcceptableOrUnknown(data['row_hash']!, _rowHashMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rowHashMeta);
+    }
+    if (data.containsKey('row_index')) {
+      context.handle(
+        _rowIndexMeta,
+        rowIndex.isAcceptableOrUnknown(data['row_index']!, _rowIndexMeta),
+      );
+    }
+    if (data.containsKey('record_type')) {
+      context.handle(
+        _recordTypeMeta,
+        recordType.isAcceptableOrUnknown(data['record_type']!, _recordTypeMeta),
+      );
+    }
+    if (data.containsKey('mapped_entity_type')) {
+      context.handle(
+        _mappedEntityTypeMeta,
+        mappedEntityType.isAcceptableOrUnknown(
+          data['mapped_entity_type']!,
+          _mappedEntityTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mapped_entity_id')) {
+      context.handle(
+        _mappedEntityIdMeta,
+        mappedEntityId.isAcceptableOrUnknown(
+          data['mapped_entity_id']!,
+          _mappedEntityIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LegacyImportRecordRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LegacyImportRecordRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tenant_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      batchId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}batch_id'],
+      )!,
+      sourceSystem: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_system'],
+      )!,
+      sourceFile: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_file'],
+      )!,
+      sourceTable: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_table'],
+      )!,
+      sourceKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_key'],
+      )!,
+      rowHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}row_hash'],
+      )!,
+      rowIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}row_index'],
+      ),
+      recordType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}record_type'],
+      )!,
+      mappedEntityType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mapped_entity_type'],
+      ),
+      mappedEntityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mapped_entity_id'],
+      ),
+      payloadJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload_json'],
+      )!,
+    );
+  }
+
+  @override
+  $LegacyImportRecordsTable createAlias(String alias) {
+    return $LegacyImportRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class LegacyImportRecordRow extends DataClass
+    implements Insertable<LegacyImportRecordRow> {
+  final String id;
+  final String tenantId;
+  final String createdAt;
+  final String updatedAt;
+  final String? deletedAt;
+  final int version;
+  final String syncStatus;
+  final String? lastSyncedAt;
+  final String batchId;
+  final String sourceSystem;
+  final String sourceFile;
+  final String sourceTable;
+  final String sourceKey;
+  final String rowHash;
+  final int? rowIndex;
+  final String recordType;
+  final String? mappedEntityType;
+  final String? mappedEntityId;
+  final String payloadJson;
+  const LegacyImportRecordRow({
+    required this.id,
+    required this.tenantId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.version,
+    required this.syncStatus,
+    this.lastSyncedAt,
+    required this.batchId,
+    required this.sourceSystem,
+    required this.sourceFile,
+    required this.sourceTable,
+    required this.sourceKey,
+    required this.rowHash,
+    this.rowIndex,
+    required this.recordType,
+    this.mappedEntityType,
+    this.mappedEntityId,
+    required this.payloadJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['tenant_id'] = Variable<String>(tenantId);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<String>(deletedAt);
+    }
+    map['version'] = Variable<int>(version);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt);
+    }
+    map['batch_id'] = Variable<String>(batchId);
+    map['source_system'] = Variable<String>(sourceSystem);
+    map['source_file'] = Variable<String>(sourceFile);
+    map['source_table'] = Variable<String>(sourceTable);
+    map['source_key'] = Variable<String>(sourceKey);
+    map['row_hash'] = Variable<String>(rowHash);
+    if (!nullToAbsent || rowIndex != null) {
+      map['row_index'] = Variable<int>(rowIndex);
+    }
+    map['record_type'] = Variable<String>(recordType);
+    if (!nullToAbsent || mappedEntityType != null) {
+      map['mapped_entity_type'] = Variable<String>(mappedEntityType);
+    }
+    if (!nullToAbsent || mappedEntityId != null) {
+      map['mapped_entity_id'] = Variable<String>(mappedEntityId);
+    }
+    map['payload_json'] = Variable<String>(payloadJson);
+    return map;
+  }
+
+  LegacyImportRecordsCompanion toCompanion(bool nullToAbsent) {
+    return LegacyImportRecordsCompanion(
+      id: Value(id),
+      tenantId: Value(tenantId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      version: Value(version),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      batchId: Value(batchId),
+      sourceSystem: Value(sourceSystem),
+      sourceFile: Value(sourceFile),
+      sourceTable: Value(sourceTable),
+      sourceKey: Value(sourceKey),
+      rowHash: Value(rowHash),
+      rowIndex: rowIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rowIndex),
+      recordType: Value(recordType),
+      mappedEntityType: mappedEntityType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mappedEntityType),
+      mappedEntityId: mappedEntityId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mappedEntityId),
+      payloadJson: Value(payloadJson),
+    );
+  }
+
+  factory LegacyImportRecordRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LegacyImportRecordRow(
+      id: serializer.fromJson<String>(json['id']),
+      tenantId: serializer.fromJson<String>(json['tenantId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      deletedAt: serializer.fromJson<String?>(json['deletedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<String?>(json['lastSyncedAt']),
+      batchId: serializer.fromJson<String>(json['batchId']),
+      sourceSystem: serializer.fromJson<String>(json['sourceSystem']),
+      sourceFile: serializer.fromJson<String>(json['sourceFile']),
+      sourceTable: serializer.fromJson<String>(json['sourceTable']),
+      sourceKey: serializer.fromJson<String>(json['sourceKey']),
+      rowHash: serializer.fromJson<String>(json['rowHash']),
+      rowIndex: serializer.fromJson<int?>(json['rowIndex']),
+      recordType: serializer.fromJson<String>(json['recordType']),
+      mappedEntityType: serializer.fromJson<String?>(json['mappedEntityType']),
+      mappedEntityId: serializer.fromJson<String?>(json['mappedEntityId']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'tenantId': serializer.toJson<String>(tenantId),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'deletedAt': serializer.toJson<String?>(deletedAt),
+      'version': serializer.toJson<int>(version),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<String?>(lastSyncedAt),
+      'batchId': serializer.toJson<String>(batchId),
+      'sourceSystem': serializer.toJson<String>(sourceSystem),
+      'sourceFile': serializer.toJson<String>(sourceFile),
+      'sourceTable': serializer.toJson<String>(sourceTable),
+      'sourceKey': serializer.toJson<String>(sourceKey),
+      'rowHash': serializer.toJson<String>(rowHash),
+      'rowIndex': serializer.toJson<int?>(rowIndex),
+      'recordType': serializer.toJson<String>(recordType),
+      'mappedEntityType': serializer.toJson<String?>(mappedEntityType),
+      'mappedEntityId': serializer.toJson<String?>(mappedEntityId),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+    };
+  }
+
+  LegacyImportRecordRow copyWith({
+    String? id,
+    String? tenantId,
+    String? createdAt,
+    String? updatedAt,
+    Value<String?> deletedAt = const Value.absent(),
+    int? version,
+    String? syncStatus,
+    Value<String?> lastSyncedAt = const Value.absent(),
+    String? batchId,
+    String? sourceSystem,
+    String? sourceFile,
+    String? sourceTable,
+    String? sourceKey,
+    String? rowHash,
+    Value<int?> rowIndex = const Value.absent(),
+    String? recordType,
+    Value<String?> mappedEntityType = const Value.absent(),
+    Value<String?> mappedEntityId = const Value.absent(),
+    String? payloadJson,
+  }) => LegacyImportRecordRow(
+    id: id ?? this.id,
+    tenantId: tenantId ?? this.tenantId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    version: version ?? this.version,
+    syncStatus: syncStatus ?? this.syncStatus,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    batchId: batchId ?? this.batchId,
+    sourceSystem: sourceSystem ?? this.sourceSystem,
+    sourceFile: sourceFile ?? this.sourceFile,
+    sourceTable: sourceTable ?? this.sourceTable,
+    sourceKey: sourceKey ?? this.sourceKey,
+    rowHash: rowHash ?? this.rowHash,
+    rowIndex: rowIndex.present ? rowIndex.value : this.rowIndex,
+    recordType: recordType ?? this.recordType,
+    mappedEntityType: mappedEntityType.present
+        ? mappedEntityType.value
+        : this.mappedEntityType,
+    mappedEntityId: mappedEntityId.present
+        ? mappedEntityId.value
+        : this.mappedEntityId,
+    payloadJson: payloadJson ?? this.payloadJson,
+  );
+  LegacyImportRecordRow copyWithCompanion(LegacyImportRecordsCompanion data) {
+    return LegacyImportRecordRow(
+      id: data.id.present ? data.id.value : this.id,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      batchId: data.batchId.present ? data.batchId.value : this.batchId,
+      sourceSystem: data.sourceSystem.present
+          ? data.sourceSystem.value
+          : this.sourceSystem,
+      sourceFile: data.sourceFile.present
+          ? data.sourceFile.value
+          : this.sourceFile,
+      sourceTable: data.sourceTable.present
+          ? data.sourceTable.value
+          : this.sourceTable,
+      sourceKey: data.sourceKey.present ? data.sourceKey.value : this.sourceKey,
+      rowHash: data.rowHash.present ? data.rowHash.value : this.rowHash,
+      rowIndex: data.rowIndex.present ? data.rowIndex.value : this.rowIndex,
+      recordType: data.recordType.present
+          ? data.recordType.value
+          : this.recordType,
+      mappedEntityType: data.mappedEntityType.present
+          ? data.mappedEntityType.value
+          : this.mappedEntityType,
+      mappedEntityId: data.mappedEntityId.present
+          ? data.mappedEntityId.value
+          : this.mappedEntityId,
+      payloadJson: data.payloadJson.present
+          ? data.payloadJson.value
+          : this.payloadJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LegacyImportRecordRow(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('batchId: $batchId, ')
+          ..write('sourceSystem: $sourceSystem, ')
+          ..write('sourceFile: $sourceFile, ')
+          ..write('sourceTable: $sourceTable, ')
+          ..write('sourceKey: $sourceKey, ')
+          ..write('rowHash: $rowHash, ')
+          ..write('rowIndex: $rowIndex, ')
+          ..write('recordType: $recordType, ')
+          ..write('mappedEntityType: $mappedEntityType, ')
+          ..write('mappedEntityId: $mappedEntityId, ')
+          ..write('payloadJson: $payloadJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    batchId,
+    sourceSystem,
+    sourceFile,
+    sourceTable,
+    sourceKey,
+    rowHash,
+    rowIndex,
+    recordType,
+    mappedEntityType,
+    mappedEntityId,
+    payloadJson,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LegacyImportRecordRow &&
+          other.id == this.id &&
+          other.tenantId == this.tenantId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.version == this.version &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.batchId == this.batchId &&
+          other.sourceSystem == this.sourceSystem &&
+          other.sourceFile == this.sourceFile &&
+          other.sourceTable == this.sourceTable &&
+          other.sourceKey == this.sourceKey &&
+          other.rowHash == this.rowHash &&
+          other.rowIndex == this.rowIndex &&
+          other.recordType == this.recordType &&
+          other.mappedEntityType == this.mappedEntityType &&
+          other.mappedEntityId == this.mappedEntityId &&
+          other.payloadJson == this.payloadJson);
+}
+
+class LegacyImportRecordsCompanion
+    extends UpdateCompanion<LegacyImportRecordRow> {
+  final Value<String> id;
+  final Value<String> tenantId;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String?> deletedAt;
+  final Value<int> version;
+  final Value<String> syncStatus;
+  final Value<String?> lastSyncedAt;
+  final Value<String> batchId;
+  final Value<String> sourceSystem;
+  final Value<String> sourceFile;
+  final Value<String> sourceTable;
+  final Value<String> sourceKey;
+  final Value<String> rowHash;
+  final Value<int?> rowIndex;
+  final Value<String> recordType;
+  final Value<String?> mappedEntityType;
+  final Value<String?> mappedEntityId;
+  final Value<String> payloadJson;
+  final Value<int> rowid;
+  const LegacyImportRecordsCompanion({
+    this.id = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.batchId = const Value.absent(),
+    this.sourceSystem = const Value.absent(),
+    this.sourceFile = const Value.absent(),
+    this.sourceTable = const Value.absent(),
+    this.sourceKey = const Value.absent(),
+    this.rowHash = const Value.absent(),
+    this.rowIndex = const Value.absent(),
+    this.recordType = const Value.absent(),
+    this.mappedEntityType = const Value.absent(),
+    this.mappedEntityId = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LegacyImportRecordsCompanion.insert({
+    required String id,
+    required String tenantId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    required String batchId,
+    required String sourceSystem,
+    required String sourceFile,
+    required String sourceTable,
+    required String sourceKey,
+    required String rowHash,
+    this.rowIndex = const Value.absent(),
+    this.recordType = const Value.absent(),
+    this.mappedEntityType = const Value.absent(),
+    this.mappedEntityId = const Value.absent(),
+    required String payloadJson,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       tenantId = Value(tenantId),
+       batchId = Value(batchId),
+       sourceSystem = Value(sourceSystem),
+       sourceFile = Value(sourceFile),
+       sourceTable = Value(sourceTable),
+       sourceKey = Value(sourceKey),
+       rowHash = Value(rowHash),
+       payloadJson = Value(payloadJson);
+  static Insertable<LegacyImportRecordRow> custom({
+    Expression<String>? id,
+    Expression<String>? tenantId,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? deletedAt,
+    Expression<int>? version,
+    Expression<String>? syncStatus,
+    Expression<String>? lastSyncedAt,
+    Expression<String>? batchId,
+    Expression<String>? sourceSystem,
+    Expression<String>? sourceFile,
+    Expression<String>? sourceTable,
+    Expression<String>? sourceKey,
+    Expression<String>? rowHash,
+    Expression<int>? rowIndex,
+    Expression<String>? recordType,
+    Expression<String>? mappedEntityType,
+    Expression<String>? mappedEntityId,
+    Expression<String>? payloadJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (version != null) 'version': version,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (batchId != null) 'batch_id': batchId,
+      if (sourceSystem != null) 'source_system': sourceSystem,
+      if (sourceFile != null) 'source_file': sourceFile,
+      if (sourceTable != null) 'source_table': sourceTable,
+      if (sourceKey != null) 'source_key': sourceKey,
+      if (rowHash != null) 'row_hash': rowHash,
+      if (rowIndex != null) 'row_index': rowIndex,
+      if (recordType != null) 'record_type': recordType,
+      if (mappedEntityType != null) 'mapped_entity_type': mappedEntityType,
+      if (mappedEntityId != null) 'mapped_entity_id': mappedEntityId,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LegacyImportRecordsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? tenantId,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<String?>? deletedAt,
+    Value<int>? version,
+    Value<String>? syncStatus,
+    Value<String?>? lastSyncedAt,
+    Value<String>? batchId,
+    Value<String>? sourceSystem,
+    Value<String>? sourceFile,
+    Value<String>? sourceTable,
+    Value<String>? sourceKey,
+    Value<String>? rowHash,
+    Value<int?>? rowIndex,
+    Value<String>? recordType,
+    Value<String?>? mappedEntityType,
+    Value<String?>? mappedEntityId,
+    Value<String>? payloadJson,
+    Value<int>? rowid,
+  }) {
+    return LegacyImportRecordsCompanion(
+      id: id ?? this.id,
+      tenantId: tenantId ?? this.tenantId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      version: version ?? this.version,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      batchId: batchId ?? this.batchId,
+      sourceSystem: sourceSystem ?? this.sourceSystem,
+      sourceFile: sourceFile ?? this.sourceFile,
+      sourceTable: sourceTable ?? this.sourceTable,
+      sourceKey: sourceKey ?? this.sourceKey,
+      rowHash: rowHash ?? this.rowHash,
+      rowIndex: rowIndex ?? this.rowIndex,
+      recordType: recordType ?? this.recordType,
+      mappedEntityType: mappedEntityType ?? this.mappedEntityType,
+      mappedEntityId: mappedEntityId ?? this.mappedEntityId,
+      payloadJson: payloadJson ?? this.payloadJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<String>(tenantId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<String>(deletedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt.value);
+    }
+    if (batchId.present) {
+      map['batch_id'] = Variable<String>(batchId.value);
+    }
+    if (sourceSystem.present) {
+      map['source_system'] = Variable<String>(sourceSystem.value);
+    }
+    if (sourceFile.present) {
+      map['source_file'] = Variable<String>(sourceFile.value);
+    }
+    if (sourceTable.present) {
+      map['source_table'] = Variable<String>(sourceTable.value);
+    }
+    if (sourceKey.present) {
+      map['source_key'] = Variable<String>(sourceKey.value);
+    }
+    if (rowHash.present) {
+      map['row_hash'] = Variable<String>(rowHash.value);
+    }
+    if (rowIndex.present) {
+      map['row_index'] = Variable<int>(rowIndex.value);
+    }
+    if (recordType.present) {
+      map['record_type'] = Variable<String>(recordType.value);
+    }
+    if (mappedEntityType.present) {
+      map['mapped_entity_type'] = Variable<String>(mappedEntityType.value);
+    }
+    if (mappedEntityId.present) {
+      map['mapped_entity_id'] = Variable<String>(mappedEntityId.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LegacyImportRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('batchId: $batchId, ')
+          ..write('sourceSystem: $sourceSystem, ')
+          ..write('sourceFile: $sourceFile, ')
+          ..write('sourceTable: $sourceTable, ')
+          ..write('sourceKey: $sourceKey, ')
+          ..write('rowHash: $rowHash, ')
+          ..write('rowIndex: $rowIndex, ')
+          ..write('recordType: $recordType, ')
+          ..write('mappedEntityType: $mappedEntityType, ')
+          ..write('mappedEntityId: $mappedEntityId, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReportTemplatesTable extends ReportTemplates
+    with TableInfo<$ReportTemplatesTable, ReportTemplateRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReportTemplatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<String> tenantId = GeneratedColumn<String>(
+    'tenant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: _utcNowIso,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<String> deletedAt = GeneratedColumn<String>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('synced'),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<String> lastSyncedAt = GeneratedColumn<String>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reportTypeMeta = const VerificationMeta(
+    'reportType',
+  );
+  @override
+  late final GeneratedColumn<String> reportType = GeneratedColumn<String>(
+    'report_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('work_order'),
+  );
+  static const VerificationMeta _titlePrefixMeta = const VerificationMeta(
+    'titlePrefix',
+  );
+  @override
+  late final GeneratedColumn<String> titlePrefix = GeneratedColumn<String>(
+    'title_prefix',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('Rapport'),
+  );
+  static const VerificationMeta _localeMeta = const VerificationMeta('locale');
+  @override
+  late final GeneratedColumn<String> locale = GeneratedColumn<String>(
+    'locale',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('de'),
+  );
+  static const VerificationMeta _primaryColorMeta = const VerificationMeta(
+    'primaryColor',
+  );
+  @override
+  late final GeneratedColumn<String> primaryColor = GeneratedColumn<String>(
+    'primary_color',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('#1f2937'),
+  );
+  static const VerificationMeta _footerTextMeta = const VerificationMeta(
+    'footerText',
+  );
+  @override
+  late final GeneratedColumn<String> footerText = GeneratedColumn<String>(
+    'footer_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _includeCustomerMeta = const VerificationMeta(
+    'includeCustomer',
+  );
+  @override
+  late final GeneratedColumn<bool> includeCustomer = GeneratedColumn<bool>(
+    'include_customer',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_customer" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includeInstallationsMeta =
+      const VerificationMeta('includeInstallations');
+  @override
+  late final GeneratedColumn<bool> includeInstallations = GeneratedColumn<bool>(
+    'include_installations',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_installations" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includeMeasurementsMeta =
+      const VerificationMeta('includeMeasurements');
+  @override
+  late final GeneratedColumn<bool> includeMeasurements = GeneratedColumn<bool>(
+    'include_measurements',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_measurements" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includeDefectsMeta = const VerificationMeta(
+    'includeDefects',
+  );
+  @override
+  late final GeneratedColumn<bool> includeDefects = GeneratedColumn<bool>(
+    'include_defects',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_defects" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includeMaterialsMeta = const VerificationMeta(
+    'includeMaterials',
+  );
+  @override
+  late final GeneratedColumn<bool> includeMaterials = GeneratedColumn<bool>(
+    'include_materials',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_materials" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includeTimeEntriesMeta =
+      const VerificationMeta('includeTimeEntries');
+  @override
+  late final GeneratedColumn<bool> includeTimeEntries = GeneratedColumn<bool>(
+    'include_time_entries',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_time_entries" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includePhotosMeta = const VerificationMeta(
+    'includePhotos',
+  );
+  @override
+  late final GeneratedColumn<bool> includePhotos = GeneratedColumn<bool>(
+    'include_photos',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_photos" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _includeSignatureMeta = const VerificationMeta(
+    'includeSignature',
+  );
+  @override
+  late final GeneratedColumn<bool> includeSignature = GeneratedColumn<bool>(
+    'include_signature',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_signature" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isDefaultMeta = const VerificationMeta(
+    'isDefault',
+  );
+  @override
+  late final GeneratedColumn<bool> isDefault = GeneratedColumn<bool>(
+    'is_default',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_default" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    name,
+    reportType,
+    titlePrefix,
+    locale,
+    primaryColor,
+    footerText,
+    includeCustomer,
+    includeInstallations,
+    includeMeasurements,
+    includeDefects,
+    includeMaterials,
+    includeTimeEntries,
+    includePhotos,
+    includeSignature,
+    isDefault,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'report_templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReportTemplateRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tenantIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('report_type')) {
+      context.handle(
+        _reportTypeMeta,
+        reportType.isAcceptableOrUnknown(data['report_type']!, _reportTypeMeta),
+      );
+    }
+    if (data.containsKey('title_prefix')) {
+      context.handle(
+        _titlePrefixMeta,
+        titlePrefix.isAcceptableOrUnknown(
+          data['title_prefix']!,
+          _titlePrefixMeta,
+        ),
+      );
+    }
+    if (data.containsKey('locale')) {
+      context.handle(
+        _localeMeta,
+        locale.isAcceptableOrUnknown(data['locale']!, _localeMeta),
+      );
+    }
+    if (data.containsKey('primary_color')) {
+      context.handle(
+        _primaryColorMeta,
+        primaryColor.isAcceptableOrUnknown(
+          data['primary_color']!,
+          _primaryColorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('footer_text')) {
+      context.handle(
+        _footerTextMeta,
+        footerText.isAcceptableOrUnknown(data['footer_text']!, _footerTextMeta),
+      );
+    }
+    if (data.containsKey('include_customer')) {
+      context.handle(
+        _includeCustomerMeta,
+        includeCustomer.isAcceptableOrUnknown(
+          data['include_customer']!,
+          _includeCustomerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_installations')) {
+      context.handle(
+        _includeInstallationsMeta,
+        includeInstallations.isAcceptableOrUnknown(
+          data['include_installations']!,
+          _includeInstallationsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_measurements')) {
+      context.handle(
+        _includeMeasurementsMeta,
+        includeMeasurements.isAcceptableOrUnknown(
+          data['include_measurements']!,
+          _includeMeasurementsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_defects')) {
+      context.handle(
+        _includeDefectsMeta,
+        includeDefects.isAcceptableOrUnknown(
+          data['include_defects']!,
+          _includeDefectsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_materials')) {
+      context.handle(
+        _includeMaterialsMeta,
+        includeMaterials.isAcceptableOrUnknown(
+          data['include_materials']!,
+          _includeMaterialsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_time_entries')) {
+      context.handle(
+        _includeTimeEntriesMeta,
+        includeTimeEntries.isAcceptableOrUnknown(
+          data['include_time_entries']!,
+          _includeTimeEntriesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_photos')) {
+      context.handle(
+        _includePhotosMeta,
+        includePhotos.isAcceptableOrUnknown(
+          data['include_photos']!,
+          _includePhotosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_signature')) {
+      context.handle(
+        _includeSignatureMeta,
+        includeSignature.isAcceptableOrUnknown(
+          data['include_signature']!,
+          _includeSignatureMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_default')) {
+      context.handle(
+        _isDefaultMeta,
+        isDefault.isAcceptableOrUnknown(data['is_default']!, _isDefaultMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReportTemplateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReportTemplateRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tenant_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      reportType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}report_type'],
+      )!,
+      titlePrefix: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title_prefix'],
+      )!,
+      locale: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}locale'],
+      )!,
+      primaryColor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}primary_color'],
+      )!,
+      footerText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}footer_text'],
+      ),
+      includeCustomer: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_customer'],
+      )!,
+      includeInstallations: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_installations'],
+      )!,
+      includeMeasurements: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_measurements'],
+      )!,
+      includeDefects: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_defects'],
+      )!,
+      includeMaterials: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_materials'],
+      )!,
+      includeTimeEntries: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_time_entries'],
+      )!,
+      includePhotos: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_photos'],
+      )!,
+      includeSignature: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_signature'],
+      )!,
+      isDefault: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_default'],
+      )!,
+    );
+  }
+
+  @override
+  $ReportTemplatesTable createAlias(String alias) {
+    return $ReportTemplatesTable(attachedDatabase, alias);
+  }
+}
+
+class ReportTemplateRow extends DataClass
+    implements Insertable<ReportTemplateRow> {
+  final String id;
+  final String tenantId;
+  final String createdAt;
+  final String updatedAt;
+  final String? deletedAt;
+  final int version;
+  final String syncStatus;
+  final String? lastSyncedAt;
+  final String name;
+  final String reportType;
+  final String titlePrefix;
+  final String locale;
+  final String primaryColor;
+  final String? footerText;
+  final bool includeCustomer;
+  final bool includeInstallations;
+  final bool includeMeasurements;
+  final bool includeDefects;
+  final bool includeMaterials;
+  final bool includeTimeEntries;
+  final bool includePhotos;
+  final bool includeSignature;
+  final bool isDefault;
+  const ReportTemplateRow({
+    required this.id,
+    required this.tenantId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.version,
+    required this.syncStatus,
+    this.lastSyncedAt,
+    required this.name,
+    required this.reportType,
+    required this.titlePrefix,
+    required this.locale,
+    required this.primaryColor,
+    this.footerText,
+    required this.includeCustomer,
+    required this.includeInstallations,
+    required this.includeMeasurements,
+    required this.includeDefects,
+    required this.includeMaterials,
+    required this.includeTimeEntries,
+    required this.includePhotos,
+    required this.includeSignature,
+    required this.isDefault,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['tenant_id'] = Variable<String>(tenantId);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<String>(deletedAt);
+    }
+    map['version'] = Variable<int>(version);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt);
+    }
+    map['name'] = Variable<String>(name);
+    map['report_type'] = Variable<String>(reportType);
+    map['title_prefix'] = Variable<String>(titlePrefix);
+    map['locale'] = Variable<String>(locale);
+    map['primary_color'] = Variable<String>(primaryColor);
+    if (!nullToAbsent || footerText != null) {
+      map['footer_text'] = Variable<String>(footerText);
+    }
+    map['include_customer'] = Variable<bool>(includeCustomer);
+    map['include_installations'] = Variable<bool>(includeInstallations);
+    map['include_measurements'] = Variable<bool>(includeMeasurements);
+    map['include_defects'] = Variable<bool>(includeDefects);
+    map['include_materials'] = Variable<bool>(includeMaterials);
+    map['include_time_entries'] = Variable<bool>(includeTimeEntries);
+    map['include_photos'] = Variable<bool>(includePhotos);
+    map['include_signature'] = Variable<bool>(includeSignature);
+    map['is_default'] = Variable<bool>(isDefault);
+    return map;
+  }
+
+  ReportTemplatesCompanion toCompanion(bool nullToAbsent) {
+    return ReportTemplatesCompanion(
+      id: Value(id),
+      tenantId: Value(tenantId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      version: Value(version),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      name: Value(name),
+      reportType: Value(reportType),
+      titlePrefix: Value(titlePrefix),
+      locale: Value(locale),
+      primaryColor: Value(primaryColor),
+      footerText: footerText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(footerText),
+      includeCustomer: Value(includeCustomer),
+      includeInstallations: Value(includeInstallations),
+      includeMeasurements: Value(includeMeasurements),
+      includeDefects: Value(includeDefects),
+      includeMaterials: Value(includeMaterials),
+      includeTimeEntries: Value(includeTimeEntries),
+      includePhotos: Value(includePhotos),
+      includeSignature: Value(includeSignature),
+      isDefault: Value(isDefault),
+    );
+  }
+
+  factory ReportTemplateRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReportTemplateRow(
+      id: serializer.fromJson<String>(json['id']),
+      tenantId: serializer.fromJson<String>(json['tenantId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      deletedAt: serializer.fromJson<String?>(json['deletedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<String?>(json['lastSyncedAt']),
+      name: serializer.fromJson<String>(json['name']),
+      reportType: serializer.fromJson<String>(json['reportType']),
+      titlePrefix: serializer.fromJson<String>(json['titlePrefix']),
+      locale: serializer.fromJson<String>(json['locale']),
+      primaryColor: serializer.fromJson<String>(json['primaryColor']),
+      footerText: serializer.fromJson<String?>(json['footerText']),
+      includeCustomer: serializer.fromJson<bool>(json['includeCustomer']),
+      includeInstallations: serializer.fromJson<bool>(
+        json['includeInstallations'],
+      ),
+      includeMeasurements: serializer.fromJson<bool>(
+        json['includeMeasurements'],
+      ),
+      includeDefects: serializer.fromJson<bool>(json['includeDefects']),
+      includeMaterials: serializer.fromJson<bool>(json['includeMaterials']),
+      includeTimeEntries: serializer.fromJson<bool>(json['includeTimeEntries']),
+      includePhotos: serializer.fromJson<bool>(json['includePhotos']),
+      includeSignature: serializer.fromJson<bool>(json['includeSignature']),
+      isDefault: serializer.fromJson<bool>(json['isDefault']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'tenantId': serializer.toJson<String>(tenantId),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'deletedAt': serializer.toJson<String?>(deletedAt),
+      'version': serializer.toJson<int>(version),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<String?>(lastSyncedAt),
+      'name': serializer.toJson<String>(name),
+      'reportType': serializer.toJson<String>(reportType),
+      'titlePrefix': serializer.toJson<String>(titlePrefix),
+      'locale': serializer.toJson<String>(locale),
+      'primaryColor': serializer.toJson<String>(primaryColor),
+      'footerText': serializer.toJson<String?>(footerText),
+      'includeCustomer': serializer.toJson<bool>(includeCustomer),
+      'includeInstallations': serializer.toJson<bool>(includeInstallations),
+      'includeMeasurements': serializer.toJson<bool>(includeMeasurements),
+      'includeDefects': serializer.toJson<bool>(includeDefects),
+      'includeMaterials': serializer.toJson<bool>(includeMaterials),
+      'includeTimeEntries': serializer.toJson<bool>(includeTimeEntries),
+      'includePhotos': serializer.toJson<bool>(includePhotos),
+      'includeSignature': serializer.toJson<bool>(includeSignature),
+      'isDefault': serializer.toJson<bool>(isDefault),
+    };
+  }
+
+  ReportTemplateRow copyWith({
+    String? id,
+    String? tenantId,
+    String? createdAt,
+    String? updatedAt,
+    Value<String?> deletedAt = const Value.absent(),
+    int? version,
+    String? syncStatus,
+    Value<String?> lastSyncedAt = const Value.absent(),
+    String? name,
+    String? reportType,
+    String? titlePrefix,
+    String? locale,
+    String? primaryColor,
+    Value<String?> footerText = const Value.absent(),
+    bool? includeCustomer,
+    bool? includeInstallations,
+    bool? includeMeasurements,
+    bool? includeDefects,
+    bool? includeMaterials,
+    bool? includeTimeEntries,
+    bool? includePhotos,
+    bool? includeSignature,
+    bool? isDefault,
+  }) => ReportTemplateRow(
+    id: id ?? this.id,
+    tenantId: tenantId ?? this.tenantId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    version: version ?? this.version,
+    syncStatus: syncStatus ?? this.syncStatus,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    name: name ?? this.name,
+    reportType: reportType ?? this.reportType,
+    titlePrefix: titlePrefix ?? this.titlePrefix,
+    locale: locale ?? this.locale,
+    primaryColor: primaryColor ?? this.primaryColor,
+    footerText: footerText.present ? footerText.value : this.footerText,
+    includeCustomer: includeCustomer ?? this.includeCustomer,
+    includeInstallations: includeInstallations ?? this.includeInstallations,
+    includeMeasurements: includeMeasurements ?? this.includeMeasurements,
+    includeDefects: includeDefects ?? this.includeDefects,
+    includeMaterials: includeMaterials ?? this.includeMaterials,
+    includeTimeEntries: includeTimeEntries ?? this.includeTimeEntries,
+    includePhotos: includePhotos ?? this.includePhotos,
+    includeSignature: includeSignature ?? this.includeSignature,
+    isDefault: isDefault ?? this.isDefault,
+  );
+  ReportTemplateRow copyWithCompanion(ReportTemplatesCompanion data) {
+    return ReportTemplateRow(
+      id: data.id.present ? data.id.value : this.id,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      name: data.name.present ? data.name.value : this.name,
+      reportType: data.reportType.present
+          ? data.reportType.value
+          : this.reportType,
+      titlePrefix: data.titlePrefix.present
+          ? data.titlePrefix.value
+          : this.titlePrefix,
+      locale: data.locale.present ? data.locale.value : this.locale,
+      primaryColor: data.primaryColor.present
+          ? data.primaryColor.value
+          : this.primaryColor,
+      footerText: data.footerText.present
+          ? data.footerText.value
+          : this.footerText,
+      includeCustomer: data.includeCustomer.present
+          ? data.includeCustomer.value
+          : this.includeCustomer,
+      includeInstallations: data.includeInstallations.present
+          ? data.includeInstallations.value
+          : this.includeInstallations,
+      includeMeasurements: data.includeMeasurements.present
+          ? data.includeMeasurements.value
+          : this.includeMeasurements,
+      includeDefects: data.includeDefects.present
+          ? data.includeDefects.value
+          : this.includeDefects,
+      includeMaterials: data.includeMaterials.present
+          ? data.includeMaterials.value
+          : this.includeMaterials,
+      includeTimeEntries: data.includeTimeEntries.present
+          ? data.includeTimeEntries.value
+          : this.includeTimeEntries,
+      includePhotos: data.includePhotos.present
+          ? data.includePhotos.value
+          : this.includePhotos,
+      includeSignature: data.includeSignature.present
+          ? data.includeSignature.value
+          : this.includeSignature,
+      isDefault: data.isDefault.present ? data.isDefault.value : this.isDefault,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReportTemplateRow(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('name: $name, ')
+          ..write('reportType: $reportType, ')
+          ..write('titlePrefix: $titlePrefix, ')
+          ..write('locale: $locale, ')
+          ..write('primaryColor: $primaryColor, ')
+          ..write('footerText: $footerText, ')
+          ..write('includeCustomer: $includeCustomer, ')
+          ..write('includeInstallations: $includeInstallations, ')
+          ..write('includeMeasurements: $includeMeasurements, ')
+          ..write('includeDefects: $includeDefects, ')
+          ..write('includeMaterials: $includeMaterials, ')
+          ..write('includeTimeEntries: $includeTimeEntries, ')
+          ..write('includePhotos: $includePhotos, ')
+          ..write('includeSignature: $includeSignature, ')
+          ..write('isDefault: $isDefault')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    tenantId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    version,
+    syncStatus,
+    lastSyncedAt,
+    name,
+    reportType,
+    titlePrefix,
+    locale,
+    primaryColor,
+    footerText,
+    includeCustomer,
+    includeInstallations,
+    includeMeasurements,
+    includeDefects,
+    includeMaterials,
+    includeTimeEntries,
+    includePhotos,
+    includeSignature,
+    isDefault,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReportTemplateRow &&
+          other.id == this.id &&
+          other.tenantId == this.tenantId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.version == this.version &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.name == this.name &&
+          other.reportType == this.reportType &&
+          other.titlePrefix == this.titlePrefix &&
+          other.locale == this.locale &&
+          other.primaryColor == this.primaryColor &&
+          other.footerText == this.footerText &&
+          other.includeCustomer == this.includeCustomer &&
+          other.includeInstallations == this.includeInstallations &&
+          other.includeMeasurements == this.includeMeasurements &&
+          other.includeDefects == this.includeDefects &&
+          other.includeMaterials == this.includeMaterials &&
+          other.includeTimeEntries == this.includeTimeEntries &&
+          other.includePhotos == this.includePhotos &&
+          other.includeSignature == this.includeSignature &&
+          other.isDefault == this.isDefault);
+}
+
+class ReportTemplatesCompanion extends UpdateCompanion<ReportTemplateRow> {
+  final Value<String> id;
+  final Value<String> tenantId;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String?> deletedAt;
+  final Value<int> version;
+  final Value<String> syncStatus;
+  final Value<String?> lastSyncedAt;
+  final Value<String> name;
+  final Value<String> reportType;
+  final Value<String> titlePrefix;
+  final Value<String> locale;
+  final Value<String> primaryColor;
+  final Value<String?> footerText;
+  final Value<bool> includeCustomer;
+  final Value<bool> includeInstallations;
+  final Value<bool> includeMeasurements;
+  final Value<bool> includeDefects;
+  final Value<bool> includeMaterials;
+  final Value<bool> includeTimeEntries;
+  final Value<bool> includePhotos;
+  final Value<bool> includeSignature;
+  final Value<bool> isDefault;
+  final Value<int> rowid;
+  const ReportTemplatesCompanion({
+    this.id = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.name = const Value.absent(),
+    this.reportType = const Value.absent(),
+    this.titlePrefix = const Value.absent(),
+    this.locale = const Value.absent(),
+    this.primaryColor = const Value.absent(),
+    this.footerText = const Value.absent(),
+    this.includeCustomer = const Value.absent(),
+    this.includeInstallations = const Value.absent(),
+    this.includeMeasurements = const Value.absent(),
+    this.includeDefects = const Value.absent(),
+    this.includeMaterials = const Value.absent(),
+    this.includeTimeEntries = const Value.absent(),
+    this.includePhotos = const Value.absent(),
+    this.includeSignature = const Value.absent(),
+    this.isDefault = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ReportTemplatesCompanion.insert({
+    required String id,
+    required String tenantId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    required String name,
+    this.reportType = const Value.absent(),
+    this.titlePrefix = const Value.absent(),
+    this.locale = const Value.absent(),
+    this.primaryColor = const Value.absent(),
+    this.footerText = const Value.absent(),
+    this.includeCustomer = const Value.absent(),
+    this.includeInstallations = const Value.absent(),
+    this.includeMeasurements = const Value.absent(),
+    this.includeDefects = const Value.absent(),
+    this.includeMaterials = const Value.absent(),
+    this.includeTimeEntries = const Value.absent(),
+    this.includePhotos = const Value.absent(),
+    this.includeSignature = const Value.absent(),
+    this.isDefault = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       tenantId = Value(tenantId),
+       name = Value(name);
+  static Insertable<ReportTemplateRow> custom({
+    Expression<String>? id,
+    Expression<String>? tenantId,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? deletedAt,
+    Expression<int>? version,
+    Expression<String>? syncStatus,
+    Expression<String>? lastSyncedAt,
+    Expression<String>? name,
+    Expression<String>? reportType,
+    Expression<String>? titlePrefix,
+    Expression<String>? locale,
+    Expression<String>? primaryColor,
+    Expression<String>? footerText,
+    Expression<bool>? includeCustomer,
+    Expression<bool>? includeInstallations,
+    Expression<bool>? includeMeasurements,
+    Expression<bool>? includeDefects,
+    Expression<bool>? includeMaterials,
+    Expression<bool>? includeTimeEntries,
+    Expression<bool>? includePhotos,
+    Expression<bool>? includeSignature,
+    Expression<bool>? isDefault,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (version != null) 'version': version,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (name != null) 'name': name,
+      if (reportType != null) 'report_type': reportType,
+      if (titlePrefix != null) 'title_prefix': titlePrefix,
+      if (locale != null) 'locale': locale,
+      if (primaryColor != null) 'primary_color': primaryColor,
+      if (footerText != null) 'footer_text': footerText,
+      if (includeCustomer != null) 'include_customer': includeCustomer,
+      if (includeInstallations != null)
+        'include_installations': includeInstallations,
+      if (includeMeasurements != null)
+        'include_measurements': includeMeasurements,
+      if (includeDefects != null) 'include_defects': includeDefects,
+      if (includeMaterials != null) 'include_materials': includeMaterials,
+      if (includeTimeEntries != null)
+        'include_time_entries': includeTimeEntries,
+      if (includePhotos != null) 'include_photos': includePhotos,
+      if (includeSignature != null) 'include_signature': includeSignature,
+      if (isDefault != null) 'is_default': isDefault,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ReportTemplatesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? tenantId,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<String?>? deletedAt,
+    Value<int>? version,
+    Value<String>? syncStatus,
+    Value<String?>? lastSyncedAt,
+    Value<String>? name,
+    Value<String>? reportType,
+    Value<String>? titlePrefix,
+    Value<String>? locale,
+    Value<String>? primaryColor,
+    Value<String?>? footerText,
+    Value<bool>? includeCustomer,
+    Value<bool>? includeInstallations,
+    Value<bool>? includeMeasurements,
+    Value<bool>? includeDefects,
+    Value<bool>? includeMaterials,
+    Value<bool>? includeTimeEntries,
+    Value<bool>? includePhotos,
+    Value<bool>? includeSignature,
+    Value<bool>? isDefault,
+    Value<int>? rowid,
+  }) {
+    return ReportTemplatesCompanion(
+      id: id ?? this.id,
+      tenantId: tenantId ?? this.tenantId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      version: version ?? this.version,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      name: name ?? this.name,
+      reportType: reportType ?? this.reportType,
+      titlePrefix: titlePrefix ?? this.titlePrefix,
+      locale: locale ?? this.locale,
+      primaryColor: primaryColor ?? this.primaryColor,
+      footerText: footerText ?? this.footerText,
+      includeCustomer: includeCustomer ?? this.includeCustomer,
+      includeInstallations: includeInstallations ?? this.includeInstallations,
+      includeMeasurements: includeMeasurements ?? this.includeMeasurements,
+      includeDefects: includeDefects ?? this.includeDefects,
+      includeMaterials: includeMaterials ?? this.includeMaterials,
+      includeTimeEntries: includeTimeEntries ?? this.includeTimeEntries,
+      includePhotos: includePhotos ?? this.includePhotos,
+      includeSignature: includeSignature ?? this.includeSignature,
+      isDefault: isDefault ?? this.isDefault,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<String>(tenantId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<String>(deletedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (reportType.present) {
+      map['report_type'] = Variable<String>(reportType.value);
+    }
+    if (titlePrefix.present) {
+      map['title_prefix'] = Variable<String>(titlePrefix.value);
+    }
+    if (locale.present) {
+      map['locale'] = Variable<String>(locale.value);
+    }
+    if (primaryColor.present) {
+      map['primary_color'] = Variable<String>(primaryColor.value);
+    }
+    if (footerText.present) {
+      map['footer_text'] = Variable<String>(footerText.value);
+    }
+    if (includeCustomer.present) {
+      map['include_customer'] = Variable<bool>(includeCustomer.value);
+    }
+    if (includeInstallations.present) {
+      map['include_installations'] = Variable<bool>(includeInstallations.value);
+    }
+    if (includeMeasurements.present) {
+      map['include_measurements'] = Variable<bool>(includeMeasurements.value);
+    }
+    if (includeDefects.present) {
+      map['include_defects'] = Variable<bool>(includeDefects.value);
+    }
+    if (includeMaterials.present) {
+      map['include_materials'] = Variable<bool>(includeMaterials.value);
+    }
+    if (includeTimeEntries.present) {
+      map['include_time_entries'] = Variable<bool>(includeTimeEntries.value);
+    }
+    if (includePhotos.present) {
+      map['include_photos'] = Variable<bool>(includePhotos.value);
+    }
+    if (includeSignature.present) {
+      map['include_signature'] = Variable<bool>(includeSignature.value);
+    }
+    if (isDefault.present) {
+      map['is_default'] = Variable<bool>(isDefault.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReportTemplatesCompanion(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('version: $version, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('name: $name, ')
+          ..write('reportType: $reportType, ')
+          ..write('titlePrefix: $titlePrefix, ')
+          ..write('locale: $locale, ')
+          ..write('primaryColor: $primaryColor, ')
+          ..write('footerText: $footerText, ')
+          ..write('includeCustomer: $includeCustomer, ')
+          ..write('includeInstallations: $includeInstallations, ')
+          ..write('includeMeasurements: $includeMeasurements, ')
+          ..write('includeDefects: $includeDefects, ')
+          ..write('includeMaterials: $includeMaterials, ')
+          ..write('includeTimeEntries: $includeTimeEntries, ')
+          ..write('includePhotos: $includePhotos, ')
+          ..write('includeSignature: $includeSignature, ')
+          ..write('isDefault: $isDefault, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -17009,6 +22923,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MaterialsTable materials = $MaterialsTable(this);
   late final $WorkOrderMaterialsTable workOrderMaterials =
       $WorkOrderMaterialsTable(this);
+  late final $TariffCatalogItemsTable tariffCatalogItems =
+      $TariffCatalogItemsTable(this);
+  late final $ObjectTariffAssignmentsTable objectTariffAssignments =
+      $ObjectTariffAssignmentsTable(this);
+  late final $WorkOrderServiceLinesTable workOrderServiceLines =
+      $WorkOrderServiceLinesTable(this);
+  late final $LegacyImportRecordsTable legacyImportRecords =
+      $LegacyImportRecordsTable(this);
+  late final $ReportTemplatesTable reportTemplates = $ReportTemplatesTable(
+    this,
+  );
   late final $ReportsTable reports = $ReportsTable(this);
   late final $OutboxEntriesTable outboxEntries = $OutboxEntriesTable(this);
   late final $SyncStatesTable syncStates = $SyncStatesTable(this);
@@ -17027,6 +22952,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final PhotoDao photoDao = PhotoDao(this as AppDatabase);
   late final TimeEntryDao timeEntryDao = TimeEntryDao(this as AppDatabase);
   late final MaterialDao materialDao = MaterialDao(this as AppDatabase);
+  late final ReportTemplateDao reportTemplateDao = ReportTemplateDao(
+    this as AppDatabase,
+  );
   late final ReportDao reportDao = ReportDao(this as AppDatabase);
   late final OutboxDao outboxDao = OutboxDao(this as AppDatabase);
   late final SyncStateDao syncStateDao = SyncStateDao(this as AppDatabase);
@@ -17051,6 +22979,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     timeEntries,
     materials,
     workOrderMaterials,
+    tariffCatalogItems,
+    objectTariffAssignments,
+    workOrderServiceLines,
+    legacyImportRecords,
+    reportTemplates,
     reports,
     outboxEntries,
     syncStates,
@@ -23113,6 +29046,8 @@ typedef $$MaterialsTableCreateCompanionBuilder =
       required String name,
       required String unit,
       Value<double?> defaultPrice,
+      Value<double?> stockQuantity,
+      Value<double?> minStockQuantity,
       Value<bool> isActive,
       Value<int> rowid,
     });
@@ -23130,6 +29065,8 @@ typedef $$MaterialsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> unit,
       Value<double?> defaultPrice,
+      Value<double?> stockQuantity,
+      Value<double?> minStockQuantity,
       Value<bool> isActive,
       Value<int> rowid,
     });
@@ -23200,6 +29137,16 @@ class $$MaterialsTableFilterComposer
 
   ColumnFilters<double> get defaultPrice => $composableBuilder(
     column: $table.defaultPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get stockQuantity => $composableBuilder(
+    column: $table.stockQuantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get minStockQuantity => $composableBuilder(
+    column: $table.minStockQuantity,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -23278,6 +29225,16 @@ class $$MaterialsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get stockQuantity => $composableBuilder(
+    column: $table.stockQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get minStockQuantity => $composableBuilder(
+    column: $table.minStockQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isActive => $composableBuilder(
     column: $table.isActive,
     builder: (column) => ColumnOrderings(column),
@@ -23335,6 +29292,16 @@ class $$MaterialsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<double> get stockQuantity => $composableBuilder(
+    column: $table.stockQuantity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get minStockQuantity => $composableBuilder(
+    column: $table.minStockQuantity,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
 }
@@ -23382,6 +29349,8 @@ class $$MaterialsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> unit = const Value.absent(),
                 Value<double?> defaultPrice = const Value.absent(),
+                Value<double?> stockQuantity = const Value.absent(),
+                Value<double?> minStockQuantity = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MaterialsCompanion(
@@ -23397,6 +29366,8 @@ class $$MaterialsTableTableManager
                 name: name,
                 unit: unit,
                 defaultPrice: defaultPrice,
+                stockQuantity: stockQuantity,
+                minStockQuantity: minStockQuantity,
                 isActive: isActive,
                 rowid: rowid,
               ),
@@ -23414,6 +29385,8 @@ class $$MaterialsTableTableManager
                 required String name,
                 required String unit,
                 Value<double?> defaultPrice = const Value.absent(),
+                Value<double?> stockQuantity = const Value.absent(),
+                Value<double?> minStockQuantity = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MaterialsCompanion.insert(
@@ -23429,6 +29402,8 @@ class $$MaterialsTableTableManager
                 name: name,
                 unit: unit,
                 defaultPrice: defaultPrice,
+                stockQuantity: stockQuantity,
+                minStockQuantity: minStockQuantity,
                 isActive: isActive,
                 rowid: rowid,
               ),
@@ -23847,6 +29822,2651 @@ typedef $$WorkOrderMaterialsTableProcessedTableManager =
         >,
       ),
       WorkOrderMaterialRow,
+      PrefetchHooks Function()
+    >;
+typedef $$TariffCatalogItemsTableCreateCompanionBuilder =
+    TariffCatalogItemsCompanion Function({
+      required String id,
+      required String tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      required String tariffSystem,
+      required String code,
+      required String description,
+      Value<double?> defaultPrice,
+      Value<String?> taxCategory,
+      Value<double?> taxPoints,
+      Value<bool> isActive,
+      Value<int> rowid,
+    });
+typedef $$TariffCatalogItemsTableUpdateCompanionBuilder =
+    TariffCatalogItemsCompanion Function({
+      Value<String> id,
+      Value<String> tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      Value<String> tariffSystem,
+      Value<String> code,
+      Value<String> description,
+      Value<double?> defaultPrice,
+      Value<String?> taxCategory,
+      Value<double?> taxPoints,
+      Value<bool> isActive,
+      Value<int> rowid,
+    });
+
+class $$TariffCatalogItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $TariffCatalogItemsTable> {
+  $$TariffCatalogItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tariffSystem => $composableBuilder(
+    column: $table.tariffSystem,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get defaultPrice => $composableBuilder(
+    column: $table.defaultPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get taxCategory => $composableBuilder(
+    column: $table.taxCategory,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get taxPoints => $composableBuilder(
+    column: $table.taxPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TariffCatalogItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TariffCatalogItemsTable> {
+  $$TariffCatalogItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tariffSystem => $composableBuilder(
+    column: $table.tariffSystem,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get defaultPrice => $composableBuilder(
+    column: $table.defaultPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get taxCategory => $composableBuilder(
+    column: $table.taxCategory,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get taxPoints => $composableBuilder(
+    column: $table.taxPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TariffCatalogItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TariffCatalogItemsTable> {
+  $$TariffCatalogItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tenantId =>
+      $composableBuilder(column: $table.tenantId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get tariffSystem => $composableBuilder(
+    column: $table.tariffSystem,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get defaultPrice => $composableBuilder(
+    column: $table.defaultPrice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get taxCategory => $composableBuilder(
+    column: $table.taxCategory,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get taxPoints =>
+      $composableBuilder(column: $table.taxPoints, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$TariffCatalogItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TariffCatalogItemsTable,
+          TariffCatalogItemRow,
+          $$TariffCatalogItemsTableFilterComposer,
+          $$TariffCatalogItemsTableOrderingComposer,
+          $$TariffCatalogItemsTableAnnotationComposer,
+          $$TariffCatalogItemsTableCreateCompanionBuilder,
+          $$TariffCatalogItemsTableUpdateCompanionBuilder,
+          (
+            TariffCatalogItemRow,
+            BaseReferences<
+              _$AppDatabase,
+              $TariffCatalogItemsTable,
+              TariffCatalogItemRow
+            >,
+          ),
+          TariffCatalogItemRow,
+          PrefetchHooks Function()
+        > {
+  $$TariffCatalogItemsTableTableManager(
+    _$AppDatabase db,
+    $TariffCatalogItemsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TariffCatalogItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TariffCatalogItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TariffCatalogItemsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> tenantId = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                Value<String> tariffSystem = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<double?> defaultPrice = const Value.absent(),
+                Value<String?> taxCategory = const Value.absent(),
+                Value<double?> taxPoints = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TariffCatalogItemsCompanion(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                tariffSystem: tariffSystem,
+                code: code,
+                description: description,
+                defaultPrice: defaultPrice,
+                taxCategory: taxCategory,
+                taxPoints: taxPoints,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String tenantId,
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                required String tariffSystem,
+                required String code,
+                required String description,
+                Value<double?> defaultPrice = const Value.absent(),
+                Value<String?> taxCategory = const Value.absent(),
+                Value<double?> taxPoints = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TariffCatalogItemsCompanion.insert(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                tariffSystem: tariffSystem,
+                code: code,
+                description: description,
+                defaultPrice: defaultPrice,
+                taxCategory: taxCategory,
+                taxPoints: taxPoints,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TariffCatalogItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TariffCatalogItemsTable,
+      TariffCatalogItemRow,
+      $$TariffCatalogItemsTableFilterComposer,
+      $$TariffCatalogItemsTableOrderingComposer,
+      $$TariffCatalogItemsTableAnnotationComposer,
+      $$TariffCatalogItemsTableCreateCompanionBuilder,
+      $$TariffCatalogItemsTableUpdateCompanionBuilder,
+      (
+        TariffCatalogItemRow,
+        BaseReferences<
+          _$AppDatabase,
+          $TariffCatalogItemsTable,
+          TariffCatalogItemRow
+        >,
+      ),
+      TariffCatalogItemRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ObjectTariffAssignmentsTableCreateCompanionBuilder =
+    ObjectTariffAssignmentsCompanion Function({
+      required String id,
+      required String tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      Value<String?> objectId,
+      Value<String?> tariffCatalogItemId,
+      required String tariffSystem,
+      Value<String?> code,
+      required String description,
+      Value<int?> position,
+      Value<double?> defaultQuantity,
+      Value<String?> unit,
+      Value<double?> priceOverride,
+      Value<double?> taxPoints,
+      Value<String?> billingCode,
+      Value<String?> intervalCode,
+      Value<String?> flag13,
+      Value<String?> flag14,
+      Value<String?> flag15,
+      Value<String?> notes,
+      Value<bool> isActive,
+      Value<int> rowid,
+    });
+typedef $$ObjectTariffAssignmentsTableUpdateCompanionBuilder =
+    ObjectTariffAssignmentsCompanion Function({
+      Value<String> id,
+      Value<String> tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      Value<String?> objectId,
+      Value<String?> tariffCatalogItemId,
+      Value<String> tariffSystem,
+      Value<String?> code,
+      Value<String> description,
+      Value<int?> position,
+      Value<double?> defaultQuantity,
+      Value<String?> unit,
+      Value<double?> priceOverride,
+      Value<double?> taxPoints,
+      Value<String?> billingCode,
+      Value<String?> intervalCode,
+      Value<String?> flag13,
+      Value<String?> flag14,
+      Value<String?> flag15,
+      Value<String?> notes,
+      Value<bool> isActive,
+      Value<int> rowid,
+    });
+
+class $$ObjectTariffAssignmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $ObjectTariffAssignmentsTable> {
+  $$ObjectTariffAssignmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get objectId => $composableBuilder(
+    column: $table.objectId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tariffCatalogItemId => $composableBuilder(
+    column: $table.tariffCatalogItemId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tariffSystem => $composableBuilder(
+    column: $table.tariffSystem,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get defaultQuantity => $composableBuilder(
+    column: $table.defaultQuantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get priceOverride => $composableBuilder(
+    column: $table.priceOverride,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get taxPoints => $composableBuilder(
+    column: $table.taxPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get billingCode => $composableBuilder(
+    column: $table.billingCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get intervalCode => $composableBuilder(
+    column: $table.intervalCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flag13 => $composableBuilder(
+    column: $table.flag13,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flag14 => $composableBuilder(
+    column: $table.flag14,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flag15 => $composableBuilder(
+    column: $table.flag15,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ObjectTariffAssignmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ObjectTariffAssignmentsTable> {
+  $$ObjectTariffAssignmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get objectId => $composableBuilder(
+    column: $table.objectId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tariffCatalogItemId => $composableBuilder(
+    column: $table.tariffCatalogItemId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tariffSystem => $composableBuilder(
+    column: $table.tariffSystem,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get defaultQuantity => $composableBuilder(
+    column: $table.defaultQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get priceOverride => $composableBuilder(
+    column: $table.priceOverride,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get taxPoints => $composableBuilder(
+    column: $table.taxPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get billingCode => $composableBuilder(
+    column: $table.billingCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get intervalCode => $composableBuilder(
+    column: $table.intervalCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flag13 => $composableBuilder(
+    column: $table.flag13,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flag14 => $composableBuilder(
+    column: $table.flag14,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flag15 => $composableBuilder(
+    column: $table.flag15,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ObjectTariffAssignmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ObjectTariffAssignmentsTable> {
+  $$ObjectTariffAssignmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tenantId =>
+      $composableBuilder(column: $table.tenantId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get objectId =>
+      $composableBuilder(column: $table.objectId, builder: (column) => column);
+
+  GeneratedColumn<String> get tariffCatalogItemId => $composableBuilder(
+    column: $table.tariffCatalogItemId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get tariffSystem => $composableBuilder(
+    column: $table.tariffSystem,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<double> get defaultQuantity => $composableBuilder(
+    column: $table.defaultQuantity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<double> get priceOverride => $composableBuilder(
+    column: $table.priceOverride,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get taxPoints =>
+      $composableBuilder(column: $table.taxPoints, builder: (column) => column);
+
+  GeneratedColumn<String> get billingCode => $composableBuilder(
+    column: $table.billingCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get intervalCode => $composableBuilder(
+    column: $table.intervalCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get flag13 =>
+      $composableBuilder(column: $table.flag13, builder: (column) => column);
+
+  GeneratedColumn<String> get flag14 =>
+      $composableBuilder(column: $table.flag14, builder: (column) => column);
+
+  GeneratedColumn<String> get flag15 =>
+      $composableBuilder(column: $table.flag15, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$ObjectTariffAssignmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ObjectTariffAssignmentsTable,
+          ObjectTariffAssignmentRow,
+          $$ObjectTariffAssignmentsTableFilterComposer,
+          $$ObjectTariffAssignmentsTableOrderingComposer,
+          $$ObjectTariffAssignmentsTableAnnotationComposer,
+          $$ObjectTariffAssignmentsTableCreateCompanionBuilder,
+          $$ObjectTariffAssignmentsTableUpdateCompanionBuilder,
+          (
+            ObjectTariffAssignmentRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ObjectTariffAssignmentsTable,
+              ObjectTariffAssignmentRow
+            >,
+          ),
+          ObjectTariffAssignmentRow,
+          PrefetchHooks Function()
+        > {
+  $$ObjectTariffAssignmentsTableTableManager(
+    _$AppDatabase db,
+    $ObjectTariffAssignmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ObjectTariffAssignmentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ObjectTariffAssignmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ObjectTariffAssignmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> tenantId = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                Value<String?> objectId = const Value.absent(),
+                Value<String?> tariffCatalogItemId = const Value.absent(),
+                Value<String> tariffSystem = const Value.absent(),
+                Value<String?> code = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<int?> position = const Value.absent(),
+                Value<double?> defaultQuantity = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<double?> priceOverride = const Value.absent(),
+                Value<double?> taxPoints = const Value.absent(),
+                Value<String?> billingCode = const Value.absent(),
+                Value<String?> intervalCode = const Value.absent(),
+                Value<String?> flag13 = const Value.absent(),
+                Value<String?> flag14 = const Value.absent(),
+                Value<String?> flag15 = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ObjectTariffAssignmentsCompanion(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                objectId: objectId,
+                tariffCatalogItemId: tariffCatalogItemId,
+                tariffSystem: tariffSystem,
+                code: code,
+                description: description,
+                position: position,
+                defaultQuantity: defaultQuantity,
+                unit: unit,
+                priceOverride: priceOverride,
+                taxPoints: taxPoints,
+                billingCode: billingCode,
+                intervalCode: intervalCode,
+                flag13: flag13,
+                flag14: flag14,
+                flag15: flag15,
+                notes: notes,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String tenantId,
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                Value<String?> objectId = const Value.absent(),
+                Value<String?> tariffCatalogItemId = const Value.absent(),
+                required String tariffSystem,
+                Value<String?> code = const Value.absent(),
+                required String description,
+                Value<int?> position = const Value.absent(),
+                Value<double?> defaultQuantity = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<double?> priceOverride = const Value.absent(),
+                Value<double?> taxPoints = const Value.absent(),
+                Value<String?> billingCode = const Value.absent(),
+                Value<String?> intervalCode = const Value.absent(),
+                Value<String?> flag13 = const Value.absent(),
+                Value<String?> flag14 = const Value.absent(),
+                Value<String?> flag15 = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ObjectTariffAssignmentsCompanion.insert(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                objectId: objectId,
+                tariffCatalogItemId: tariffCatalogItemId,
+                tariffSystem: tariffSystem,
+                code: code,
+                description: description,
+                position: position,
+                defaultQuantity: defaultQuantity,
+                unit: unit,
+                priceOverride: priceOverride,
+                taxPoints: taxPoints,
+                billingCode: billingCode,
+                intervalCode: intervalCode,
+                flag13: flag13,
+                flag14: flag14,
+                flag15: flag15,
+                notes: notes,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ObjectTariffAssignmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ObjectTariffAssignmentsTable,
+      ObjectTariffAssignmentRow,
+      $$ObjectTariffAssignmentsTableFilterComposer,
+      $$ObjectTariffAssignmentsTableOrderingComposer,
+      $$ObjectTariffAssignmentsTableAnnotationComposer,
+      $$ObjectTariffAssignmentsTableCreateCompanionBuilder,
+      $$ObjectTariffAssignmentsTableUpdateCompanionBuilder,
+      (
+        ObjectTariffAssignmentRow,
+        BaseReferences<
+          _$AppDatabase,
+          $ObjectTariffAssignmentsTable,
+          ObjectTariffAssignmentRow
+        >,
+      ),
+      ObjectTariffAssignmentRow,
+      PrefetchHooks Function()
+    >;
+typedef $$WorkOrderServiceLinesTableCreateCompanionBuilder =
+    WorkOrderServiceLinesCompanion Function({
+      required String id,
+      required String tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      required String workOrderId,
+      Value<String?> objectTariffAssignmentId,
+      Value<String?> tariffCatalogItemId,
+      Value<String?> installationId,
+      Value<String?> code,
+      required String name,
+      required double quantity,
+      required String unit,
+      Value<double?> unitPrice,
+      Value<double?> totalPrice,
+      Value<double?> taxPoints,
+      Value<String> status,
+      Value<String?> notes,
+      Value<int> rowid,
+    });
+typedef $$WorkOrderServiceLinesTableUpdateCompanionBuilder =
+    WorkOrderServiceLinesCompanion Function({
+      Value<String> id,
+      Value<String> tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      Value<String> workOrderId,
+      Value<String?> objectTariffAssignmentId,
+      Value<String?> tariffCatalogItemId,
+      Value<String?> installationId,
+      Value<String?> code,
+      Value<String> name,
+      Value<double> quantity,
+      Value<String> unit,
+      Value<double?> unitPrice,
+      Value<double?> totalPrice,
+      Value<double?> taxPoints,
+      Value<String> status,
+      Value<String?> notes,
+      Value<int> rowid,
+    });
+
+class $$WorkOrderServiceLinesTableFilterComposer
+    extends Composer<_$AppDatabase, $WorkOrderServiceLinesTable> {
+  $$WorkOrderServiceLinesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workOrderId => $composableBuilder(
+    column: $table.workOrderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get objectTariffAssignmentId => $composableBuilder(
+    column: $table.objectTariffAssignmentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tariffCatalogItemId => $composableBuilder(
+    column: $table.tariffCatalogItemId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get installationId => $composableBuilder(
+    column: $table.installationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get taxPoints => $composableBuilder(
+    column: $table.taxPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WorkOrderServiceLinesTableOrderingComposer
+    extends Composer<_$AppDatabase, $WorkOrderServiceLinesTable> {
+  $$WorkOrderServiceLinesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get workOrderId => $composableBuilder(
+    column: $table.workOrderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get objectTariffAssignmentId => $composableBuilder(
+    column: $table.objectTariffAssignmentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tariffCatalogItemId => $composableBuilder(
+    column: $table.tariffCatalogItemId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get installationId => $composableBuilder(
+    column: $table.installationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get taxPoints => $composableBuilder(
+    column: $table.taxPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WorkOrderServiceLinesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WorkOrderServiceLinesTable> {
+  $$WorkOrderServiceLinesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tenantId =>
+      $composableBuilder(column: $table.tenantId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get workOrderId => $composableBuilder(
+    column: $table.workOrderId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get objectTariffAssignmentId => $composableBuilder(
+    column: $table.objectTariffAssignmentId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get tariffCatalogItemId => $composableBuilder(
+    column: $table.tariffCatalogItemId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get installationId => $composableBuilder(
+    column: $table.installationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<double> get unitPrice =>
+      $composableBuilder(column: $table.unitPrice, builder: (column) => column);
+
+  GeneratedColumn<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get taxPoints =>
+      $composableBuilder(column: $table.taxPoints, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+}
+
+class $$WorkOrderServiceLinesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WorkOrderServiceLinesTable,
+          WorkOrderServiceLineRow,
+          $$WorkOrderServiceLinesTableFilterComposer,
+          $$WorkOrderServiceLinesTableOrderingComposer,
+          $$WorkOrderServiceLinesTableAnnotationComposer,
+          $$WorkOrderServiceLinesTableCreateCompanionBuilder,
+          $$WorkOrderServiceLinesTableUpdateCompanionBuilder,
+          (
+            WorkOrderServiceLineRow,
+            BaseReferences<
+              _$AppDatabase,
+              $WorkOrderServiceLinesTable,
+              WorkOrderServiceLineRow
+            >,
+          ),
+          WorkOrderServiceLineRow,
+          PrefetchHooks Function()
+        > {
+  $$WorkOrderServiceLinesTableTableManager(
+    _$AppDatabase db,
+    $WorkOrderServiceLinesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WorkOrderServiceLinesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$WorkOrderServiceLinesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$WorkOrderServiceLinesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> tenantId = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                Value<String> workOrderId = const Value.absent(),
+                Value<String?> objectTariffAssignmentId = const Value.absent(),
+                Value<String?> tariffCatalogItemId = const Value.absent(),
+                Value<String?> installationId = const Value.absent(),
+                Value<String?> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<double> quantity = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<double?> unitPrice = const Value.absent(),
+                Value<double?> totalPrice = const Value.absent(),
+                Value<double?> taxPoints = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WorkOrderServiceLinesCompanion(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                workOrderId: workOrderId,
+                objectTariffAssignmentId: objectTariffAssignmentId,
+                tariffCatalogItemId: tariffCatalogItemId,
+                installationId: installationId,
+                code: code,
+                name: name,
+                quantity: quantity,
+                unit: unit,
+                unitPrice: unitPrice,
+                totalPrice: totalPrice,
+                taxPoints: taxPoints,
+                status: status,
+                notes: notes,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String tenantId,
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                required String workOrderId,
+                Value<String?> objectTariffAssignmentId = const Value.absent(),
+                Value<String?> tariffCatalogItemId = const Value.absent(),
+                Value<String?> installationId = const Value.absent(),
+                Value<String?> code = const Value.absent(),
+                required String name,
+                required double quantity,
+                required String unit,
+                Value<double?> unitPrice = const Value.absent(),
+                Value<double?> totalPrice = const Value.absent(),
+                Value<double?> taxPoints = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WorkOrderServiceLinesCompanion.insert(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                workOrderId: workOrderId,
+                objectTariffAssignmentId: objectTariffAssignmentId,
+                tariffCatalogItemId: tariffCatalogItemId,
+                installationId: installationId,
+                code: code,
+                name: name,
+                quantity: quantity,
+                unit: unit,
+                unitPrice: unitPrice,
+                totalPrice: totalPrice,
+                taxPoints: taxPoints,
+                status: status,
+                notes: notes,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WorkOrderServiceLinesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WorkOrderServiceLinesTable,
+      WorkOrderServiceLineRow,
+      $$WorkOrderServiceLinesTableFilterComposer,
+      $$WorkOrderServiceLinesTableOrderingComposer,
+      $$WorkOrderServiceLinesTableAnnotationComposer,
+      $$WorkOrderServiceLinesTableCreateCompanionBuilder,
+      $$WorkOrderServiceLinesTableUpdateCompanionBuilder,
+      (
+        WorkOrderServiceLineRow,
+        BaseReferences<
+          _$AppDatabase,
+          $WorkOrderServiceLinesTable,
+          WorkOrderServiceLineRow
+        >,
+      ),
+      WorkOrderServiceLineRow,
+      PrefetchHooks Function()
+    >;
+typedef $$LegacyImportRecordsTableCreateCompanionBuilder =
+    LegacyImportRecordsCompanion Function({
+      required String id,
+      required String tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      required String batchId,
+      required String sourceSystem,
+      required String sourceFile,
+      required String sourceTable,
+      required String sourceKey,
+      required String rowHash,
+      Value<int?> rowIndex,
+      Value<String> recordType,
+      Value<String?> mappedEntityType,
+      Value<String?> mappedEntityId,
+      required String payloadJson,
+      Value<int> rowid,
+    });
+typedef $$LegacyImportRecordsTableUpdateCompanionBuilder =
+    LegacyImportRecordsCompanion Function({
+      Value<String> id,
+      Value<String> tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      Value<String> batchId,
+      Value<String> sourceSystem,
+      Value<String> sourceFile,
+      Value<String> sourceTable,
+      Value<String> sourceKey,
+      Value<String> rowHash,
+      Value<int?> rowIndex,
+      Value<String> recordType,
+      Value<String?> mappedEntityType,
+      Value<String?> mappedEntityId,
+      Value<String> payloadJson,
+      Value<int> rowid,
+    });
+
+class $$LegacyImportRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $LegacyImportRecordsTable> {
+  $$LegacyImportRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get batchId => $composableBuilder(
+    column: $table.batchId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceSystem => $composableBuilder(
+    column: $table.sourceSystem,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceFile => $composableBuilder(
+    column: $table.sourceFile,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceTable => $composableBuilder(
+    column: $table.sourceTable,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceKey => $composableBuilder(
+    column: $table.sourceKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rowHash => $composableBuilder(
+    column: $table.rowHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rowIndex => $composableBuilder(
+    column: $table.rowIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get recordType => $composableBuilder(
+    column: $table.recordType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mappedEntityType => $composableBuilder(
+    column: $table.mappedEntityType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mappedEntityId => $composableBuilder(
+    column: $table.mappedEntityId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LegacyImportRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LegacyImportRecordsTable> {
+  $$LegacyImportRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get batchId => $composableBuilder(
+    column: $table.batchId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceSystem => $composableBuilder(
+    column: $table.sourceSystem,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceFile => $composableBuilder(
+    column: $table.sourceFile,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceTable => $composableBuilder(
+    column: $table.sourceTable,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceKey => $composableBuilder(
+    column: $table.sourceKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rowHash => $composableBuilder(
+    column: $table.rowHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rowIndex => $composableBuilder(
+    column: $table.rowIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get recordType => $composableBuilder(
+    column: $table.recordType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mappedEntityType => $composableBuilder(
+    column: $table.mappedEntityType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mappedEntityId => $composableBuilder(
+    column: $table.mappedEntityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LegacyImportRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LegacyImportRecordsTable> {
+  $$LegacyImportRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tenantId =>
+      $composableBuilder(column: $table.tenantId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get batchId =>
+      $composableBuilder(column: $table.batchId, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceSystem => $composableBuilder(
+    column: $table.sourceSystem,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceFile => $composableBuilder(
+    column: $table.sourceFile,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceTable => $composableBuilder(
+    column: $table.sourceTable,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceKey =>
+      $composableBuilder(column: $table.sourceKey, builder: (column) => column);
+
+  GeneratedColumn<String> get rowHash =>
+      $composableBuilder(column: $table.rowHash, builder: (column) => column);
+
+  GeneratedColumn<int> get rowIndex =>
+      $composableBuilder(column: $table.rowIndex, builder: (column) => column);
+
+  GeneratedColumn<String> get recordType => $composableBuilder(
+    column: $table.recordType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mappedEntityType => $composableBuilder(
+    column: $table.mappedEntityType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mappedEntityId => $composableBuilder(
+    column: $table.mappedEntityId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+}
+
+class $$LegacyImportRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LegacyImportRecordsTable,
+          LegacyImportRecordRow,
+          $$LegacyImportRecordsTableFilterComposer,
+          $$LegacyImportRecordsTableOrderingComposer,
+          $$LegacyImportRecordsTableAnnotationComposer,
+          $$LegacyImportRecordsTableCreateCompanionBuilder,
+          $$LegacyImportRecordsTableUpdateCompanionBuilder,
+          (
+            LegacyImportRecordRow,
+            BaseReferences<
+              _$AppDatabase,
+              $LegacyImportRecordsTable,
+              LegacyImportRecordRow
+            >,
+          ),
+          LegacyImportRecordRow,
+          PrefetchHooks Function()
+        > {
+  $$LegacyImportRecordsTableTableManager(
+    _$AppDatabase db,
+    $LegacyImportRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LegacyImportRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LegacyImportRecordsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LegacyImportRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> tenantId = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                Value<String> batchId = const Value.absent(),
+                Value<String> sourceSystem = const Value.absent(),
+                Value<String> sourceFile = const Value.absent(),
+                Value<String> sourceTable = const Value.absent(),
+                Value<String> sourceKey = const Value.absent(),
+                Value<String> rowHash = const Value.absent(),
+                Value<int?> rowIndex = const Value.absent(),
+                Value<String> recordType = const Value.absent(),
+                Value<String?> mappedEntityType = const Value.absent(),
+                Value<String?> mappedEntityId = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LegacyImportRecordsCompanion(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                batchId: batchId,
+                sourceSystem: sourceSystem,
+                sourceFile: sourceFile,
+                sourceTable: sourceTable,
+                sourceKey: sourceKey,
+                rowHash: rowHash,
+                rowIndex: rowIndex,
+                recordType: recordType,
+                mappedEntityType: mappedEntityType,
+                mappedEntityId: mappedEntityId,
+                payloadJson: payloadJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String tenantId,
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                required String batchId,
+                required String sourceSystem,
+                required String sourceFile,
+                required String sourceTable,
+                required String sourceKey,
+                required String rowHash,
+                Value<int?> rowIndex = const Value.absent(),
+                Value<String> recordType = const Value.absent(),
+                Value<String?> mappedEntityType = const Value.absent(),
+                Value<String?> mappedEntityId = const Value.absent(),
+                required String payloadJson,
+                Value<int> rowid = const Value.absent(),
+              }) => LegacyImportRecordsCompanion.insert(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                batchId: batchId,
+                sourceSystem: sourceSystem,
+                sourceFile: sourceFile,
+                sourceTable: sourceTable,
+                sourceKey: sourceKey,
+                rowHash: rowHash,
+                rowIndex: rowIndex,
+                recordType: recordType,
+                mappedEntityType: mappedEntityType,
+                mappedEntityId: mappedEntityId,
+                payloadJson: payloadJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LegacyImportRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LegacyImportRecordsTable,
+      LegacyImportRecordRow,
+      $$LegacyImportRecordsTableFilterComposer,
+      $$LegacyImportRecordsTableOrderingComposer,
+      $$LegacyImportRecordsTableAnnotationComposer,
+      $$LegacyImportRecordsTableCreateCompanionBuilder,
+      $$LegacyImportRecordsTableUpdateCompanionBuilder,
+      (
+        LegacyImportRecordRow,
+        BaseReferences<
+          _$AppDatabase,
+          $LegacyImportRecordsTable,
+          LegacyImportRecordRow
+        >,
+      ),
+      LegacyImportRecordRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ReportTemplatesTableCreateCompanionBuilder =
+    ReportTemplatesCompanion Function({
+      required String id,
+      required String tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      required String name,
+      Value<String> reportType,
+      Value<String> titlePrefix,
+      Value<String> locale,
+      Value<String> primaryColor,
+      Value<String?> footerText,
+      Value<bool> includeCustomer,
+      Value<bool> includeInstallations,
+      Value<bool> includeMeasurements,
+      Value<bool> includeDefects,
+      Value<bool> includeMaterials,
+      Value<bool> includeTimeEntries,
+      Value<bool> includePhotos,
+      Value<bool> includeSignature,
+      Value<bool> isDefault,
+      Value<int> rowid,
+    });
+typedef $$ReportTemplatesTableUpdateCompanionBuilder =
+    ReportTemplatesCompanion Function({
+      Value<String> id,
+      Value<String> tenantId,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<String?> deletedAt,
+      Value<int> version,
+      Value<String> syncStatus,
+      Value<String?> lastSyncedAt,
+      Value<String> name,
+      Value<String> reportType,
+      Value<String> titlePrefix,
+      Value<String> locale,
+      Value<String> primaryColor,
+      Value<String?> footerText,
+      Value<bool> includeCustomer,
+      Value<bool> includeInstallations,
+      Value<bool> includeMeasurements,
+      Value<bool> includeDefects,
+      Value<bool> includeMaterials,
+      Value<bool> includeTimeEntries,
+      Value<bool> includePhotos,
+      Value<bool> includeSignature,
+      Value<bool> isDefault,
+      Value<int> rowid,
+    });
+
+class $$ReportTemplatesTableFilterComposer
+    extends Composer<_$AppDatabase, $ReportTemplatesTable> {
+  $$ReportTemplatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reportType => $composableBuilder(
+    column: $table.reportType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get titlePrefix => $composableBuilder(
+    column: $table.titlePrefix,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get locale => $composableBuilder(
+    column: $table.locale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get footerText => $composableBuilder(
+    column: $table.footerText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeCustomer => $composableBuilder(
+    column: $table.includeCustomer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeInstallations => $composableBuilder(
+    column: $table.includeInstallations,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeMeasurements => $composableBuilder(
+    column: $table.includeMeasurements,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeDefects => $composableBuilder(
+    column: $table.includeDefects,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeMaterials => $composableBuilder(
+    column: $table.includeMaterials,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeTimeEntries => $composableBuilder(
+    column: $table.includeTimeEntries,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includePhotos => $composableBuilder(
+    column: $table.includePhotos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeSignature => $composableBuilder(
+    column: $table.includeSignature,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ReportTemplatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReportTemplatesTable> {
+  $$ReportTemplatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reportType => $composableBuilder(
+    column: $table.reportType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get titlePrefix => $composableBuilder(
+    column: $table.titlePrefix,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get locale => $composableBuilder(
+    column: $table.locale,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get footerText => $composableBuilder(
+    column: $table.footerText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeCustomer => $composableBuilder(
+    column: $table.includeCustomer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeInstallations => $composableBuilder(
+    column: $table.includeInstallations,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeMeasurements => $composableBuilder(
+    column: $table.includeMeasurements,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeDefects => $composableBuilder(
+    column: $table.includeDefects,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeMaterials => $composableBuilder(
+    column: $table.includeMaterials,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeTimeEntries => $composableBuilder(
+    column: $table.includeTimeEntries,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includePhotos => $composableBuilder(
+    column: $table.includePhotos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeSignature => $composableBuilder(
+    column: $table.includeSignature,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReportTemplatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReportTemplatesTable> {
+  $$ReportTemplatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tenantId =>
+      $composableBuilder(column: $table.tenantId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get reportType => $composableBuilder(
+    column: $table.reportType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get titlePrefix => $composableBuilder(
+    column: $table.titlePrefix,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get locale =>
+      $composableBuilder(column: $table.locale, builder: (column) => column);
+
+  GeneratedColumn<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get footerText => $composableBuilder(
+    column: $table.footerText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeCustomer => $composableBuilder(
+    column: $table.includeCustomer,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeInstallations => $composableBuilder(
+    column: $table.includeInstallations,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeMeasurements => $composableBuilder(
+    column: $table.includeMeasurements,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeDefects => $composableBuilder(
+    column: $table.includeDefects,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeMaterials => $composableBuilder(
+    column: $table.includeMaterials,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeTimeEntries => $composableBuilder(
+    column: $table.includeTimeEntries,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includePhotos => $composableBuilder(
+    column: $table.includePhotos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeSignature => $composableBuilder(
+    column: $table.includeSignature,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isDefault =>
+      $composableBuilder(column: $table.isDefault, builder: (column) => column);
+}
+
+class $$ReportTemplatesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReportTemplatesTable,
+          ReportTemplateRow,
+          $$ReportTemplatesTableFilterComposer,
+          $$ReportTemplatesTableOrderingComposer,
+          $$ReportTemplatesTableAnnotationComposer,
+          $$ReportTemplatesTableCreateCompanionBuilder,
+          $$ReportTemplatesTableUpdateCompanionBuilder,
+          (
+            ReportTemplateRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ReportTemplatesTable,
+              ReportTemplateRow
+            >,
+          ),
+          ReportTemplateRow,
+          PrefetchHooks Function()
+        > {
+  $$ReportTemplatesTableTableManager(
+    _$AppDatabase db,
+    $ReportTemplatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReportTemplatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReportTemplatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReportTemplatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> tenantId = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> reportType = const Value.absent(),
+                Value<String> titlePrefix = const Value.absent(),
+                Value<String> locale = const Value.absent(),
+                Value<String> primaryColor = const Value.absent(),
+                Value<String?> footerText = const Value.absent(),
+                Value<bool> includeCustomer = const Value.absent(),
+                Value<bool> includeInstallations = const Value.absent(),
+                Value<bool> includeMeasurements = const Value.absent(),
+                Value<bool> includeDefects = const Value.absent(),
+                Value<bool> includeMaterials = const Value.absent(),
+                Value<bool> includeTimeEntries = const Value.absent(),
+                Value<bool> includePhotos = const Value.absent(),
+                Value<bool> includeSignature = const Value.absent(),
+                Value<bool> isDefault = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReportTemplatesCompanion(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                name: name,
+                reportType: reportType,
+                titlePrefix: titlePrefix,
+                locale: locale,
+                primaryColor: primaryColor,
+                footerText: footerText,
+                includeCustomer: includeCustomer,
+                includeInstallations: includeInstallations,
+                includeMeasurements: includeMeasurements,
+                includeDefects: includeDefects,
+                includeMaterials: includeMaterials,
+                includeTimeEntries: includeTimeEntries,
+                includePhotos: includePhotos,
+                includeSignature: includeSignature,
+                isDefault: isDefault,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String tenantId,
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<String?> deletedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+                Value<String?> lastSyncedAt = const Value.absent(),
+                required String name,
+                Value<String> reportType = const Value.absent(),
+                Value<String> titlePrefix = const Value.absent(),
+                Value<String> locale = const Value.absent(),
+                Value<String> primaryColor = const Value.absent(),
+                Value<String?> footerText = const Value.absent(),
+                Value<bool> includeCustomer = const Value.absent(),
+                Value<bool> includeInstallations = const Value.absent(),
+                Value<bool> includeMeasurements = const Value.absent(),
+                Value<bool> includeDefects = const Value.absent(),
+                Value<bool> includeMaterials = const Value.absent(),
+                Value<bool> includeTimeEntries = const Value.absent(),
+                Value<bool> includePhotos = const Value.absent(),
+                Value<bool> includeSignature = const Value.absent(),
+                Value<bool> isDefault = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReportTemplatesCompanion.insert(
+                id: id,
+                tenantId: tenantId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                version: version,
+                syncStatus: syncStatus,
+                lastSyncedAt: lastSyncedAt,
+                name: name,
+                reportType: reportType,
+                titlePrefix: titlePrefix,
+                locale: locale,
+                primaryColor: primaryColor,
+                footerText: footerText,
+                includeCustomer: includeCustomer,
+                includeInstallations: includeInstallations,
+                includeMeasurements: includeMeasurements,
+                includeDefects: includeDefects,
+                includeMaterials: includeMaterials,
+                includeTimeEntries: includeTimeEntries,
+                includePhotos: includePhotos,
+                includeSignature: includeSignature,
+                isDefault: isDefault,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReportTemplatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReportTemplatesTable,
+      ReportTemplateRow,
+      $$ReportTemplatesTableFilterComposer,
+      $$ReportTemplatesTableOrderingComposer,
+      $$ReportTemplatesTableAnnotationComposer,
+      $$ReportTemplatesTableCreateCompanionBuilder,
+      $$ReportTemplatesTableUpdateCompanionBuilder,
+      (
+        ReportTemplateRow,
+        BaseReferences<_$AppDatabase, $ReportTemplatesTable, ReportTemplateRow>,
+      ),
+      ReportTemplateRow,
       PrefetchHooks Function()
     >;
 typedef $$ReportsTableCreateCompanionBuilder =
@@ -24956,6 +33576,19 @@ class $AppDatabaseManager {
       $$MaterialsTableTableManager(_db, _db.materials);
   $$WorkOrderMaterialsTableTableManager get workOrderMaterials =>
       $$WorkOrderMaterialsTableTableManager(_db, _db.workOrderMaterials);
+  $$TariffCatalogItemsTableTableManager get tariffCatalogItems =>
+      $$TariffCatalogItemsTableTableManager(_db, _db.tariffCatalogItems);
+  $$ObjectTariffAssignmentsTableTableManager get objectTariffAssignments =>
+      $$ObjectTariffAssignmentsTableTableManager(
+        _db,
+        _db.objectTariffAssignments,
+      );
+  $$WorkOrderServiceLinesTableTableManager get workOrderServiceLines =>
+      $$WorkOrderServiceLinesTableTableManager(_db, _db.workOrderServiceLines);
+  $$LegacyImportRecordsTableTableManager get legacyImportRecords =>
+      $$LegacyImportRecordsTableTableManager(_db, _db.legacyImportRecords);
+  $$ReportTemplatesTableTableManager get reportTemplates =>
+      $$ReportTemplatesTableTableManager(_db, _db.reportTemplates);
   $$ReportsTableTableManager get reports =>
       $$ReportsTableTableManager(_db, _db.reports);
   $$OutboxEntriesTableTableManager get outboxEntries =>
@@ -25023,6 +33656,10 @@ mixin _$WorkOrderDaoMixin on DatabaseAccessor<AppDatabase> {
   $WorkOrderInstallationsTable get workOrderInstallations =>
       attachedDatabase.workOrderInstallations;
   $TimeEntriesTable get timeEntries => attachedDatabase.timeEntries;
+  $ObjectTariffAssignmentsTable get objectTariffAssignments =>
+      attachedDatabase.objectTariffAssignments;
+  $WorkOrderServiceLinesTable get workOrderServiceLines =>
+      attachedDatabase.workOrderServiceLines;
   $OutboxEntriesTable get outboxEntries => attachedDatabase.outboxEntries;
   WorkOrderDaoManager get managers => WorkOrderDaoManager(this);
 }
@@ -25048,6 +33685,16 @@ class WorkOrderDaoManager {
       );
   $$TimeEntriesTableTableManager get timeEntries =>
       $$TimeEntriesTableTableManager(_db.attachedDatabase, _db.timeEntries);
+  $$ObjectTariffAssignmentsTableTableManager get objectTariffAssignments =>
+      $$ObjectTariffAssignmentsTableTableManager(
+        _db.attachedDatabase,
+        _db.objectTariffAssignments,
+      );
+  $$WorkOrderServiceLinesTableTableManager get workOrderServiceLines =>
+      $$WorkOrderServiceLinesTableTableManager(
+        _db.attachedDatabase,
+        _db.workOrderServiceLines,
+      );
   $$OutboxEntriesTableTableManager get outboxEntries =>
       $$OutboxEntriesTableTableManager(_db.attachedDatabase, _db.outboxEntries);
 }
@@ -25146,6 +33793,21 @@ class MaterialDaoManager {
       $$WorkOrderMaterialsTableTableManager(
         _db.attachedDatabase,
         _db.workOrderMaterials,
+      );
+}
+
+mixin _$ReportTemplateDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ReportTemplatesTable get reportTemplates => attachedDatabase.reportTemplates;
+  ReportTemplateDaoManager get managers => ReportTemplateDaoManager(this);
+}
+
+class ReportTemplateDaoManager {
+  final _$ReportTemplateDaoMixin _db;
+  ReportTemplateDaoManager(this._db);
+  $$ReportTemplatesTableTableManager get reportTemplates =>
+      $$ReportTemplatesTableTableManager(
+        _db.attachedDatabase,
+        _db.reportTemplates,
       );
 }
 

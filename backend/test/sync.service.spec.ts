@@ -25,6 +25,10 @@ describe("SyncService", () => {
           displayName: "Kunde",
           version: 2,
           deletedAt: null,
+          sourceSystem: "genesis",
+          sourceFile: "Daten/KFDSTAMM.MDB",
+          sourceTable: "GebStamm",
+          sourceKey: "customer:kfd:1",
         },
       ]),
     } as unknown as EntityCrudService;
@@ -47,11 +51,73 @@ describe("SyncService", () => {
         },
       ],
     });
+    const changes = result.changes as Array<{ data: Record<string, unknown> }>;
+    expect(changes[0].data).not.toHaveProperty("sourceSystem");
+    expect(changes[0].data).not.toHaveProperty("sourceFile");
+    expect(changes[0].data).not.toHaveProperty("sourceTable");
+    expect(changes[0].data).not.toHaveProperty("sourceKey");
     expect(result).toHaveProperty("nextCursor");
     expect(crud.list).toHaveBeenCalledWith("customers", "tenant-1", {
       includeDeleted: "true",
       since: "2026-01-01T00:00:00.000Z",
+      limit: "100000",
     });
+  });
+
+  it("keeps Genesis raw payload and source metadata for legacy record pulls", async () => {
+    const crud = {
+      list: jest.fn().mockResolvedValue([
+        {
+          id: "legacy-1",
+          tenantId: "tenant-1",
+          batchId: "batch-1",
+          sourceSystem: "genesis",
+          sourceFile: "Daten/KFKRECH.MDB",
+          sourceTable: "RechZeilen",
+          sourceKey: "row:KFKRECH.RechZeilen:0:abc",
+          rowHash: "abc",
+          rowIndex: 0,
+          recordType: "row",
+          mappedEntityType: null,
+          mappedEntityId: null,
+          payload: { OPRechNr: 123, PossBez: "Kontrolle" },
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+          deletedAt: null,
+          version: 1,
+        },
+      ]),
+    } as unknown as EntityCrudService;
+    const service = new SyncService(crud, prismaMock());
+
+    const result = await service.pull("tenant-1", {
+      entityType: "legacy_import_records",
+    });
+
+    expect(result.changes).toMatchObject([
+      {
+        entityType: "legacy_import_record",
+        operation: "upsert",
+        data: {
+          id: "legacy-1",
+          sourceFile: "Daten/KFKRECH.MDB",
+          sourceTable: "RechZeilen",
+          sourceKey: "row:KFKRECH.RechZeilen:0:abc",
+          payloadJson: JSON.stringify({ OPRechNr: 123, PossBez: "Kontrolle" }),
+        },
+      },
+    ]);
+    const changes = result.changes as Array<{ data: Record<string, unknown> }>;
+    expect(changes[0].data).not.toHaveProperty("payload");
+    expect(crud.list).toHaveBeenCalledWith(
+      "legacy_import_records",
+      "tenant-1",
+      {
+        includeDeleted: "true",
+        since: undefined,
+        limit: "100000",
+      },
+    );
   });
 
   it("rejects stale push entries as conflicts and stores idempotency state", async () => {
