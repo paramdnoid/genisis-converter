@@ -1,5 +1,9 @@
 // Shared iOS signing settings. Keep real team values in Signing.local.xcconfig.
 #include? "Signing.local.xcconfig"
 
-CODE_SIGN_STYLE = Automatic
-DEVELOPMENT_TEAM = $(IOS_DEVELOPMENT_TEAM)
+CODE_SIGN_STYLE[sdk=iphoneos*] = Automatic
+DEVELOPMENT_TEAM[sdk=iphoneos*] = $(IOS_DEVELOPMENT_TEAM)
+
+CODE_SIGNING_ALLOWED[sdk=iphonesimulator*] = NO
+CODE_SIGNING_REQUIRED[sdk=iphonesimulator*] = NO
+CODE_SIGN_IDENTITY[sdk=iphonesimulator*] =

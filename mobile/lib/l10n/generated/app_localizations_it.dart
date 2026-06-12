@@ -138,10 +138,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get startOrderAction => 'Avvia';
 
   @override
-  String get pauseOrderAction => 'Pausieren';
+  String get pauseOrderAction => 'Metti in pausa';
 
   @override
-  String get resumeOrderAction => 'Fortsetzen';
+  String get resumeOrderAction => 'Riprendi';
 
   @override
   String get allOrdersTooltip => 'Tutti gli ordini';
@@ -150,7 +150,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncStatusTitle => 'Stato sync';
 
   @override
-  String get syncNowTooltip => 'Jetzt synchronisieren';
+  String get syncNowTooltip => 'Sincronizza ora';
 
   @override
   String get syncStatusCleanMessage => 'Nessuna modifica locale nell\'outbox.';
@@ -175,6 +175,21 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsTitle => 'Impostazioni';
+
+  @override
+  String get languageTitle => 'Lingua';
+
+  @override
+  String get languageSystemOption => 'Sistema';
+
+  @override
+  String get languageGermanOption => 'Deutsch';
+
+  @override
+  String get languageFrenchOption => 'Français';
+
+  @override
+  String get languageItalianOption => 'Italiano';
 
   @override
   String get noAppointment => 'senza appuntamento';
@@ -216,59 +231,59 @@ class AppLocalizationsIt extends AppLocalizations {
   String get backToDashboardAction => 'Vai alla dashboard';
 
   @override
-  String get localRecordMissingMessage =>
-      'Der lokale Datensatz ist nicht vorhanden.';
+  String get localRecordMissingMessage => 'Il record locale non e disponibile.';
 
   @override
   String get localWorkOrderMissingMessage =>
-      'Der lokale Auftrag ist nicht vorhanden.';
+      'L\'ordine locale non e disponibile.';
 
   @override
-  String get workOrdersTitle => 'Aufträge';
+  String get workOrdersTitle => 'Ordini';
 
   @override
   String get workOrdersLoadErrorTitle =>
-      'Aufträge konnten nicht geladen werden';
+      'Non e stato possibile caricare gli ordini';
 
   @override
-  String get workOrdersSearchLabel => 'Aufträge suchen';
+  String get workOrdersSearchLabel => 'Cerca ordini';
 
   @override
-  String get workOrdersEmptyFilteredTitle => 'Keine passenden Aufträge';
+  String get workOrdersEmptyFilteredTitle => 'Nessun ordine corrispondente';
 
   @override
   String get workOrdersEmptyFilteredMessage =>
-      'Passe Suche oder Statusfilter an.';
+      'Adatta la ricerca o il filtro di stato.';
 
   @override
-  String get resetFilterAction => 'Filter zurücksetzen';
+  String get resetFilterAction => 'Reimposta filtro';
 
   @override
-  String get allFilterLabel => 'Alle';
+  String get allFilterLabel => 'Tutti';
 
   @override
-  String get locallyChangedStatus => 'Lokal geändert';
+  String get locallyChangedStatus => 'Modificato localmente';
 
   @override
-  String get completeOrderTooltip => 'Abschließen';
+  String get completeOrderTooltip => 'Chiudi';
 
   @override
-  String get workOrderDetailTitle => 'Auftragsdetail';
+  String get workOrderDetailTitle => 'Dettaglio ordine';
 
   @override
-  String get workOrderLoadErrorTitle => 'Auftrag konnte nicht geladen werden';
+  String get workOrderLoadErrorTitle =>
+      'Non e stato possibile caricare l\'ordine';
 
   @override
-  String get workOrderNotFoundTitle => 'Auftrag nicht gefunden';
+  String get workOrderNotFoundTitle => 'Ordine non trovato';
 
   @override
-  String get actualTimeLabel => 'Ist-Zeit';
+  String get actualTimeLabel => 'Tempo effettivo';
 
   @override
-  String get navigationOpenError => 'Navigation konnte nicht geöffnet werden.';
+  String get navigationOpenError => 'Impossibile aprire la navigazione.';
 
   @override
-  String get callOpenError => 'Anruf konnte nicht gestartet werden.';
+  String get callOpenError => 'Impossibile avviare la chiamata.';
 
   @override
   String get navigationAction => 'Navigation';
@@ -293,55 +308,55 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get phoneLabel => 'Telefon';
+  String get phoneLabel => 'Telefono';
 
   @override
-  String get addressLabel => 'Adresse';
+  String get addressLabel => 'Indirizzo';
 
   @override
-  String get customerTypeLabel => 'Typ';
+  String get customerTypeLabel => 'Tipo';
 
   @override
-  String get billingAddressLabel => 'Rechnungsadresse';
+  String get billingAddressLabel => 'Indirizzo di fatturazione';
 
   @override
-  String get customerTitle => 'Kunde';
+  String get customerTitle => 'Cliente';
 
   @override
-  String get customerOpenAction => 'Kunde öffnen';
+  String get customerOpenAction => 'Apri cliente';
 
   @override
-  String get objectTitle => 'Objekt';
+  String get objectTitle => 'Oggetto';
 
   @override
-  String get objectOpenAction => 'Objekt öffnen';
+  String get objectOpenAction => 'Apri oggetto';
 
   @override
-  String get installationsTitle => 'Anlagen';
+  String get installationsTitle => 'Impianti';
 
   @override
-  String get noLinkedInstallations => 'Keine Anlagen verknüpft.';
+  String get noLinkedInstallations => 'Nessun impianto collegato.';
 
   @override
-  String get processingSectionTitle => 'Bearbeitung';
+  String get processingSectionTitle => 'Lavorazione';
 
   @override
   String get checklistTitle => 'Checkliste';
 
   @override
-  String get measurementsTitle => 'Messungen';
+  String get measurementsTitle => 'Misurazioni';
 
   @override
-  String get defectsTitle => 'Mängel';
+  String get defectsTitle => 'Difetti';
 
   @override
   String get photosTitle => 'Fotos';
 
   @override
-  String get noPhotosTitle => 'Keine Fotos';
+  String get noPhotosTitle => 'Nessuna foto';
 
   @override
-  String get timeEntriesTitle => 'Zeiten';
+  String get timeEntriesTitle => 'Tempi';
 
   @override
   String get materialTitle => 'Material';
@@ -350,58 +365,59 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportTitle => 'Rapport';
 
   @override
-  String get signatureTitle => 'Unterschrift';
+  String get signatureTitle => 'Firma';
 
   @override
-  String get completeWorkOrderTitle => 'Auftrag abschließen';
+  String get completeWorkOrderTitle => 'Chiudi ordine';
 
   @override
   String get completionLoadErrorTitle =>
-      'Abschluss konnte nicht geladen werden';
+      'Non e stato possibile caricare la chiusura';
 
   @override
-  String get completionCheckTitle => 'Abschlussprüfung';
+  String get completionCheckTitle => 'Controllo finale';
 
   @override
-  String get readyStatus => 'Bereit';
+  String get readyStatus => 'Pronto';
 
   @override
   String get openStatus => 'Offen';
 
   @override
   String get completionReadyMessage =>
-      'Alle lokalen Mindestdaten sind vorhanden.';
+      'Tutti i dati minimi locali sono disponibili.';
 
   @override
-  String get saveLocallyCompleteAction => 'Lokal abschließen';
+  String get saveLocallyCompleteAction => 'Chiudi localmente';
 
   @override
-  String get reportsLoadErrorTitle => 'Rapporte konnten nicht geladen werden';
+  String get reportsLoadErrorTitle =>
+      'Non e stato possibile caricare i rapporti';
 
   @override
-  String get localReportFilesTitle => 'Lokale Rapportdateien';
+  String get localReportFilesTitle => 'File rapporto locali';
 
   @override
-  String get pdfReportTitle => 'PDF-Bericht';
+  String get pdfReportTitle => 'Rapporto PDF';
 
   @override
   String get pdfReportSourceMessage =>
-      'Rapportdaten werden aus der lokalen Datenbank geladen.';
+      'I dati del rapporto vengono caricati dal database locale.';
 
   @override
-  String get pdfSignerLabel => 'Unterzeichner';
+  String get pdfSignerLabel => 'Firmatario';
 
   @override
-  String get pdfNoSignatureMessage => 'Keine Signatur gespeichert.';
+  String get pdfNoSignatureMessage => 'Nessuna firma salvata.';
 
   @override
-  String get pdfNoEntriesMessage => 'Keine Einträge.';
+  String get pdfNoEntriesMessage => 'Nessuna voce.';
 
   @override
-  String get reportNoPdfTitle => 'Noch kein PDF erzeugt';
+  String get reportNoPdfTitle => 'Nessun PDF creato';
 
   @override
-  String get reportNoPdfMessage => 'Der Rapport kann offline generiert werden.';
+  String get reportNoPdfMessage => 'Il rapporto puo essere generato offline.';
 
   @override
   String get reportSavePdfAction => 'PDF lokal speichern';
@@ -450,105 +466,106 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get reportPreviewErrorTitle => 'Vorschau konnte nicht erstellt werden';
+  String get reportPreviewErrorTitle => 'Impossibile creare l\'anteprima';
 
   @override
-  String get reportNoPreviewTitle => 'Keine Vorschau';
+  String get reportNoPreviewTitle => 'Nessuna anteprima';
 
   @override
-  String get reportNoPreviewMessage => 'Der Auftrag ist lokal nicht vorhanden.';
+  String get reportNoPreviewMessage =>
+      'L\'ordine non e disponibile localmente.';
 
   @override
-  String get measurementsUnavailableTitle => 'Keine Messungen möglich';
+  String get measurementsUnavailableTitle => 'Misurazioni non possibili';
 
   @override
   String get measurementsLoadErrorTitle =>
-      'Messungen konnten nicht geladen werden';
+      'Non e stato possibile caricare le misurazioni';
 
   @override
-  String get measurementsEmptyTitle => 'Keine Messwerte erfasst';
+  String get measurementsEmptyTitle => 'Nessuna misurazione registrata';
 
   @override
   String get measurementsEmptyMessage =>
-      'Neue Messwerte werden lokal gespeichert.';
+      'Le nuove misurazioni vengono salvate localmente.';
 
   @override
-  String get recordedMeasurementsTitle => 'Erfasste Messungen';
+  String get recordedMeasurementsTitle => 'Misurazioni registrate';
 
   @override
-  String get measurementTypeLabel => 'Messart';
+  String get measurementTypeLabel => 'Tipo di misurazione';
 
   @override
-  String get noInstallationOption => 'Keine Anlage';
+  String get noInstallationOption => 'Nessun impianto';
 
   @override
-  String get installationFieldLabel => 'Anlage';
+  String get installationFieldLabel => 'Impianto';
 
   @override
-  String get valueFieldLabel => 'Wert';
+  String get valueFieldLabel => 'Valore';
 
   @override
-  String get unitFieldLabel => 'Einheit';
+  String get unitFieldLabel => 'Unita';
 
   @override
-  String get notesFieldLabel => 'Notizen';
+  String get notesFieldLabel => 'Note';
 
   @override
-  String get notesSectionTitle => 'Notizen';
+  String get notesSectionTitle => 'Note';
 
   @override
-  String get saveMeasurementAction => 'Messwert speichern';
+  String get saveMeasurementAction => 'Salva misurazione';
 
   @override
-  String get bluetoothMeasurementTitle => 'Bluetooth-Messgerät';
+  String get bluetoothMeasurementTitle => 'Misuratore Bluetooth';
 
   @override
   String get bluetoothMeasurementSubtitle =>
-      'BLE-Messgeräte scannen, verbinden und Messwerte direkt lokal übernehmen.';
+      'Scansiona e collega dispositivi BLE per salvare direttamente le misurazioni locali.';
 
   @override
-  String get startBluetoothScanAction => 'Scan starten';
+  String get startBluetoothScanAction => 'Avvia scansione';
 
   @override
-  String get stopBluetoothScanAction => 'Scan stoppen';
+  String get stopBluetoothScanAction => 'Ferma scansione';
 
   @override
-  String get bluetoothDevicesEmptyMessage => 'Noch kein Messgerät gefunden.';
+  String get bluetoothDevicesEmptyMessage => 'Nessun misuratore trovato.';
 
   @override
-  String get bluetoothDeviceConnectingStatus => 'Verbinden...';
+  String get bluetoothDeviceConnectingStatus => 'Connessione...';
 
   @override
-  String get bluetoothReadingSaveAction => 'Messwert übernehmen';
+  String get bluetoothReadingSaveAction => 'Acquisisci misurazione';
 
   @override
   String get bluetoothReadingSavedMessage =>
-      'Bluetooth-Messwert lokal gespeichert.';
+      'Misurazione Bluetooth salvata localmente.';
 
   @override
-  String get measurementDeviceLabel => 'Gerät';
+  String get measurementDeviceLabel => 'Dispositivo';
 
   @override
-  String get photosLoadErrorTitle => 'Fotos konnten nicht geladen werden';
+  String get photosLoadErrorTitle => 'Non e stato possibile caricare le foto';
 
   @override
-  String get photosEmptyTitle => 'Keine Fotos gespeichert';
+  String get photosEmptyTitle => 'Nessuna foto salvata';
 
   @override
   String get photosEmptyMessage =>
-      'Fotos werden lokal im App-Verzeichnis abgelegt.';
+      'Le foto vengono salvate localmente nella cartella dell\'app.';
 
   @override
-  String get photoAddTitle => 'Foto hinzufügen';
+  String get photoAddTitle => 'Aggiungi foto';
 
   @override
-  String get cameraAction => 'Kamera';
+  String get cameraAction => 'Fotocamera';
 
   @override
-  String get galleryAction => 'Galerie';
+  String get galleryAction => 'Galleria';
 
   @override
-  String get photoSavedMessage => 'Foto lokal gespeichert.';
+  String get photoSavedMessage => 'Foto salvata localmente.';
 
   @override
   String get photoTitle => 'Foto';
@@ -561,16 +578,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get photoMetadataMissingMessage =>
-      'Die lokale Fotometadatei ist nicht vorhanden.';
+      'I metadati locali della foto non sono disponibili.';
 
   @override
-  String get photoCaptionLabel => 'Bildnotiz';
+  String get photoCaptionLabel => 'Nota foto';
 
   @override
-  String get savePhotoCaptionAction => 'Bildnotiz speichern';
+  String get savePhotoCaptionAction => 'Salva nota foto';
 
   @override
-  String get photoCaptionSavedMessage => 'Bildnotiz lokal gespeichert.';
+  String get photoCaptionSavedMessage => 'Nota foto salvata localmente.';
 
   @override
   String get uploadPendingStatus => 'Upload offen';
@@ -579,37 +596,38 @@ class AppLocalizationsIt extends AppLocalizations {
   String get uploadedStatus => 'Uploaded';
 
   @override
-  String get defectAssignedStatus => 'Mangel zugeordnet';
+  String get defectAssignedStatus => 'Difetto assegnato';
 
   @override
-  String get objectLoadErrorTitle => 'Objekt konnte nicht geladen werden';
+  String get objectLoadErrorTitle =>
+      'Non e stato possibile caricare l\'oggetto';
 
   @override
-  String get objectNotFoundTitle => 'Objekt nicht gefunden';
+  String get objectNotFoundTitle => 'Oggetto non trovato';
 
   @override
-  String get accessNotesLabel => 'Zugang';
+  String get accessNotesLabel => 'Accesso';
 
   @override
-  String get safetyNotesLabel => 'Sicherheit';
+  String get safetyNotesLabel => 'Sicurezza';
 
   @override
-  String get objectNotesLabel => 'Notizen zum Objekt';
+  String get objectNotesLabel => 'Note sull\'oggetto';
 
   @override
-  String get saveNotesAction => 'Notizen speichern';
+  String get saveNotesAction => 'Salva note';
 
   @override
-  String get objectNotesSavedMessage => 'Objektnotizen lokal gespeichert.';
+  String get objectNotesSavedMessage => 'Note oggetto salvate localmente.';
 
   @override
-  String get objectHistoryTitle => 'Objekthistorie';
+  String get objectHistoryTitle => 'Storico oggetto';
 
   @override
-  String get objectNotesTitle => 'Objektnotizen';
+  String get objectNotesTitle => 'Note oggetto';
 
   @override
-  String get installationListSearchLabel => 'Anlage suchen';
+  String get installationListSearchLabel => 'Cerca impianto';
 
   @override
   String get installationScanTooltip => 'Scansiona QR/codice a barre';
@@ -634,70 +652,71 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get installationsLoadErrorTitle =>
-      'Anlagen konnten nicht geladen werden';
+      'Non e stato possibile caricare gli impianti';
 
   @override
-  String get installationsEmptyTitle => 'Keine Anlagen';
+  String get installationsEmptyTitle => 'Nessun impianto';
 
   @override
   String get installationsEmptyMessage =>
-      'Die Anlagen werden aus der lokalen DB geladen.';
+      'Gli impianti vengono caricati dal database locale.';
 
   @override
-  String get installationTitle => 'Anlage';
+  String get installationTitle => 'Impianto';
 
   @override
-  String get installationLoadErrorTitle => 'Anlage konnte nicht geladen werden';
+  String get installationLoadErrorTitle =>
+      'Non e stato possibile caricare l\'impianto';
 
   @override
-  String get installationNotFoundTitle => 'Anlage nicht gefunden';
+  String get installationNotFoundTitle => 'Impianto non trovato';
 
   @override
-  String get typeLabel => 'Typ';
+  String get typeLabel => 'Tipo';
 
   @override
-  String get fuelTypeLabel => 'Brennstoff';
+  String get fuelTypeLabel => 'Combustibile';
 
   @override
-  String get locationLabel => 'Standort';
+  String get locationLabel => 'Posizione';
 
   @override
-  String get serialNumberLabel => 'Seriennummer';
+  String get serialNumberLabel => 'Numero di serie';
 
   @override
-  String get lastServiceLabel => 'Letzte Arbeit';
+  String get lastServiceLabel => 'Ultimo intervento';
 
   @override
-  String get nextServiceLabel => 'Nächste Arbeit';
+  String get nextServiceLabel => 'Prossimo intervento';
 
   @override
-  String get installationNotesLabel => 'Notizen zur Anlage';
+  String get installationNotesLabel => 'Note sull\'impianto';
 
   @override
-  String get installationNotesTitle => 'Anlagennotizen';
+  String get installationNotesTitle => 'Note impianto';
 
   @override
   String get installationNotesSavedMessage =>
-      'Anlagennotizen lokal gespeichert.';
+      'Note impianto salvate localmente.';
 
   @override
-  String get installationPhotosTitle => 'Fotos zur Anlage';
+  String get installationPhotosTitle => 'Foto dell\'impianto';
 
   @override
-  String get installationPhotosEmptyTitle => 'Keine Anlagenfotos';
+  String get installationPhotosEmptyTitle => 'Nessuna foto impianto';
 
   @override
-  String get installationHistoryTitle => 'Anlagenhistorie';
+  String get installationHistoryTitle => 'Storico impianto';
 
   @override
-  String get loginTitle => 'Anmeldung';
+  String get loginTitle => 'Accesso';
 
   @override
-  String get loginAccessTitle => 'Technikerzugang';
+  String get loginAccessTitle => 'Accesso tecnico';
 
   @override
   String get loginAccessMessage =>
-      'Lokale Sitzungen bleiben später auch ohne Verbindung nutzbar.';
+      'Le sessioni locali resteranno utilizzabili anche senza connessione.';
 
   @override
   String get emailFieldLabel => 'E-Mail';
@@ -706,132 +725,136 @@ class AppLocalizationsIt extends AppLocalizations {
   String get passwordFieldLabel => 'Passwort';
 
   @override
-  String get openDemoSessionAction => 'Demo-Sitzung öffnen';
+  String get openDemoSessionAction => 'Apri sessione demo';
 
   @override
-  String get continueOfflineAction => 'Offline fortfahren';
+  String get continueOfflineAction => 'Continua offline';
 
   @override
   String get syncStatusLoadErrorTitle =>
-      'Sync-Status konnte nicht geladen werden';
+      'Non e stato possibile caricare lo stato sync';
 
   @override
-  String get syncEntriesEmptyTitle => 'Keine offenen Sync-Einträge';
+  String get syncEntriesEmptyTitle => 'Nessuna voce sync aperta';
 
   @override
-  String get syncEntriesEmptyMessage => 'Lokale Änderungen sind abgearbeitet.';
+  String get syncEntriesEmptyMessage => 'Le modifiche locali sono completate.';
 
   @override
-  String get signerNameLabel => 'Name Unterzeichner';
+  String get signerNameLabel => 'Nome firmatario';
 
   @override
-  String get clearAction => 'Leeren';
+  String get clearAction => 'Cancella';
 
   @override
-  String get undoAction => 'Undo';
+  String get undoAction => 'Annulla';
 
   @override
-  String get saveSignatureAction => 'Signatur speichern';
+  String get saveSignatureAction => 'Salva firma';
 
   @override
-  String get timeEntriesLoadErrorTitle => 'Zeiten konnten nicht geladen werden';
+  String get timeEntriesLoadErrorTitle =>
+      'Non e stato possibile caricare i tempi';
 
   @override
-  String get timeEntriesEmptyTitle => 'Keine Zeiten erfasst';
+  String get timeEntriesEmptyTitle => 'Nessun tempo registrato';
 
   @override
   String get timeEntriesEmptyMessage =>
-      'Start/Stop-Zeiten werden lokal gespeichert.';
+      'I tempi start/stop vengono salvati localmente.';
 
   @override
-  String get timeEntryTypeLabel => 'Zeittyp';
+  String get timeEntryTypeLabel => 'Tipo di tempo';
 
   @override
-  String get durationMinutesLabel => 'Dauer in Minuten';
+  String get durationMinutesLabel => 'Durata in minuti';
 
   @override
-  String get saveTimeEntryAction => 'Zeit speichern';
+  String get saveTimeEntryAction => 'Salva tempo';
 
   @override
-  String get goToLoginAction => 'Zur Anmeldung';
+  String get goToLoginAction => 'Vai all\'accesso';
 
   @override
-  String get defectsUnavailableTitle => 'Keine Mängel möglich';
+  String get defectsUnavailableTitle => 'Difetti non possibili';
 
   @override
-  String get defectsLoadErrorTitle => 'Mängel konnten nicht geladen werden';
+  String get defectsLoadErrorTitle =>
+      'Non e stato possibile caricare i difetti';
 
   @override
-  String get defectsEmptyTitle => 'Keine Mängel erfasst';
+  String get defectsEmptyTitle => 'Nessun difetto registrato';
 
   @override
-  String get defectsEmptyMessage => 'Neue Mängel werden lokal gespeichert.';
+  String get defectsEmptyMessage =>
+      'I nuovi difetti vengono salvati localmente.';
 
   @override
-  String get recordedDefectsTitle => 'Erfasste Mängel';
+  String get recordedDefectsTitle => 'Difetti registrati';
 
   @override
-  String get defectAddTitle => 'Mangel erfassen';
+  String get defectAddTitle => 'Registra difetto';
 
   @override
-  String get severityLabel => 'Schweregrad';
+  String get severityLabel => 'Gravita';
 
   @override
-  String get titleFieldLabel => 'Titel';
+  String get titleFieldLabel => 'Titolo';
 
   @override
-  String get descriptionFieldLabel => 'Beschreibung';
+  String get descriptionFieldLabel => 'Descrizione';
 
   @override
-  String get recommendedActionLabel => 'Empfohlene Massnahme';
+  String get recommendedActionLabel => 'Azione consigliata';
 
   @override
-  String get saveDefectAction => 'Mangel speichern';
+  String get saveDefectAction => 'Salva difetto';
 
   @override
-  String get measureLabel => 'Massnahme';
+  String get measureLabel => 'Azione';
 
   @override
-  String get assignPhotoAction => 'Foto zuordnen';
+  String get assignPhotoAction => 'Assegna foto';
 
   @override
-  String get resolveAction => 'Erledigen';
+  String get resolveAction => 'Completa';
 
   @override
-  String get resolvedStatus => 'Erledigt';
+  String get resolvedStatus => 'Completato';
 
   @override
-  String get noPhotosInOrderMessage => 'Noch keine Fotos im Auftrag.';
+  String get noPhotosInOrderMessage => 'Nessuna foto nell\'ordine.';
 
   @override
-  String get materialLoadErrorTitle => 'Material konnte nicht geladen werden';
+  String get materialLoadErrorTitle =>
+      'Non e stato possibile caricare il materiale';
 
   @override
   String get materialCatalogLoadErrorTitle =>
-      'Materialstamm konnte nicht geladen werden';
+      'Non e stato possibile caricare il catalogo materiali';
 
   @override
-  String get materialEmptyTitle => 'Kein Material erfasst';
+  String get materialEmptyTitle => 'Nessun materiale registrato';
 
   @override
   String get materialEmptyMessage =>
-      'Verbrauch wird lokal am Auftrag gespeichert.';
+      'Il consumo viene salvato localmente sull\'ordine.';
 
   @override
-  String get materialAddTitle => 'Material erfassen';
+  String get materialAddTitle => 'Registra materiale';
 
   @override
-  String get freeTextOption => 'Freitext';
+  String get freeTextOption => 'Testo libero';
 
   @override
-  String get materialCatalogFieldLabel => 'Materialstamm';
+  String get materialCatalogFieldLabel => 'Catalogo materiali';
 
   @override
-  String get materialStockSectionTitle => 'Lagerbestand';
+  String get materialStockSectionTitle => 'Giacenza';
 
   @override
   String materialStockAvailable(Object quantity, Object unit) {
-    return 'Bestand: $quantity $unit';
+    return 'Giacenza: $quantity $unit';
   }
 
   @override
@@ -840,40 +863,40 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get materialLowStockLabel => 'Knapp';
+  String get materialLowStockLabel => 'Scarso';
 
   @override
   String get materialSufficientStockLabel => 'OK';
 
   @override
-  String get nameFieldLabel => 'Bezeichnung';
+  String get nameFieldLabel => 'Descrizione';
 
   @override
-  String get quantityFieldLabel => 'Menge';
+  String get quantityFieldLabel => 'Quantita';
 
   @override
-  String get saveMaterialAction => 'Material speichern';
+  String get saveMaterialAction => 'Salva materiale';
 
   @override
   String get profileTitle => 'Profil';
 
   @override
-  String get storageTitle => 'Speicher';
+  String get storageTitle => 'Memoria';
 
   @override
   String get appVersionTitle => 'App-Version';
 
   @override
-  String get calculatingStatus => 'wird berechnet';
+  String get calculatingStatus => 'calcolo in corso';
 
   @override
-  String get demoTechnician => 'Demo-Techniker';
+  String get demoTechnician => 'Tecnico demo';
 
   @override
-  String get openSyncStatusAction => 'Sync-Status öffnen';
+  String get openSyncStatusAction => 'Apri stato sync';
 
   @override
-  String get createDebugExportAction => 'Debug Export erstellen';
+  String get createDebugExportAction => 'Crea export debug';
 
   @override
   String get logoutAction => 'Logout';
@@ -884,56 +907,59 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get profileLoadErrorTitle => 'Profil konnte nicht geladen werden';
+  String get profileLoadErrorTitle =>
+      'Non e stato possibile caricare il profilo';
 
   @override
-  String get profileUnavailableTitle => 'Profil nicht verfügbar';
+  String get profileUnavailableTitle => 'Profilo non disponibile';
 
   @override
-  String get profileUnavailableMessage => 'Die lokalen Stammdaten fehlen.';
+  String get profileUnavailableMessage => 'I dati locali di base mancano.';
 
   @override
-  String get roleLabel => 'Rolle';
+  String get roleLabel => 'Ruolo';
 
   @override
-  String get cityLabel => 'Ort';
+  String get cityLabel => 'Localita';
 
   @override
-  String get countryLabel => 'Land';
+  String get countryLabel => 'Paese';
 
   @override
-  String get customersTitle => 'Kunden';
+  String get customersTitle => 'Clienti';
 
   @override
-  String get customersLoadErrorTitle => 'Kunden konnten nicht geladen werden';
+  String get customersLoadErrorTitle =>
+      'Non e stato possibile caricare i clienti';
 
   @override
-  String get customersEmptyTitle => 'Keine Kunden';
+  String get customersEmptyTitle => 'Nessun cliente';
 
   @override
   String get customersEmptyMessage =>
-      'Kundendaten werden nach dem Sync lokal sichtbar.';
+      'I clienti saranno disponibili localmente dopo il sync.';
 
   @override
-  String get customerLoadErrorTitle => 'Kunde konnte nicht geladen werden';
+  String get customerLoadErrorTitle =>
+      'Non e stato possibile caricare il cliente';
 
   @override
-  String get customerNotFoundTitle => 'Kunde nicht gefunden';
+  String get customerNotFoundTitle => 'Cliente non trovato';
 
   @override
-  String get customerNotesLabel => 'Kundennotizen';
+  String get customerNotesLabel => 'Note cliente';
 
   @override
-  String get customerNotesSavedMessage => 'Kundennotizen lokal gespeichert.';
+  String get customerNotesSavedMessage => 'Note cliente salvate localmente.';
 
   @override
-  String get objectsTitle => 'Objekte';
+  String get objectsTitle => 'Oggetti';
 
   @override
-  String get objectsEmptyTitle => 'Keine Objekte';
+  String get objectsEmptyTitle => 'Nessun oggetto';
 
   @override
-  String get orderHistoryTitle => 'Auftragshistorie';
+  String get orderHistoryTitle => 'Storico ordini';
 
   @override
   String get historyTotalMetricLabel => 'Totale';
@@ -963,93 +989,92 @@ class AppLocalizationsIt extends AppLocalizations {
   String get historyNoUpcomingOrders => 'nessun appuntamento aperto';
 
   @override
-  String get previousOrdersEmptyTitle => 'Keine früheren Aufträge';
+  String get previousOrdersEmptyTitle => 'Nessun ordine precedente';
 
   @override
-  String get ordersEmptyTitle => 'Keine Aufträge';
+  String get ordersEmptyTitle => 'Nessun ordine';
 
   @override
   String get checklistLoadErrorTitle =>
-      'Checkliste konnte nicht geladen werden';
+      'Non e stato possibile caricare la checklist';
 
   @override
-  String get checklistUnavailableTitle => 'Keine Checkliste verfügbar';
+  String get checklistUnavailableTitle => 'Nessuna checklist disponibile';
 
   @override
-  String get checklistTemplateMissingTitle => 'Keine Vorlage gefunden';
+  String get checklistTemplateMissingTitle => 'Nessun modello trovato';
 
   @override
   String get checklistMissingTemplateMessage =>
-      'Für diesen Auftragstyp existiert lokal keine aktive Vorlage.';
+      'Per questo tipo di ordine non esiste un modello locale attivo.';
 
   @override
-  String get commentFieldLabel => 'Kommentar';
+  String get commentFieldLabel => 'Commento';
 
   @override
-  String get yesOption => 'Ja';
+  String get yesOption => 'Si';
 
   @override
   String get noOption => 'Nein';
 
   @override
-  String get answerFieldLabel => 'Antwort';
+  String get answerFieldLabel => 'Risposta';
 
   @override
-  String get numberFieldLabel => 'Zahl';
+  String get numberFieldLabel => 'Numero';
 
   @override
-  String get selectionFieldLabel => 'Auswahl';
+  String get selectionFieldLabel => 'Selezione';
 
   @override
-  String get photoRequiredRecordedTitle => 'Fotopflicht notiert';
+  String get photoRequiredRecordedTitle => 'Obbligo foto annotato';
 
   @override
-  String get unknownAnswerTypeMessage => 'Unbekannter Antworttyp.';
+  String get unknownAnswerTypeMessage => 'Tipo di risposta sconosciuto.';
 
   @override
-  String get locallySavedStatus => 'Lokal gespeichert';
+  String get locallySavedStatus => 'Salvato localmente';
 
   @override
-  String get initialSyncTitle => 'Initialer Sync';
+  String get initialSyncTitle => 'Sync iniziale';
 
   @override
-  String get initialSyncReadyLabel => 'Bereit';
+  String get initialSyncReadyLabel => 'Pronto';
 
   @override
-  String get initialSyncLoadTitle => 'Arbeitsdaten laden';
+  String get initialSyncLoadTitle => 'Carica dati di lavoro';
 
   @override
-  String get initialSyncLoadMinimalAction => 'Minimaldaten laden';
+  String get initialSyncLoadMinimalAction => 'Carica dati minimi';
 
   @override
-  String get initialSyncOpenDatabaseStep => 'Lokale Datenbank öffnen';
+  String get initialSyncOpenDatabaseStep => 'Aprire database locale';
 
   @override
-  String get initialSyncProfileStep => 'Benutzerprofil prüfen';
+  String get initialSyncProfileStep => 'Verificare profilo utente';
 
   @override
-  String get initialSyncOrdersStep => 'Aufträge und Kunden bereitstellen';
+  String get initialSyncOrdersStep => 'Preparare ordini e clienti';
 
   @override
-  String get initialSyncObjectsStep => 'Objekte und Anlagen bereitstellen';
+  String get initialSyncObjectsStep => 'Preparare oggetti e impianti';
 
   @override
-  String get initialSyncChecklistStep =>
-      'Checklisten und Materialstamm bereitstellen';
+  String get initialSyncChecklistStep => 'Preparare checklist e materiali';
 
   @override
-  String get initialSyncFailedLabel => 'Initialer Sync fehlgeschlagen';
+  String get initialSyncFailedLabel => 'Sync iniziale fallito';
 
   @override
-  String get customerSignatureTitle => 'Kundenunterschrift';
+  String get customerSignatureTitle => 'Firma cliente';
 
   @override
-  String get timeEntryAddTitle => 'Zeit erfassen';
+  String get timeEntryAddTitle => 'Registra tempo';
 
   @override
-  String get durationPositiveError => 'Dauer muss groesser als 0 sein.';
+  String get durationPositiveError => 'La durata deve essere maggiore di 0.';
 
   @override
   String get splashTagline =>
-      'Einsätze, Rapporte und lokale Arbeitsdaten für den Feldalltag.';
+      'Interventi, rapporti e dati locali per il lavoro sul campo.';
 }

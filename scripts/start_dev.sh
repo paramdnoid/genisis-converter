@@ -11,6 +11,7 @@ RUN_MIGRATIONS="${RUN_MIGRATIONS:-1}"
 MIGRATION_MODE="${MIGRATION_MODE:-deploy}"
 RUN_SEED="${RUN_SEED:-1}"
 DEVICE_ID="${DEVICE_ID:-}"
+PREFER_IOS_SIMULATOR="${PREFER_IOS_SIMULATOR:-0}"
 START_PRISMA_STUDIO="${START_PRISMA_STUDIO:-0}"
 BACKEND_PID=""
 STUDIO_PID=""
@@ -30,7 +31,7 @@ Options:
   --mobile                     Force Flutter run
   --device <id>                Pass a Flutter device id, e.g. chrome or emulator-5554
   --android                    Shortcut for --device android
-  --ios                        Shortcut for --device ios
+  --ios, --ios-simulator       Boot and run an iOS simulator without code signing
   --chrome                     Shortcut for --device chrome
   --studio                     Start Prisma Studio too
   --skip-setup                 Skip npm install / flutter pub get
@@ -44,6 +45,8 @@ Useful env overrides:
   API_BASE_URL=http://localhost:3000
   PORT=3000
   DEVICE_ID=chrome
+  IOS_SIMULATOR_DEVICE_ID=<simulator-udid>
+  PREFER_IOS_SIMULATOR=1|0
   START_MOBILE=auto|1|0
   RUN_SETUP=auto|1|0
   RUN_MIGRATIONS=1|0
@@ -162,6 +165,44 @@ is_android_target() {
   [[ "$device_id" == android* || "$device_id" == emulator-* || "$target_platform" == android* ]]
 }
 
+ios_simulator_id() {
+  local requested_device_id="${IOS_SIMULATOR_DEVICE_ID:-}"
+  local simulator_id
+  local devices
+
+  command_exists xcrun || die "xcrun is required for iOS simulator startup"
+
+  if [[ -n "$requested_device_id" ]]; then
+    printf '%s\n' "$requested_device_id"
+    return 0
+  fi
+
+  devices="$(xcrun simctl list devices available)"
+
+  simulator_id="$(printf '%s\n' "$devices" \
+    | sed -nE 's/^[[:space:]]*iPhone.*\(([0-9A-F-]{36})\) \(Booted\).*$/\1/p' \
+    | head -n 1)"
+  if [[ -n "$simulator_id" ]]; then
+    printf '%s\n' "$simulator_id"
+    return 0
+  fi
+
+  printf '%s\n' "$devices" \
+    | sed -nE 's/^[[:space:]]*iPhone.*\(([0-9A-F-]{36})\) \(Shutdown\).*$/\1/p' \
+    | head -n 1
+}
+
+boot_ios_simulator() {
+  local simulator_id="$1"
+
+  [[ -n "$simulator_id" ]] || die "No available iOS simulator found"
+
+  log "Booting iOS simulator $simulator_id"
+  xcrun simctl boot "$simulator_id" >/dev/null 2>&1 || true
+  open -a Simulator --args -CurrentDeviceUDID "$simulator_id" >/dev/null 2>&1 || open -a Simulator
+  xcrun simctl bootstatus "$simulator_id" -b >/dev/null
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --backend-only|--no-mobile)
@@ -183,8 +224,8 @@ while [[ $# -gt 0 ]]; do
       START_MOBILE=1
       shift
       ;;
-    --ios)
-      DEVICE_ID="ios"
+    --ios|--ios-simulator)
+      PREFER_IOS_SIMULATOR=1
       START_MOBILE=1
       shift
       ;;
@@ -303,6 +344,11 @@ if [[ "$START_MOBILE" == "auto" ]]; then
 fi
 
 if [[ "$START_MOBILE" == "1" ]]; then
+  if [[ "$PREFER_IOS_SIMULATOR" == "1" ]]; then
+    DEVICE_ID="$(ios_simulator_id)"
+    boot_ios_simulator "$DEVICE_ID"
+  fi
+
   if [[ -z "$DEVICE_ID" ]]; then
     DEVICE_ID="$(flutter_device_field id)"
   fi

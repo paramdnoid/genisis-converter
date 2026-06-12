@@ -137,10 +137,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get startOrderAction => 'Demarrer';
 
   @override
-  String get pauseOrderAction => 'Pausieren';
+  String get pauseOrderAction => 'Pause';
 
   @override
-  String get resumeOrderAction => 'Fortsetzen';
+  String get resumeOrderAction => 'Reprendre';
 
   @override
   String get allOrdersTooltip => 'Tous les ordres';
@@ -149,7 +149,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncStatusTitle => 'Statut de sync';
 
   @override
-  String get syncNowTooltip => 'Jetzt synchronisieren';
+  String get syncNowTooltip => 'Synchroniser maintenant';
 
   @override
   String get syncStatusCleanMessage =>
@@ -175,6 +175,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsTitle => 'Parametres';
+
+  @override
+  String get languageTitle => 'Langue';
+
+  @override
+  String get languageSystemOption => 'Systeme';
+
+  @override
+  String get languageGermanOption => 'Deutsch';
+
+  @override
+  String get languageFrenchOption => 'Français';
+
+  @override
+  String get languageItalianOption => 'Italiano';
 
   @override
   String get noAppointment => 'sans rendez-vous';
@@ -218,49 +233,48 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get localRecordMissingMessage =>
-      'Der lokale Datensatz ist nicht vorhanden.';
+      'L\'enregistrement local est introuvable.';
 
   @override
-  String get localWorkOrderMissingMessage =>
-      'Der lokale Auftrag ist nicht vorhanden.';
+  String get localWorkOrderMissingMessage => 'L\'ordre local est introuvable.';
 
   @override
-  String get workOrdersTitle => 'Aufträge';
+  String get workOrdersTitle => 'Ordres';
 
   @override
   String get workOrdersLoadErrorTitle =>
-      'Aufträge konnten nicht geladen werden';
+      'Les ordres n\'ont pas pu etre charges';
 
   @override
-  String get workOrdersSearchLabel => 'Aufträge suchen';
+  String get workOrdersSearchLabel => 'Rechercher des ordres';
 
   @override
-  String get workOrdersEmptyFilteredTitle => 'Keine passenden Aufträge';
+  String get workOrdersEmptyFilteredTitle => 'Aucun ordre correspondant';
 
   @override
   String get workOrdersEmptyFilteredMessage =>
-      'Passe Suche oder Statusfilter an.';
+      'Adapte la recherche ou le filtre de statut.';
 
   @override
-  String get resetFilterAction => 'Filter zurücksetzen';
+  String get resetFilterAction => 'Reinitialiser le filtre';
 
   @override
-  String get allFilterLabel => 'Alle';
+  String get allFilterLabel => 'Tous';
 
   @override
-  String get locallyChangedStatus => 'Lokal geändert';
+  String get locallyChangedStatus => 'Modifie localement';
 
   @override
-  String get completeOrderTooltip => 'Abschließen';
+  String get completeOrderTooltip => 'Cloturer';
 
   @override
-  String get workOrderDetailTitle => 'Auftragsdetail';
+  String get workOrderDetailTitle => 'Detail de l\'ordre';
 
   @override
-  String get workOrderLoadErrorTitle => 'Auftrag konnte nicht geladen werden';
+  String get workOrderLoadErrorTitle => 'L\'ordre n\'a pas pu etre charge';
 
   @override
-  String get workOrderNotFoundTitle => 'Auftrag nicht gefunden';
+  String get workOrderNotFoundTitle => 'Ordre introuvable';
 
   @override
   String get actualTimeLabel => 'Ist-Zeit';
@@ -318,10 +332,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get objectOpenAction => 'Objekt öffnen';
 
   @override
-  String get installationsTitle => 'Anlagen';
+  String get installationsTitle => 'Installations';
 
   @override
-  String get noLinkedInstallations => 'Keine Anlagen verknüpft.';
+  String get noLinkedInstallations => 'Aucune installation liee.';
 
   @override
   String get processingSectionTitle => 'Bearbeitung';
@@ -333,13 +347,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get measurementsTitle => 'Messungen';
 
   @override
-  String get defectsTitle => 'Mängel';
+  String get defectsTitle => 'Defauts';
 
   @override
   String get photosTitle => 'Fotos';
 
   @override
-  String get noPhotosTitle => 'Keine Fotos';
+  String get noPhotosTitle => 'Aucune photo';
 
   @override
   String get timeEntriesTitle => 'Zeiten';
@@ -393,10 +407,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pdfSignerLabel => 'Unterzeichner';
 
   @override
-  String get pdfNoSignatureMessage => 'Keine Signatur gespeichert.';
+  String get pdfNoSignatureMessage => 'Aucune signature enregistree.';
 
   @override
-  String get pdfNoEntriesMessage => 'Keine Einträge.';
+  String get pdfNoEntriesMessage => 'Aucune entree.';
 
   @override
   String get reportNoPdfTitle => 'Noch kein PDF erzeugt';
@@ -452,36 +466,36 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get reportPreviewErrorTitle => 'Vorschau konnte nicht erstellt werden';
+  String get reportPreviewErrorTitle => 'L\'apercu n\'a pas pu etre cree';
 
   @override
-  String get reportNoPreviewTitle => 'Keine Vorschau';
+  String get reportNoPreviewTitle => 'Aucun apercu';
 
   @override
-  String get reportNoPreviewMessage => 'Der Auftrag ist lokal nicht vorhanden.';
+  String get reportNoPreviewMessage => 'L\'ordre n\'existe pas localement.';
 
   @override
-  String get measurementsUnavailableTitle => 'Keine Messungen möglich';
+  String get measurementsUnavailableTitle => 'Mesures impossibles';
 
   @override
   String get measurementsLoadErrorTitle =>
-      'Messungen konnten nicht geladen werden';
+      'Les mesures n\'ont pas pu etre chargees';
 
   @override
-  String get measurementsEmptyTitle => 'Keine Messwerte erfasst';
+  String get measurementsEmptyTitle => 'Aucune mesure saisie';
 
   @override
   String get measurementsEmptyMessage =>
-      'Neue Messwerte werden lokal gespeichert.';
+      'Les nouvelles mesures sont enregistrees localement.';
 
   @override
-  String get recordedMeasurementsTitle => 'Erfasste Messungen';
+  String get recordedMeasurementsTitle => 'Mesures saisies';
 
   @override
   String get measurementTypeLabel => 'Messart';
 
   @override
-  String get noInstallationOption => 'Keine Anlage';
+  String get noInstallationOption => 'Aucune installation';
 
   @override
   String get installationFieldLabel => 'Anlage';
@@ -531,14 +545,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get measurementDeviceLabel => 'Gerät';
 
   @override
-  String get photosLoadErrorTitle => 'Fotos konnten nicht geladen werden';
+  String get photosLoadErrorTitle => 'Les photos n\'ont pas pu etre chargees';
 
   @override
-  String get photosEmptyTitle => 'Keine Fotos gespeichert';
+  String get photosEmptyTitle => 'Aucune photo enregistree';
 
   @override
   String get photosEmptyMessage =>
-      'Fotos werden lokal im App-Verzeichnis abgelegt.';
+      'Les photos sont stockees localement dans le dossier de l\'app.';
 
   @override
   String get photoAddTitle => 'Foto hinzufügen';
@@ -563,7 +577,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get photoMetadataMissingMessage =>
-      'Die lokale Fotometadatei ist nicht vorhanden.';
+      'Les metadonnees locales de la photo sont introuvables.';
 
   @override
   String get photoCaptionLabel => 'Bildnotiz';
@@ -581,13 +595,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get uploadedStatus => 'Uploaded';
 
   @override
-  String get defectAssignedStatus => 'Mangel zugeordnet';
+  String get defectAssignedStatus => 'Defaut lie';
 
   @override
-  String get objectLoadErrorTitle => 'Objekt konnte nicht geladen werden';
+  String get objectLoadErrorTitle => 'L\'objet n\'a pas pu etre charge';
 
   @override
-  String get objectNotFoundTitle => 'Objekt nicht gefunden';
+  String get objectNotFoundTitle => 'Objet introuvable';
 
   @override
   String get accessNotesLabel => 'Zugang';
@@ -637,23 +651,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get installationsLoadErrorTitle =>
-      'Anlagen konnten nicht geladen werden';
+      'Les installations n\'ont pas pu etre chargees';
 
   @override
-  String get installationsEmptyTitle => 'Keine Anlagen';
+  String get installationsEmptyTitle => 'Aucune installation';
 
   @override
   String get installationsEmptyMessage =>
-      'Die Anlagen werden aus der lokalen DB geladen.';
+      'Les installations sont chargees depuis la base locale.';
 
   @override
-  String get installationTitle => 'Anlage';
+  String get installationTitle => 'Installation';
 
   @override
-  String get installationLoadErrorTitle => 'Anlage konnte nicht geladen werden';
+  String get installationLoadErrorTitle =>
+      'L\'installation n\'a pas pu etre chargee';
 
   @override
-  String get installationNotFoundTitle => 'Anlage nicht gefunden';
+  String get installationNotFoundTitle => 'Installation introuvable';
 
   @override
   String get typeLabel => 'Typ';

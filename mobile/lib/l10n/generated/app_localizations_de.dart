@@ -178,6 +178,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsTitle => 'Einstellungen';
 
   @override
+  String get languageTitle => 'Sprache';
+
+  @override
+  String get languageSystemOption => 'System';
+
+  @override
+  String get languageGermanOption => 'Deutsch';
+
+  @override
+  String get languageFrenchOption => 'Français';
+
+  @override
+  String get languageItalianOption => 'Italiano';
+
+  @override
   String get noAppointment => 'ohne Termin';
 
   @override

@@ -388,6 +388,36 @@ abstract class AppLocalizations {
   /// **'Einstellungen'**
   String get settingsTitle;
 
+  /// No description provided for @languageTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Sprache'**
+  String get languageTitle;
+
+  /// No description provided for @languageSystemOption.
+  ///
+  /// In de, this message translates to:
+  /// **'System'**
+  String get languageSystemOption;
+
+  /// No description provided for @languageGermanOption.
+  ///
+  /// In de, this message translates to:
+  /// **'Deutsch'**
+  String get languageGermanOption;
+
+  /// No description provided for @languageFrenchOption.
+  ///
+  /// In de, this message translates to:
+  /// **'Français'**
+  String get languageFrenchOption;
+
+  /// No description provided for @languageItalianOption.
+  ///
+  /// In de, this message translates to:
+  /// **'Italiano'**
+  String get languageItalianOption;
+
   /// No description provided for @noAppointment.
   ///
   /// In de, this message translates to:
